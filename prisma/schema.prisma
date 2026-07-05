@@ -1,0 +1,199 @@
+// Prisma schema for the community launch platform MVP.
+// PostgreSQL. Run `npm run db:migrate` to create the database.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Users & auth
+// ---------------------------------------------------------------------------
+
+enum UserRole {
+  USER
+  MODERATOR
+  ADMIN
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  avatarUrl    String?  @map("avatar_url")
+  bio          String?
+  role         UserRole @default(USER)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  products          Product[]
+  upvotes           Upvote[]
+  comments          Comment[]
+  reportsFiled      ModerationReport[] @relation("ReportsFiled")
+  reportsResolved   ModerationReport[] @relation("ReportsResolved")
+  communityLinks    CommunityLink[]
+  extensionEvents   ExtensionEvent[]
+
+  @@map("users")
+}
+
+// ---------------------------------------------------------------------------
+// Products & categories
+// ---------------------------------------------------------------------------
+
+enum ProductStatus {
+  DRAFT
+  SCHEDULED
+  LIVE
+  ARCHIVED
+}
+
+model Category {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  slug     String    @unique
+  products Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id          String        @id @default(cuid())
+  makerId     String        @map("maker_id")
+  name        String
+  slug        String        @unique
+  tagline     String
+  description String
+  websiteUrl  String?       @map("website_url")
+  logoUrl     String?       @map("logo_url")
+  categoryId  String        @map("category_id")
+  launchDate  DateTime      @map("launch_date")
+  status      ProductStatus @default(DRAFT)
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  maker    User               @relation(fields: [makerId], references: [id], onDelete: Cascade)
+  category Category           @relation(fields: [categoryId], references: [id])
+  upvotes  Upvote[]
+  comments Comment[]
+  reports  ModerationReport[]
+
+  @@index([status, launchDate])
+  @@index([makerId])
+  @@index([categoryId])
+  @@map("products")
+}
+
+// ---------------------------------------------------------------------------
+// Engagement
+// ---------------------------------------------------------------------------
+
+model Upvote {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  productId String   @map("product_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  // One upvote per user per product, enforced at the database level.
+  @@unique([userId, productId])
+  @@index([productId])
+  @@map("upvotes")
+}
+
+model Comment {
+  id        String    @id @default(cuid())
+  userId    String    @map("user_id")
+  productId String    @map("product_id")
+  body      String
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at") // soft delete for moderation trail
+
+  user    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product            @relation(fields: [productId], references: [id], onDelete: Cascade)
+  reports ModerationReport[]
+
+  @@index([productId, createdAt])
+  @@map("comments")
+}
+
+// ---------------------------------------------------------------------------
+// Moderation
+// ---------------------------------------------------------------------------
+
+enum ReportStatus {
+  OPEN
+  REVIEWING
+  RESOLVED
+  DISMISSED
+}
+
+model ModerationReport {
+  id         String       @id @default(cuid())
+  reporterId String       @map("reporter_id")
+  productId  String?      @map("product_id")
+  commentId  String?      @map("comment_id")
+  reason     String
+  status     ReportStatus @default(OPEN)
+  resolvedById String?    @map("resolved_by_id")
+  createdAt  DateTime     @default(now()) @map("created_at")
+
+  reporter   User     @relation("ReportsFiled", fields: [reporterId], references: [id], onDelete: Cascade)
+  resolvedBy User?    @relation("ReportsResolved", fields: [resolvedById], references: [id])
+  product    Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  comment    Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@map("moderation_reports")
+}
+
+// ---------------------------------------------------------------------------
+// Browser-extension support (consent-based, manual submissions only)
+// ---------------------------------------------------------------------------
+// These tables only store links a user *explicitly chose* to submit.
+// There is no automation: no auto-upvoting, no scraping, no credential
+// storage. The extension calls the same authenticated APIs a human would.
+
+enum LinkStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+model CommunityLink {
+  id             String     @id @default(cuid())
+  submittedById  String     @map("submitted_by")
+  title          String
+  url            String
+  sourcePlatform String     @map("source_platform") // e.g. "skool"
+  type           String     // e.g. "logro", "milestone", "announcement"
+  status         LinkStatus @default(PENDING)
+  createdAt      DateTime   @default(now()) @map("created_at")
+
+  submittedBy User @relation(fields: [submittedById], references: [id], onDelete: Cascade)
+
+  // The same user cannot submit the same URL twice.
+  @@unique([submittedById, url])
+  @@index([status])
+  @@map("community_links")
+}
+
+model ExtensionEvent {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  eventType String   @map("event_type") // e.g. "link_submitted", "link_viewed"
+  metadata  Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("extension_events")
+}
