@@ -43,6 +43,10 @@ Seeded demo accounts (password `changeme123`, override with `SEED_USER_PASSWORD`
 
 ## API contract
 
+> 📖 **Docs interactivas:** con el server corriendo, abre `http://localhost:3000/api/docs`
+> (Swagger UI sobre [`public/openapi.yaml`](public/openapi.yaml) — contrato completo
+> de los 31 endpoints con bodies, respuestas y códigos de error).
+
 All responses: `{ data: … }` on success, `{ error: { message, details? } }` on failure. Auth via NextAuth session cookie.
 
 ### Auth & profile

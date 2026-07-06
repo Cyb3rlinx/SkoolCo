@@ -1,0 +1,630 @@
+openapi: 3.0.3
+info:
+  title: LaunchPad API
+  version: 0.2.0
+  description: |
+    Backend de la plataforma comunitaria de lanzamiento de productos.
+
+    **Convenciones**
+    - Respuestas exitosas: `{ "data": ... }`
+    - Errores: `{ "error": { "message": string, "details"?: object } }`
+    - Autenticación: sesión JWT de NextAuth vía cookie. El login se hace con
+      `signIn()` del cliente NextAuth o `POST /api/auth/callback/credentials`
+      (endpoint gestionado por NextAuth, no documentado aquí).
+    - Todos los endpoints de escritura validan el body con Zod; los límites
+      exactos (longitudes, rangos) se indican en cada schema.
+    - Varios endpoints tienen rate limiting; al excederlo responden `429`.
+servers:
+  - url: http://localhost:3000
+    description: Desarrollo local
+
+tags:
+  - name: Salud
+  - name: Auth
+  - name: Perfil
+  - name: Productos
+  - name: Engagement
+  - name: Leaderboard
+  - name: Notificaciones
+  - name: Moderación
+  - name: Extensión
+
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: next-auth.session-token
+      description: Cookie de sesión emitida por NextAuth al hacer login.
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            message: { type: string }
+            details: { type: object, nullable: true }
+    UserPublic:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        avatarUrl: { type: string, nullable: true }
+    Category:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        slug: { type: string }
+    ProductListItem:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        slug: { type: string }
+        tagline: { type: string }
+        logoUrl: { type: string, nullable: true }
+        websiteUrl: { type: string, nullable: true }
+        launchDate: { type: string, format: date-time }
+        status: { type: string, enum: [DRAFT, SCHEDULED, LIVE, ARCHIVED] }
+        createdAt: { type: string, format: date-time }
+        category: { $ref: '#/components/schemas/Category' }
+        maker: { $ref: '#/components/schemas/UserPublic' }
+        _count:
+          type: object
+          properties:
+            upvotes: { type: integer }
+            comments: { type: integer }
+    ProductDetail:
+      allOf:
+        - $ref: '#/components/schemas/ProductListItem'
+        - type: object
+          properties:
+            description: { type: string }
+            updatedAt: { type: string, format: date-time }
+            upvotedByMe: { type: boolean }
+    Comment:
+      type: object
+      properties:
+        id: { type: string }
+        body: { type: string }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        user: { $ref: '#/components/schemas/UserPublic' }
+    Notification:
+      type: object
+      properties:
+        id: { type: string }
+        type: { type: string, enum: [UPVOTE, COMMENT] }
+        readAt: { type: string, format: date-time, nullable: true }
+        createdAt: { type: string, format: date-time }
+        actor: { $ref: '#/components/schemas/UserPublic' }
+        product:
+          type: object
+          nullable: true
+          properties:
+            id: { type: string }
+            name: { type: string }
+            slug: { type: string }
+        comment:
+          type: object
+          nullable: true
+          properties:
+            id: { type: string }
+            body: { type: string }
+    Paginated:
+      type: object
+      properties:
+        page: { type: integer }
+        pageSize: { type: integer }
+        total: { type: integer }
+        totalPages: { type: integer }
+  responses:
+    Unauthorized:
+      description: No autenticado
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    Forbidden:
+      description: Sin permiso
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    NotFound:
+      description: No encontrado
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    RateLimited:
+      description: Demasiadas solicitudes
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    ValidationError:
+      description: Body inválido (Zod)
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+
+paths:
+  /api/health:
+    get:
+      tags: [Salud]
+      summary: Healthcheck (liveness + ping a la DB)
+      responses:
+        '200':
+          description: 'OK — `{ status: "ok", db: "ok" }`'
+        '503':
+          description: 'DB caída — `{ status: "degraded", db: "down" }`'
+
+  /api/auth/register:
+    post:
+      tags: [Auth]
+      summary: Crear cuenta
+      description: |
+        Rate limit: 5/hora/IP. Rechaza contraseñas presentes en filtraciones
+        conocidas (HIBP). Envía email de verificación (si el mailer está
+        configurado; si no, se loguea en consola del servidor).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, password]
+              properties:
+                name: { type: string, minLength: 2, maxLength: 80 }
+                email: { type: string, format: email, maxLength: 254 }
+                password: { type: string, minLength: 8, maxLength: 128 }
+      responses:
+        '201': { description: 'Usuario creado — `{ data: { id, name, email, role, createdAt } }`' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '409': { description: Email ya registrado }
+        '429': { $ref: '#/components/responses/RateLimited' }
+
+  /api/auth/forgot-password:
+    post:
+      tags: [Auth]
+      summary: Solicitar reset de contraseña
+      description: |
+        Siempre responde 200 con el mismo mensaje, exista o no el email
+        (anti-enumeración). Si existe, envía un link con token de 1 hora,
+        un solo uso. Rate limit por IP.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email: { type: string, format: email }
+      responses:
+        '200': { description: Mensaje genérico }
+        '429': { $ref: '#/components/responses/RateLimited' }
+
+  /api/auth/reset-password:
+    post:
+      tags: [Auth]
+      summary: Restablecer contraseña con token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token, password]
+              properties:
+                token: { type: string }
+                password: { type: string, minLength: 8, maxLength: 128 }
+      responses:
+        '200': { description: Contraseña actualizada }
+        '400': { description: Token inválido/expirado o contraseña filtrada (HIBP) }
+
+  /api/auth/verify-email:
+    post:
+      tags: [Auth]
+      summary: Verificar email con token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token]
+              properties:
+                token: { type: string }
+      responses:
+        '200': { description: Email verificado }
+        '400': { description: Token inválido o expirado }
+
+  /api/auth/resend-verification:
+    post:
+      tags: [Auth]
+      summary: Reenviar email de verificación
+      description: Respuesta genérica siempre (anti-enumeración). Rate limit 3/15min/IP.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email: { type: string, format: email }
+      responses:
+        '200': { description: Mensaje genérico }
+        '429': { $ref: '#/components/responses/RateLimited' }
+
+  /api/me:
+    get:
+      tags: [Perfil]
+      summary: Perfil propio
+      security: [{ sessionCookie: [] }]
+      responses:
+        '200': { description: 'Perfil + contadores `{ _count: { products, upvotes, comments } }`' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    patch:
+      tags: [Perfil]
+      summary: Actualizar perfil
+      security: [{ sessionCookie: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string, minLength: 2, maxLength: 80 }
+                bio: { type: string, maxLength: 500 }
+                avatarUrl: { type: string, format: uri, nullable: true }
+      responses:
+        '200': { description: Perfil actualizado }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    delete:
+      tags: [Perfil]
+      summary: Borrar cuenta (definitivo)
+      description: |
+        Requiere confirmar la contraseña. Borra en cascada productos, upvotes,
+        comentarios, links y tokens. Los reports que el usuario resolvió como
+        moderador conservan su historial con `resolvedBy = null`.
+      security: [{ sessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [password]
+              properties:
+                password: { type: string }
+      responses:
+        '204': { description: Cuenta eliminada }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { description: Contraseña incorrecta }
+
+  /api/categories:
+    get:
+      tags: [Productos]
+      summary: Categorías con conteo de productos LIVE
+      responses:
+        '200': { description: 'Lista `[{ id, name, slug, _count: { products } }]`' }
+
+  /api/products:
+    get:
+      tags: [Productos]
+      summary: Listar/buscar productos
+      description: |
+        Anónimos solo ven LIVE. Usuarios pueden filtrar por status pero solo
+        ven sus propios no-LIVE (staff ve todo).
+      parameters:
+        - { name: status, in: query, schema: { type: string, enum: [DRAFT, SCHEDULED, LIVE, ARCHIVED] } }
+        - { name: category, in: query, schema: { type: string }, description: slug de categoría }
+        - { name: q, in: query, schema: { type: string, maxLength: 100 }, description: búsqueda en nombre/tagline/descripción }
+        - { name: sort, in: query, schema: { type: string, enum: [newest, top, launching], default: newest } }
+        - { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+        - { name: pageSize, in: query, schema: { type: integer, minimum: 1, maximum: 50, default: 20 } }
+      responses:
+        '200':
+          description: Paginado de ProductListItem
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      tags: [Productos]
+      summary: Publicar un producto
+      description: 'Rate limit: 5/hora. El slug se genera del nombre (con -2, -3… si colisiona).'
+      security: [{ sessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, tagline, description, categoryId, launchDate]
+              properties:
+                name: { type: string, minLength: 2, maxLength: 80 }
+                tagline: { type: string, minLength: 4, maxLength: 140 }
+                description: { type: string, minLength: 10, maxLength: 5000 }
+                websiteUrl: { type: string, format: uri, nullable: true }
+                logoUrl: { type: string, format: uri, nullable: true }
+                categoryId: { type: string }
+                launchDate: { type: string, format: date-time }
+                status: { type: string, enum: [DRAFT, SCHEDULED, LIVE], default: DRAFT }
+      responses:
+        '201': { description: Producto creado }
+        '400': { description: Body inválido o categoría desconocida }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+
+  /api/products/{slug}:
+    parameters:
+      - { name: slug, in: path, required: true, schema: { type: string }, description: slug o id }
+    get:
+      tags: [Productos]
+      summary: Detalle de producto
+      description: Incluye `upvotedByMe`. No-LIVE visible solo para maker/staff.
+      responses:
+        '200': { description: ProductDetail }
+        '404': { $ref: '#/components/responses/NotFound' }
+    patch:
+      tags: [Productos]
+      summary: Editar producto (maker o staff)
+      security: [{ sessionCookie: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: Campos de creación, todos opcionales; status admite también ARCHIVED.
+              type: object
+      responses:
+        '200': { description: Producto actualizado }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      tags: [Productos]
+      summary: Archivar producto (soft delete; maker o staff)
+      security: [{ sessionCookie: [] }]
+      responses:
+        '204': { description: Archivado }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /api/products/{slug}/upvote:
+    parameters:
+      - { name: slug, in: path, required: true, schema: { type: string } }
+    post:
+      tags: [Engagement]
+      summary: Dar upvote (idempotente)
+      description: |
+        Solo productos LIVE. Un upvote por usuario (constraint de DB).
+        Repetir devuelve 200 sin duplicar. Notifica al maker (nunca a uno mismo).
+        Rate limit 30/min.
+      security: [{ sessionCookie: [] }]
+      responses:
+        '200': { description: '`{ upvoted: true, upvoteCount }`' }
+        '400': { description: Producto no LIVE }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+    delete:
+      tags: [Engagement]
+      summary: Quitar upvote (idempotente)
+      security: [{ sessionCookie: [] }]
+      responses:
+        '200': { description: '`{ upvoted: false, upvoteCount }`' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /api/products/{slug}/comments:
+    parameters:
+      - { name: slug, in: path, required: true, schema: { type: string } }
+    get:
+      tags: [Engagement]
+      summary: Comentarios del producto (nuevos primero)
+      parameters:
+        - { name: page, in: query, schema: { type: integer, default: 1 } }
+        - { name: pageSize, in: query, schema: { type: integer, maximum: 50, default: 20 } }
+      responses:
+        '200': { description: Paginado de Comment (soft-deleted ocultos) }
+        '404': { $ref: '#/components/responses/NotFound' }
+    post:
+      tags: [Engagement]
+      summary: Comentar (solo LIVE)
+      description: Rate limit 10/min. Notifica al maker (nunca a uno mismo).
+      security: [{ sessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [body]
+              properties:
+                body: { type: string, minLength: 1, maxLength: 2000 }
+      responses:
+        '201': { description: Comment creado }
+        '400': { description: Producto no LIVE }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+
+  /api/comments/{id}:
+    delete:
+      tags: [Engagement]
+      summary: Borrar comentario (propio; staff puede cualquiera)
+      description: Soft delete — conserva rastro para moderación.
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        '204': { description: Borrado }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /api/leaderboard:
+    get:
+      tags: [Leaderboard]
+      summary: Ranking de miembros
+      description: 'Score = lanzamientos LIVE×10 + upvotes recibidos×2 + comentarios×1. Vista SQL, siempre consistente.'
+      parameters:
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 25 } }
+      responses:
+        '200': { description: '`[{ userId, name, avatarUrl, launchesCount, upvotesReceived, commentsCount, score }]`' }
+
+  /api/notifications:
+    get:
+      tags: [Notificaciones]
+      summary: Notificaciones propias (nuevas primero)
+      description: Incluye `unreadCount` para el badge del frontend.
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - { name: unread, in: query, schema: { type: boolean }, description: 'true → solo no leídas' }
+        - { name: page, in: query, schema: { type: integer, default: 1 } }
+        - { name: pageSize, in: query, schema: { type: integer, maximum: 50, default: 20 } }
+      responses:
+        '200': { description: Paginado de Notification + unreadCount }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /api/notifications/read:
+    patch:
+      tags: [Notificaciones]
+      summary: Marcar notificaciones como leídas
+      description: Sin `ids` marca TODAS. Solo afecta las propias.
+      security: [{ sessionCookie: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  items: { type: string }
+                  maxItems: 100
+      responses:
+        '200': { description: '`{ marked: number }`' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /api/reports:
+    post:
+      tags: [Moderación]
+      summary: Reportar producto o comentario
+      description: Exactamente uno de productId/commentId. Rate limit 10/hora.
+      security: [{ sessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                productId: { type: string }
+                commentId: { type: string }
+                reason: { type: string, minLength: 5, maxLength: 1000 }
+      responses:
+        '201': { description: Report creado }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { description: Producto/comentario no existe }
+        '429': { $ref: '#/components/responses/RateLimited' }
+    get:
+      tags: [Moderación]
+      summary: Cola de moderación (staff)
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - { name: status, in: query, schema: { type: string, enum: [OPEN, REVIEWING, RESOLVED, DISMISSED] } }
+      responses:
+        '200': { description: 'Reports con reporter, producto/comentario, resolvedAt y resolvedBy (auditoría)' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /api/reports/{id}:
+    patch:
+      tags: [Moderación]
+      summary: Resolver/descartar un report (staff)
+      description: 'RESOLVED/DISMISSED registran resolvedBy + resolvedAt (auditoría). REVIEWING los limpia.'
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status: { type: string, enum: [REVIEWING, RESOLVED, DISMISSED] }
+      responses:
+        '200': { description: '`{ id, status, resolvedById, resolvedAt }`' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /api/community-links:
+    get:
+      tags: [Extensión]
+      summary: Links de logros (públicos = VERIFIED)
+      description: '`?mine=1` (auth) lista los propios, incluidos PENDING.'
+      parameters:
+        - { name: mine, in: query, schema: { type: string, enum: ["1"] } }
+      responses:
+        '200': { description: Lista de links }
+    post:
+      tags: [Extensión]
+      summary: Enviar link de logro (manual, con consentimiento)
+      description: |
+        Solo URLs públicas https de skool.com. Rate limit 10/hora. Duplicado
+        por usuario+URL → 409. Nace PENDING hasta verificación humana.
+      security: [{ sessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, url]
+              properties:
+                title: { type: string, minLength: 2, maxLength: 140 }
+                url: { type: string, format: uri, description: 'https://…skool.com únicamente' }
+                type: { type: string, enum: [logro, milestone, announcement, other], default: logro }
+      responses:
+        '201': { description: Link creado (PENDING) }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409': { description: Ya enviaste esta URL }
+        '429': { $ref: '#/components/responses/RateLimited' }
+
+  /api/community-links/{id}:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: string } }
+    patch:
+      tags: [Extensión]
+      summary: Verificar/rechazar link (staff)
+      security: [{ sessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status: { type: string, enum: [VERIFIED, REJECTED] }
+      responses:
+        '200': { description: '`{ id, status }`' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      tags: [Extensión]
+      summary: Borrar link propio (staff puede cualquiera)
+      security: [{ sessionCookie: [] }]
+      responses:
+        '204': { description: Borrado }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /api/extension/events:
+    post:
+      tags: [Extensión]
+      summary: Registrar evento de la extensión (auditoría first-party)
+      description: Rate limit 60/min. Solo acciones explícitas del propio usuario.
+      security: [{ sessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [eventType]
+              properties:
+                eventType: { type: string, enum: [link_submitted, link_viewed, extension_opened] }
+                metadata: { type: object }
+      responses:
+        '201': { description: Evento registrado }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/RateLimited' }
