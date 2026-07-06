@@ -31,6 +31,15 @@ export function withErrorHandling<Args extends unknown[]>(
     try {
       return await handler(...args);
     } catch (err) {
+      // Next's internal bailout signal during build-time static analysis —
+      // must propagate so the route is treated as dynamic, not a 500.
+      if (
+        typeof err === "object" &&
+        err !== null &&
+        (err as { digest?: string }).digest === "DYNAMIC_SERVER_USAGE"
+      ) {
+        throw err;
+      }
       if (err instanceof ApiError) {
         return errorResponse(err.status, err.message);
       }
