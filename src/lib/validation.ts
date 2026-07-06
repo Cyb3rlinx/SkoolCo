@@ -120,6 +120,21 @@ export const resendVerificationSchema = z.object({
 });
 
 // ---------------------------------------------------------------------------
+// Notifications
+// ---------------------------------------------------------------------------
+
+export const listNotificationsQuerySchema = z.object({
+  unread: z.coerce.boolean().optional(), // ?unread=true → only unread
+  page: z.coerce.number().int().min(1).default(1),
+  pageSize: z.coerce.number().int().min(1).max(50).default(20),
+});
+
+/** Without `ids`, marks ALL of the user's notifications as read. */
+export const markNotificationsReadSchema = z.object({
+  ids: z.array(z.string().min(1).max(64)).min(1).max(100).optional(),
+});
+
+// ---------------------------------------------------------------------------
 // Account
 // ---------------------------------------------------------------------------
 

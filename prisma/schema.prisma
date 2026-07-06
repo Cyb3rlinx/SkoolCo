@@ -40,6 +40,8 @@ model User {
   extensionEvents   ExtensionEvent[]
   passwordResetTokens     PasswordResetToken[]
   emailVerificationTokens EmailVerificationToken[]
+  notificationsReceived   Notification[] @relation("NotificationsReceived")
+  notificationsActed      Notification[] @relation("NotificationsActed")
 
   @@map("users")
 }
@@ -79,11 +81,12 @@ model Product {
   createdAt   DateTime      @default(now()) @map("created_at")
   updatedAt   DateTime      @updatedAt @map("updated_at")
 
-  maker    User               @relation(fields: [makerId], references: [id], onDelete: Cascade)
-  category Category           @relation(fields: [categoryId], references: [id])
-  upvotes  Upvote[]
-  comments Comment[]
-  reports  ModerationReport[]
+  maker         User               @relation(fields: [makerId], references: [id], onDelete: Cascade)
+  category      Category           @relation(fields: [categoryId], references: [id])
+  upvotes       Upvote[]
+  comments      Comment[]
+  reports       ModerationReport[]
+  notifications Notification[]
 
   @@index([status, launchDate])
   @@index([makerId])
@@ -119,9 +122,10 @@ model Comment {
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at") // soft delete for moderation trail
 
-  user    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  product Product            @relation(fields: [productId], references: [id], onDelete: Cascade)
-  reports ModerationReport[]
+  user          User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product       Product            @relation(fields: [productId], references: [id], onDelete: Cascade)
+  reports       ModerationReport[]
+  notifications Notification[]
 
   @@index([productId, createdAt])
   @@map("comments")
@@ -220,6 +224,36 @@ model PasswordResetToken {
 
   @@index([userId])
   @@map("password_reset_tokens")
+}
+
+// ---------------------------------------------------------------------------
+// In-app notifications
+// ---------------------------------------------------------------------------
+// Created when someone upvotes or comments on your product (never for your
+// own actions). Consumed by the frontend "bell". No emails, no push — MVP.
+
+enum NotificationType {
+  UPVOTE
+  COMMENT
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String           @map("user_id") // recipient
+  actorId   String           @map("actor_id") // who triggered it
+  type      NotificationType
+  productId String?          @map("product_id")
+  commentId String?          @map("comment_id")
+  readAt    DateTime?        @map("read_at")
+  createdAt DateTime         @default(now()) @map("created_at")
+
+  user    User     @relation("NotificationsReceived", fields: [userId], references: [id], onDelete: Cascade)
+  actor   User     @relation("NotificationsActed", fields: [actorId], references: [id], onDelete: Cascade)
+  product Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  comment Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt, createdAt])
+  @@map("notifications")
 }
 
 model EmailVerificationToken {

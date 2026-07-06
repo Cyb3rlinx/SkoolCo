@@ -4,6 +4,7 @@ import { requireUser, ApiError } from "@/lib/auth";
 import { withErrorHandling, ok, errorResponse } from "@/lib/api";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 import { findProduct } from "@/lib/products";
+import { notify } from "@/lib/notifications";
 
 type Params = { params: { slug: string } };
 
@@ -28,6 +29,13 @@ export const POST = withErrorHandling(async (_req: Request, { params }: Params) 
   try {
     await prisma.upvote.create({
       data: { userId: user.id, productId: product.id },
+    });
+    // Only on a NEW upvote (not idempotent repeats) — never for your own product.
+    await notify({
+      userId: product.makerId,
+      actorId: user.id,
+      type: "UPVOTE",
+      productId: product.id,
     });
   } catch (err) {
     // P2002 = unique constraint violation -> already upvoted; treat as idempotent.

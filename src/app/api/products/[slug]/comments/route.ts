@@ -4,6 +4,7 @@ import { createCommentSchema } from "@/lib/validation";
 import { withErrorHandling, parseBody, ok, created, errorResponse } from "@/lib/api";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 import { findProduct } from "@/lib/products";
+import { notify } from "@/lib/notifications";
 
 type Params = { params: { slug: string } };
 
@@ -54,6 +55,14 @@ export const POST = withErrorHandling(async (req: Request, { params }: Params) =
   const comment = await prisma.comment.create({
     data: { userId: user.id, productId: product.id, body: input.body },
     select: commentSelect,
+  });
+
+  await notify({
+    userId: product.makerId,
+    actorId: user.id,
+    type: "COMMENT",
+    productId: product.id,
+    commentId: comment.id,
   });
 
   return created(comment);
