@@ -29,6 +29,8 @@ export const RATE_LIMITS = {
   communityLink: { limit: 10, windowMs: 60 * 60_000 }, // 10 link submissions / hour
   register: { limit: 5, windowMs: 60 * 60_000 }, // 5 signups / hour / IP
   extensionEvent: { limit: 60, windowMs: 60_000 }, // 60 events / minute
+  login: { limit: 5, windowMs: 15 * 60_000 }, // 5 login attempts / 15 min (per email and per IP)
+  resendVerification: { limit: 3, windowMs: 15 * 60_000 }, // 3 resends / 15 min / IP
 } satisfies Record<string, RateLimitRule>;
 
 /**
