@@ -119,6 +119,15 @@ export const resendVerificationSchema = z.object({
 });
 
 // ---------------------------------------------------------------------------
+// Account
+// ---------------------------------------------------------------------------
+
+/** Deleting an account is destructive: the session alone is not enough. */
+export const deleteAccountSchema = z.object({
+  password: z.string().min(8).max(128),
+});
+
+// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 

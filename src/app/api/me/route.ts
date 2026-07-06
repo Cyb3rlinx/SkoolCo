@@ -1,7 +1,8 @@
+import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
-import { updateProfileSchema } from "@/lib/validation";
-import { withErrorHandling, parseBody, ok } from "@/lib/api";
+import { updateProfileSchema, deleteAccountSchema } from "@/lib/validation";
+import { withErrorHandling, parseBody, ok, noContent, errorResponse } from "@/lib/api";
 
 const profileSelect = {
   id: true,
@@ -35,4 +36,27 @@ export const PATCH = withErrorHandling(async (req: Request) => {
     select: profileSelect,
   });
   return ok(user);
+});
+
+/**
+ * DELETE /api/me — permanently delete the account (password confirmation
+ * required). DB cascades remove products, upvotes, comments, links, events
+ * and tokens; reports the user resolved as moderator keep their history
+ * with resolvedBy set to null.
+ */
+export const DELETE = withErrorHandling(async (req: Request) => {
+  const sessionUser = await requireUser();
+  const { password } = await parseBody(req, deleteAccountSchema);
+
+  const user = await prisma.user.findUniqueOrThrow({
+    where: { id: sessionUser.id },
+    select: { passwordHash: true },
+  });
+  const valid = await bcrypt.compare(password, user.passwordHash);
+  if (!valid) {
+    return errorResponse(403, "Contraseña incorrecta.");
+  }
+
+  await prisma.user.delete({ where: { id: sessionUser.id } });
+  return noContent();
 });
