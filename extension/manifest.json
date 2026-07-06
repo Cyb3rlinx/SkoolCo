@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "LaunchPad — Logros",
-  "version": "0.1.0",
-  "description": "Envía posts públicos de Skool como logros a LaunchPad, con tu consentimiento y un clic.",
+  "version": "0.2.0",
+  "description": "Envía posts públicos de tus comunidades (Skool, Discord, YouTube y más) como logros a LaunchPad, con tu consentimiento y un clic.",
   "action": { "default_popup": "popup.html", "default_title": "LaunchPad Logros" },
   "options_page": "options.html",
   "permissions": ["activeTab", "storage", "tabs"],

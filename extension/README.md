@@ -27,7 +27,9 @@ Extensión MV3 para enviar posts públicos de Skool como logros a LaunchPad
 
 ## Uso
 
-- Abre un post público de tu comunidad en `skool.com`.
+- Abre un post público de tu comunidad — plataformas soportadas: **Skool,
+  Discord, YouTube, X (Twitter), Facebook, LinkedIn, Instagram, Telegram y
+  Circle** (allowlist compartido con el backend en `src/lib/platforms.ts`).
 - Clic en el ícono de la extensión → pestaña **Enviar**: título pre-cargado
   (editable), tipo, y **Enviar como logro**. Queda **pendiente** hasta que un
   moderador lo verifique.

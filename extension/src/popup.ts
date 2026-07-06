@@ -1,5 +1,5 @@
 import { getMyLinks, submitLink, postEvent, type LinkType } from "./api";
-import { isSkoolPostUrl, cleanTitle } from "./skool";
+import { isCommunityPostUrl, cleanTitle } from "./community";
 import { getBaseUrl } from "./storage";
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -31,9 +31,10 @@ async function initSend(base: string) {
   const form = $<HTMLFormElement>("send-form");
   const tab = await activeTab();
 
-  if (!tab || !isSkoolPostUrl(tab.url)) {
+  if (!tab || !isCommunityPostUrl(tab.url)) {
     guard.hidden = false;
-    guardMsg.textContent = "Abre un post público de Skool para enviarlo como logro.";
+    guardMsg.textContent =
+      "Abre un post público de tu comunidad (Skool, Discord, YouTube, X, Facebook, LinkedIn, Instagram, Telegram o Circle) para enviarlo como logro.";
     return;
   }
 

@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: LaunchPad API
-  version: 0.2.0
+  version: 0.3.0
   description: |
     Backend de la plataforma comunitaria de lanzamiento de productos.
 
@@ -559,7 +559,9 @@ paths:
       tags: [Extensión]
       summary: Enviar link de logro (manual, con consentimiento)
       description: |
-        Solo URLs públicas https de skool.com. Rate limit 10/hora. Duplicado
+        Solo URLs públicas https de plataformas del allowlist: Skool, Discord,
+        YouTube, X (Twitter), Facebook, LinkedIn, Instagram, Telegram, Circle.
+        `sourcePlatform` se deriva del dominio. Rate limit 10/hora. Duplicado
         por usuario+URL → 409. Nace PENDING hasta verificación humana.
       security: [{ sessionCookie: [] }]
       requestBody:
@@ -571,7 +573,7 @@ paths:
               required: [title, url]
               properties:
                 title: { type: string, minLength: 2, maxLength: 140 }
-                url: { type: string, format: uri, description: 'https://…skool.com únicamente' }
+                url: { type: string, format: uri, description: 'https de una plataforma del allowlist (ver descripción)' }
                 type: { type: string, enum: [logro, milestone, announcement, other], default: logro }
       responses:
         '201': { description: Link creado (PENDING) }
