@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { ZodError, type ZodSchema } from "zod";
+import { ZodError, z } from "zod";
 import { ApiError } from "@/lib/auth";
 
 export function ok<T>(data: T, init?: ResponseInit) {
@@ -45,8 +45,12 @@ export function withErrorHandling<Args extends unknown[]>(
   };
 }
 
-/** Parse and validate a JSON body against a Zod schema. */
-export async function parseBody<T>(req: Request, schema: ZodSchema<T>): Promise<T> {
+/** Parse and validate a JSON body against a Zod schema. Returns the schema's
+ * OUTPUT type, so fields with `.default()` are non-optional at the call site. */
+export async function parseBody<S extends z.ZodTypeAny>(
+  req: Request,
+  schema: S
+): Promise<z.output<S>> {
   let json: unknown;
   try {
     json = await req.json();
@@ -57,8 +61,16 @@ export async function parseBody<T>(req: Request, schema: ZodSchema<T>): Promise<
 }
 
 /** Best-effort client IP for anonymous rate limiting. */
-export function clientIp(req: Request): string {
-  const fwd = req.headers.get("x-forwarded-for");
+export function clientIp(req: {
+  headers: Headers | Record<string, string | string[] | undefined>;
+}): string {
+  const get = (name: string): string | null => {
+    const h = req.headers as Headers;
+    if (typeof h?.get === "function") return h.get(name);
+    const raw = (req.headers as Record<string, string | string[] | undefined>)[name];
+    return Array.isArray(raw) ? raw[0] : raw ?? null;
+  };
+  const fwd = get("x-forwarded-for");
   if (fwd) return fwd.split(",")[0].trim();
-  return req.headers.get("x-real-ip") ?? "unknown";
+  return get("x-real-ip") ?? "unknown";
 }

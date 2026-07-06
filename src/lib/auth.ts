@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
+import { clientIp } from "@/lib/api";
 
 /**
  * Email + password authentication with JWT sessions.
@@ -26,12 +28,19 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         if (!credentials?.email || !credentials.password) return null;
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email.toLowerCase().trim() },
-        });
+        const email = credentials.email.toLowerCase().trim();
+        const ip = clientIp(req as unknown as Request);
+
+        // Anti brute-force: throttle by email AND by IP. Failing either
+        // returns null (indistinguishable from bad credentials).
+        const okEmail = checkRateLimit(`login:email:${email}`, RATE_LIMITS.login);
+        const okIp = checkRateLimit(`login:ip:${ip}`, RATE_LIMITS.login);
+        if (!okEmail || !okIp) return null;
+
+        const user = await prisma.user.findUnique({ where: { email } });
         if (!user) return null;
 
         const valid = await bcrypt.compare(credentials.password, user.passwordHash);

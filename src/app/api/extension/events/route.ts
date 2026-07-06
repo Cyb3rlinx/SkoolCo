@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { extensionEventSchema } from "@/lib/validation";
@@ -25,7 +26,7 @@ export const POST = withErrorHandling(async (req: Request) => {
     data: {
       userId: user.id,
       eventType: input.eventType,
-      metadata: input.metadata ?? undefined,
+      metadata: (input.metadata ?? undefined) as Prisma.InputJsonValue | undefined,
     },
     select: { id: true, eventType: true, createdAt: true },
   });
