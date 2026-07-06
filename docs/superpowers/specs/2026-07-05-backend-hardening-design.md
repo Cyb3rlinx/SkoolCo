@@ -104,23 +104,72 @@ queda demasiado abierta.
   mismas rutas siguen funcionando same-origin).
 - `.env.example`: agregar comentado `ALLOWED_EXTENSION_ORIGINS=`.
 
+## Feature 5 — Headers de seguridad (extra A)
+
+En el mismo `src/middleware.ts` del CORS, agregar headers de seguridad a todas
+las respuestas:
+- `X-Frame-Options: DENY` (anti-clickjacking)
+- `X-Content-Type-Options: nosniff`
+- `Referrer-Policy: strict-origin-when-cross-origin`
+- `Strict-Transport-Security: max-age=63072000; includeSubDomains` (solo efectivo
+  bajo HTTPS; inofensivo en local)
+- `Permissions-Policy` mínima (deshabilita camera/microphone/geolocation por defecto)
+
+## Feature 6 — Anti contraseña filtrada / HaveIBeenPwned (extra B)
+
+En el registro (`register`) y en `reset-password`, antes de hashear la contraseña,
+verificar contra la API de HIBP Pwned Passwords usando **k-anonymity**:
+- sha1 de la contraseña → enviar solo los primeros 5 chars del hash a
+  `https://api.pwnedpasswords.com/range/<prefix>` (la contraseña nunca sale).
+- si el sufijo aparece en la respuesta → rechazar con 400 "contraseña comprometida".
+- `src/lib/password.ts` con `isPasswordPwned(password): Promise<boolean>`.
+- **Fail-open:** si la API de HIBP no responde (timeout/red), no bloquear el
+  registro (no dejamos a un usuario afuera por un tercero caído); loguear el fallo.
+- Testeable con la función mockeando fetch.
+
+## Feature 7 — Healthcheck (extra C)
+
+`GET /api/health` → `{ status: "ok", db: "ok" | "down" }`. Hace un
+`SELECT 1` best-effort contra Postgres vía Prisma (`$queryRaw`). Sin auth. Útil
+para monitoreo y readiness checks del deploy.
+
+## Feature 8 — Verificación de email (extra D)
+
+- **Schema:** agregar `emailVerified DateTime?` a `User`, y modelo
+  `EmailVerificationToken` (misma forma que `PasswordResetToken`: userId,
+  tokenHash, expiresAt, usedAt). Migración Prisma.
+- **Flujo:** al registrarse, crear token y enviar email de verificación
+  (reusa `src/lib/email.ts`). Usuario queda con `emailVerified = null`.
+- **Endpoints:**
+  - `POST /api/auth/verify-email` — body `{ token }`, marca `emailVerified = now()`
+    y `usedAt`.
+  - `POST /api/auth/resend-verification` — reenvía (rate-limited, anti-enumeración).
+- **Política MVP:** no se bloquea el login por email sin verificar (para no frenar
+  el testeo con usuarios reales). El estado `emailVerified` queda disponible para
+  que el frontend/producto decida qué gatear después. Documentar esta decisión.
+
 ## Alcance de archivos
 
 **Nuevos:**
 - `src/lib/email.ts`
-- `src/middleware.ts`
+- `src/lib/password.ts` (HIBP k-anonymity — extra B)
+- `src/middleware.ts` (CORS + security headers — extras A)
 - `src/app/api/auth/forgot-password/route.ts`
 - `src/app/api/auth/reset-password/route.ts`
-- `prisma/migrations/<ts>_password_reset_token/migration.sql`
+- `src/app/api/auth/verify-email/route.ts` (extra D)
+- `src/app/api/auth/resend-verification/route.ts` (extra D)
+- `src/app/api/health/route.ts` (extra C)
+- `prisma/migrations/<ts>_password_reset_and_email_verification/migration.sql`
 - Tests: `src/lib/*.test.ts` (o carpeta `tests/`)
 - `.github/workflows/ci.yml`
 - `vitest.config.ts`
 
 **Editados (quirúrgico):**
 - `src/lib/auth.ts` (pre-check rate limit en login)
-- `src/lib/rate-limit.ts` (regla `login`)
-- `src/lib/validation.ts` (schemas forgot/reset password)
-- `prisma/schema.prisma` (modelo PasswordResetToken)
+- `src/lib/rate-limit.ts` (reglas `login`, `resendVerification`)
+- `src/lib/validation.ts` (schemas forgot/reset/verify password)
+- `src/app/api/auth/register/route.ts` (HIBP check + token de verificación)
+- `prisma/schema.prisma` (PasswordResetToken, EmailVerificationToken, User.emailVerified)
 - `.env.example` (nuevas vars comentadas)
 - `package.json` (vitest + scripts test)
 
@@ -130,14 +179,18 @@ queda demasiado abierta.
 - Toda entrada nueva validada con Zod server-side. ✅
 - Rate limits añadidos a login y a forgot-password. ✅
 - Secretos (RESEND_API_KEY) solo server-side, nunca en el bundle. ✅
-- Tokens de reset: solo hash en DB, expiración + un solo uso. ✅
-- Anti-enumeración en login y forgot-password. ✅
+- Tokens de reset/verificación: solo hash en DB, expiración + un solo uso. ✅
+- Anti-enumeración en login, forgot-password y resend-verification. ✅
+- Contraseñas verificadas contra brechas conocidas (HIBP). ✅
+- Headers de seguridad (clickjacking, MIME-sniffing, HSTS). ✅
 
 ## Fuera de alcance (YAGNI)
 
 - Migrar rate limiter a Redis (solo si van a serverless).
 - OAuth (Google/GitHub).
 - Subida de archivos para logos.
-- Páginas frontend del reset (las hace el cofundador).
-- Verificación contra HaveIBeenPwned.
+- Páginas frontend del reset/verificación (las hace el cofundador).
+- Bloquear login por email no verificado (decisión de producto, post-MVP).
+- Borrado de cuenta propia / GDPR (extra E — segunda tanda).
+- Log de auditoría de moderación (extra F — segunda tanda).
 - RLS en Supabase (defensa en profundidad; la seguridad hoy vive en Prisma).
