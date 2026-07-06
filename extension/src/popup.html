@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <header>
+    <strong>LaunchPad — Logros</strong>
+    <nav>
+      <button id="tab-send" class="tab active">Enviar</button>
+      <button id="tab-links" class="tab">Mis links</button>
+    </nav>
+  </header>
+
+  <section id="view-send">
+    <div id="send-guard" hidden>
+      <p id="guard-msg"></p>
+      <button id="open-site" hidden>Abrir LaunchPad</button>
+    </div>
+    <form id="send-form" hidden>
+      <p class="url" id="post-url"></p>
+      <label>Título <input id="title" maxlength="140" required minlength="2" /></label>
+      <label>Tipo
+        <select id="type">
+          <option value="logro">Logro</option>
+          <option value="milestone">Hito</option>
+          <option value="announcement">Anuncio</option>
+          <option value="other">Otro</option>
+        </select>
+      </label>
+      <button type="submit" id="submit">Enviar como logro</button>
+    </form>
+    <p id="send-msg" role="status"></p>
+  </section>
+
+  <section id="view-links" hidden>
+    <ul id="links-list"></ul>
+    <p id="links-msg" role="status"></p>
+  </section>
+
+  <script src="popup.js"></script>
+</body>
+</html>

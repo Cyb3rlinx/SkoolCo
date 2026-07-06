@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>LaunchPad Logros — Opciones</title>
+  <style>
+    body { font: 14px system-ui; max-width: 480px; margin: 2rem auto; padding: 0 1rem; }
+    input { width: 100%; padding: .5rem; margin: .5rem 0; box-sizing: border-box; }
+    button { padding: .5rem 1rem; }
+    #msg { margin-top: .5rem; }
+  </style>
+</head>
+<body>
+  <h1>Opciones</h1>
+  <label for="baseUrl">URL del backend de LaunchPad</label>
+  <input id="baseUrl" type="url" placeholder="http://localhost:3000" />
+  <button id="save">Guardar</button>
+  <p id="msg" role="status"></p>
+  <script src="options.js"></script>
+</body>
+</html>
