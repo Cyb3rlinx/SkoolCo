@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------------------------------------------------------------------------
+ * LaunchPad design tokens.
+ * Light theme only for the MVP; dark theme = override these vars under a
+ * `.dark` selector later, no component changes needed.
+ * ------------------------------------------------------------------------- */
+:root {
+  --background: 250 40% 99%;
+  --foreground: 246 22% 12%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 246 22% 12%;
+
+  --muted: 250 25% 96%;
+  --muted-foreground: 246 8% 44%;
+
+  /* Brand: violet → indigo. Deliberately far from the orange/red family of
+     existing launch platforms — original identity. */
+  --primary: 258 82% 56%;
+  --primary-foreground: 0 0% 100%;
+
+  --accent: 258 90% 96.5%;
+  --accent-foreground: 258 60% 40%;
+
+  --destructive: 0 72% 48%;
+  --destructive-foreground: 0 0% 100%;
+
+  --success: 158 74% 34%;
+  --success-foreground: 0 0% 100%;
+
+  --warning: 34 94% 44%;
+  --warning-foreground: 0 0% 100%;
+
+  --border: 246 18% 90%;
+  --input: 246 18% 87%;
+  --ring: 258 82% 62%;
+
+  --radius: 0.75rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection {
+    @apply bg-primary/20;
+  }
+}
+
+@layer components {
+  /* Page-width container used by every page and the header/footer. */
+  .container-page {
+    @apply mx-auto w-full max-w-6xl px-4 sm:px-6;
+  }
+
+  /* Brand gradient (logo tile, primary CTAs, highlights). */
+  .brand-gradient {
+    background-image: linear-gradient(135deg, hsl(262 83% 58%) 0%, hsl(243 75% 59%) 100%);
+  }
+
+  .brand-text-gradient {
+    background-image: linear-gradient(120deg, hsl(262 83% 52%), hsl(243 75% 55%));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}

@@ -1,0 +1,36 @@
+import type { Metadata } from "next";
+import type { ReactNode } from "react";
+import { Manrope } from "next/font/google";
+import { Providers } from "./providers";
+import { SiteHeader } from "@/components/layout/site-header";
+import { SiteFooter } from "@/components/layout/site-footer";
+import "./globals.css";
+
+const manrope = Manrope({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-sans",
+});
+
+export const metadata: Metadata = {
+  title: {
+    default: "LaunchPad — lanza tu producto con la comunidad",
+    template: "%s · LaunchPad",
+  },
+  description:
+    "La plataforma de lanzamientos impulsada por la comunidad: publica tu proyecto, recibe votos y feedback real, y gana visibilidad.",
+};
+
+export default function RootLayout({ children }: { children: ReactNode }) {
+  return (
+    <html lang="es" className={manrope.variable}>
+      <body className="flex min-h-screen flex-col font-sans">
+        <Providers>
+          <SiteHeader />
+          <main className="flex-1">{children}</main>
+          <SiteFooter />
+        </Providers>
+      </body>
+    </html>
+  );
+}

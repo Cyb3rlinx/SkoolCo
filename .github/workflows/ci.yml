@@ -8,6 +8,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: launchpad
     services:
       postgres:
         image: postgres:16
@@ -30,6 +33,7 @@ jobs:
         with:
           node-version: "22"
           cache: "npm"
+          cache-dependency-path: launchpad/package-lock.json
       - run: npm ci
       - run: npx prisma generate
       - run: npm run typecheck

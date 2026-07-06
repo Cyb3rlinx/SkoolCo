@@ -1,0 +1,151 @@
+"use client";
+
+import { useCallback, useMemo } from "react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Sparkles } from "lucide-react";
+import { fetchCategories } from "@/lib/frontend/api-client";
+import { mockCategories } from "@/lib/frontend/mock-data";
+import { useApi } from "@/lib/frontend/hooks";
+import { formatDate } from "@/lib/frontend/format";
+import type { ProductListQuery } from "@/lib/frontend/types";
+import { PageHeader } from "@/components/layout/page-header";
+import { ProductFeed } from "@/components/product/product-feed";
+import { Tabs } from "@/components/ui/tabs";
+import { Select } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button, buttonVariants } from "@/components/ui/button";
+
+type Window = "today" | "week" | "all";
+
+const TAB_ITEMS: { value: Window; label: string }[] = [
+  { value: "today", label: "Hoy" },
+  { value: "week", label: "Esta semana" },
+  { value: "all", label: "Todos" },
+];
+
+export function LaunchesClient() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const q = searchParams.get("q") ?? "";
+  const category = searchParams.get("category") ?? "";
+  const sort = (searchParams.get("sort") as "newest" | "top" | null) ?? "newest";
+  const windowParam = (searchParams.get("window") as Window | null) ?? "today";
+
+  /** Update one query param while keeping the rest (shareable URLs). */
+  const setParam = useCallback(
+    (key: string, value: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (value) params.set(key, value);
+      else params.delete(key);
+      router.replace(`/launches?${params.toString()}`, { scroll: false });
+    },
+    [router, searchParams]
+  );
+
+  const { data: categories } = useApi(fetchCategories, {
+    fallback: () => mockCategories,
+  });
+
+  const query: ProductListQuery = useMemo(
+    () => ({
+      q: q || undefined,
+      category: category || undefined,
+      sort,
+      pageSize: 50,
+    }),
+    [q, category, sort]
+  );
+
+  const heading =
+    windowParam === "today"
+      ? "Lanzamientos de hoy"
+      : windowParam === "week"
+        ? "Lanzamientos de la semana"
+        : "Todos los lanzamientos";
+
+  return (
+    <div className="container-page space-y-8 py-10">
+      <PageHeader
+        title={heading}
+        description={`${formatDate(new Date())} — vota y comenta para dar visibilidad a los makers de la comunidad.`}
+        actions={
+          <Link href="/submit" className={buttonVariants({ variant: "gradient" })}>
+            <Sparkles className="h-4 w-4" aria-hidden />
+            Publica el tuyo
+          </Link>
+        }
+      />
+
+      {/* Filters */}
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <Tabs items={TAB_ITEMS} value={windowParam} onChange={(v) => setParam("window", v === "today" ? "" : v)} />
+
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:w-auto lg:min-w-[540px]">
+          <div className="space-y-1.5">
+            <Label htmlFor="filter-q">Buscar</Label>
+            <Input
+              id="filter-q"
+              defaultValue={q}
+              key={q} /* re-sync when header search navigates here */
+              placeholder="Nombre, tagline…"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") setParam("q", (e.target as HTMLInputElement).value.trim());
+              }}
+              onBlur={(e) => {
+                if (e.target.value.trim() !== q) setParam("q", e.target.value.trim());
+              }}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="filter-category">Categoría</Label>
+            <Select
+              id="filter-category"
+              value={category}
+              onChange={(e) => setParam("category", e.target.value)}
+            >
+              <option value="">Todas</option>
+              {(categories ?? []).map((c) => (
+                <option key={c.slug} value={c.slug}>
+                  {c.name}
+                </option>
+              ))}
+            </Select>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="filter-sort">Ordenar por</Label>
+            <Select id="filter-sort" value={sort} onChange={(e) => setParam("sort", e.target.value === "newest" ? "" : e.target.value)}>
+              <option value="newest">Más recientes</option>
+              <option value="top">Más votados</option>
+            </Select>
+          </div>
+        </div>
+      </div>
+
+      {/* Feed */}
+      <ProductFeed
+        query={query}
+        dateWindow={windowParam}
+        ranked={windowParam !== "all" || sort === "top"}
+        emptyTitle={
+          windowParam === "today"
+            ? "Hoy todavía no hay lanzamientos"
+            : "No hay lanzamientos en este periodo"
+        }
+        emptyDescription="Los grandes días empiezan vacíos. Mira lanzamientos anteriores o publica el tuyo."
+        emptyAction={
+          <div className="flex flex-wrap justify-center gap-2">
+            <Button variant="outline" onClick={() => setParam("window", "all")}>
+              Ver todos los lanzamientos
+            </Button>
+            <Link href="/submit" className={buttonVariants({ variant: "gradient" })}>
+              Publicar mi producto
+            </Link>
+          </div>
+        }
+      />
+    </div>
+  );
+}

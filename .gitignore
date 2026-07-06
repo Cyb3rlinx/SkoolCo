@@ -1,5 +1,8 @@
+# Repo-root ignores. The app has its own launchpad/.gitignore and the
+# extension has extension/.gitignore.
 node_modules/
-.next/
 .env
 .env.local
 *.tsbuildinfo
+next-env.d.ts
+.claude/

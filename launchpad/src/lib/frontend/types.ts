@@ -1,0 +1,196 @@
+/**
+ * Frontend DTO types.
+ *
+ * These mirror the JSON the backend returns 1:1 (see /api/docs for the
+ * OpenAPI contract). If the backend contract changes, this is the single
+ * file to update — components only import from here.
+ */
+
+// ---------------------------------------------------------------------------
+// Envelope
+// ---------------------------------------------------------------------------
+
+/** Every endpoint responds `{ data }` on success, `{ error }` on failure. */
+export interface ApiErrorBody {
+  error: { message: string; details?: unknown };
+}
+
+export interface Paginated<T> {
+  items: T[];
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+}
+
+// ---------------------------------------------------------------------------
+// Users
+// ---------------------------------------------------------------------------
+
+export type UserRole = "USER" | "MODERATOR" | "ADMIN";
+
+export interface UserRef {
+  id: string;
+  name: string;
+  avatarUrl: string | null;
+}
+
+/** GET /api/me */
+export interface MeProfile {
+  id: string;
+  name: string;
+  email: string;
+  avatarUrl: string | null;
+  bio: string | null;
+  role: UserRole;
+  createdAt: string;
+  _count: { products: number; upvotes: number; comments: number };
+}
+
+// ---------------------------------------------------------------------------
+// Products
+// ---------------------------------------------------------------------------
+
+export type ProductStatus = "DRAFT" | "SCHEDULED" | "LIVE" | "ARCHIVED";
+
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  /** GET /api/categories includes live-product counts. */
+  _count?: { products: number };
+}
+
+/** Item shape of GET /api/products (productListSelect on the backend). */
+export interface ProductListItem {
+  id: string;
+  name: string;
+  slug: string;
+  tagline: string;
+  logoUrl: string | null;
+  websiteUrl: string | null;
+  launchDate: string;
+  status: ProductStatus;
+  createdAt: string;
+  category: { id: string; name: string; slug: string };
+  maker: UserRef;
+  _count: { upvotes: number; comments: number };
+}
+
+/** GET /api/products/:slug adds description, updatedAt and upvotedByMe. */
+export interface ProductDetail extends ProductListItem {
+  description: string;
+  updatedAt: string;
+  upvotedByMe: boolean;
+}
+
+export interface ProductListQuery {
+  status?: ProductStatus;
+  category?: string; // category slug
+  q?: string;
+  sort?: "newest" | "top" | "launching";
+  page?: number;
+  pageSize?: number;
+}
+
+/** POST /api/products body (createProductSchema on the backend). */
+export interface CreateProductInput {
+  name: string;
+  tagline: string;
+  description: string;
+  websiteUrl?: string | null;
+  logoUrl?: string | null;
+  categoryId: string;
+  launchDate: string; // ISO date
+  status?: "DRAFT" | "SCHEDULED" | "LIVE";
+}
+
+// ---------------------------------------------------------------------------
+// Engagement
+// ---------------------------------------------------------------------------
+
+export interface CommentItem {
+  id: string;
+  body: string;
+  createdAt: string;
+  updatedAt: string;
+  user: UserRef;
+}
+
+/** POST/DELETE /api/products/:slug/upvote */
+export interface UpvoteResult {
+  upvoted: boolean;
+  upvoteCount: number;
+}
+
+// ---------------------------------------------------------------------------
+// Leaderboard
+// ---------------------------------------------------------------------------
+
+/** GET /api/leaderboard — score = launches*10 + upvotes received*2 + comments*1 */
+export interface LeaderboardEntry {
+  userId: string;
+  name: string;
+  avatarUrl: string | null;
+  launchesCount: number;
+  upvotesReceived: number;
+  commentsCount: number;
+  score: number;
+}
+
+// ---------------------------------------------------------------------------
+// Notifications
+// ---------------------------------------------------------------------------
+
+export type NotificationType = "UPVOTE" | "COMMENT";
+
+export interface NotificationItem {
+  id: string;
+  type: NotificationType;
+  readAt: string | null;
+  createdAt: string;
+  actor: UserRef;
+  product: { id: string; name: string; slug: string } | null;
+  comment: { id: string; body: string } | null;
+}
+
+export interface NotificationsPage extends Paginated<NotificationItem> {
+  unreadCount: number;
+}
+
+// ---------------------------------------------------------------------------
+// Moderation
+// ---------------------------------------------------------------------------
+
+export type ReportStatus = "OPEN" | "REVIEWING" | "RESOLVED" | "DISMISSED";
+
+/** Item shape of GET /api/reports (moderator/admin only). */
+export interface ModerationReportItem {
+  id: string;
+  reason: string;
+  status: ReportStatus;
+  createdAt: string;
+  resolvedAt: string | null;
+  resolvedBy: { id: string; name: string } | null;
+  reporter: { id: string; name: string };
+  product: { id: string; name: string; slug: string } | null;
+  comment: { id: string; body: string } | null;
+}
+
+// ---------------------------------------------------------------------------
+// Community links (browser extension "Logros")
+// ---------------------------------------------------------------------------
+
+export type CommunityLinkStatus = "PENDING" | "VERIFIED" | "REJECTED";
+export type CommunityLinkType = "logro" | "milestone" | "announcement" | "other";
+
+export interface CommunityLink {
+  id: string;
+  title: string;
+  url: string;
+  sourcePlatform: string;
+  type: CommunityLinkType | string;
+  status: CommunityLinkStatus;
+  createdAt: string;
+  submittedBy: UserRef;
+}
