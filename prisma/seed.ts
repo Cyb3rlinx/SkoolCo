@@ -2,9 +2,10 @@
  * Seed data for local development and testing.
  * Run: npm run db:seed
  *
- * Creates: 6 categories, 4 users (1 admin, 1 moderator, 2 members),
- * 5 products in various states, upvotes, comments, one moderation report,
- * and one community link.
+ * Creates: 6 categories, 6 users (1 admin, 1 moderator, 4 members),
+ * 9 products in various states, distributed upvotes and comments (a lively
+ * leaderboard), sample notifications, one moderation report, and one
+ * community link.
  *
  * All demo accounts share the password from SEED_USER_PASSWORD
  * (defaults to "changeme123" — dev only, never use seeds in production).
@@ -80,6 +81,29 @@ async function main() {
     }),
   ]);
 
+  const [sofia, marco] = await Promise.all([
+    prisma.user.upsert({
+      where: { email: "sofia@example.com" },
+      update: {},
+      create: {
+        name: "Sofía Design",
+        email: "sofia@example.com",
+        passwordHash,
+        bio: "Product designer exploring no-code",
+      },
+    }),
+    prisma.user.upsert({
+      where: { email: "marco@example.com" },
+      update: {},
+      create: {
+        name: "Marco Data",
+        email: "marco@example.com",
+        passwordHash,
+        bio: "Data engineer, launch enthusiast",
+      },
+    }),
+  ]);
+
   // --- Products ------------------------------------------------------------
   const now = new Date();
   const daysAgo = (d: number) => new Date(now.getTime() - d * 86_400_000);
@@ -145,6 +169,54 @@ async function main() {
       launchDate: daysAhead(30),
       status: "DRAFT" as const,
     },
+    {
+      makerId: sofia.id,
+      name: "MeetingLite",
+      slug: "meetinglite",
+      tagline: "Agendas that keep meetings under 25 minutes",
+      description:
+        "Shared agendas with per-topic timers, automatic notes and action items sent to Slack. Built for teams tired of hour-long syncs.",
+      websiteUrl: "https://example.com/meetinglite",
+      categoryId: categories[2].id,
+      launchDate: daysAgo(2),
+      status: "LIVE" as const,
+    },
+    {
+      makerId: marco.id,
+      name: "APIWatch",
+      slug: "apiwatch",
+      tagline: "Uptime and contract monitoring for your APIs",
+      description:
+        "Monitors endpoints, validates response schemas against your OpenAPI spec and alerts on breaking changes before your users notice.",
+      websiteUrl: "https://example.com/apiwatch",
+      categoryId: categories[1].id,
+      launchDate: daysAgo(5),
+      status: "LIVE" as const,
+    },
+    {
+      makerId: sofia.id,
+      name: "LinguaLoop",
+      slug: "lingualoop",
+      tagline: "Daily 5-minute language practice with real news",
+      description:
+        "Reads today's headlines at your level, quizzes you on vocabulary and tracks a streak. Spanish, English and Portuguese at launch.",
+      websiteUrl: "https://example.com/lingualoop",
+      categoryId: categories[3].id,
+      launchDate: daysAgo(7),
+      status: "LIVE" as const,
+    },
+    {
+      makerId: marco.id,
+      name: "CoinPath",
+      slug: "coinpath",
+      tagline: "Understand where your crypto portfolio drifted",
+      description:
+        "Connects read-only to your exchanges, explains portfolio drift in plain language and suggests rebalancing scenarios. No keys with withdrawal rights, ever.",
+      websiteUrl: "https://example.com/coinpath",
+      categoryId: categories[5].id,
+      launchDate: daysAgo(12),
+      status: "LIVE" as const,
+    },
   ];
 
   const products = [];
@@ -155,14 +227,34 @@ async function main() {
   }
 
   // --- Upvotes (skipDuplicates keeps the seed idempotent) -------------------
+  // Distributed so the leaderboard has a clear, believable spread.
   await prisma.upvote.createMany({
     data: [
+      // FocusFlow (5)
       { userId: luis.id, productId: products[0].id },
       { userId: mod.id, productId: products[0].id },
       { userId: admin.id, productId: products[0].id },
+      { userId: sofia.id, productId: products[0].id },
+      { userId: marco.id, productId: products[0].id },
+      // SchemaPeek (4)
       { userId: ana.id, productId: products[2].id },
       { userId: mod.id, productId: products[2].id },
+      { userId: sofia.id, productId: products[2].id },
+      { userId: admin.id, productId: products[2].id },
+      // MeetingLite (3)
+      { userId: ana.id, productId: products[5].id },
+      { userId: luis.id, productId: products[5].id },
+      { userId: marco.id, productId: products[5].id },
+      // APIWatch (2)
+      { userId: ana.id, productId: products[6].id },
+      { userId: sofia.id, productId: products[6].id },
+      // PromptShelf (2)
       { userId: luis.id, productId: products[1].id },
+      { userId: marco.id, productId: products[1].id },
+      // LinguaLoop (1)
+      { userId: luis.id, productId: products[7].id },
+      // CoinPath (1)
+      { userId: ana.id, productId: products[8].id },
     ],
     skipDuplicates: true,
   });
@@ -187,6 +279,45 @@ async function main() {
           productId: products[2].id,
           body: "The ER diagrams look super clean. Does it support Postgres views?",
         },
+        {
+          userId: marco.id,
+          productId: products[0].id,
+          body: "How does it decide when I'm at my best? Calendar history or manual input?",
+        },
+        {
+          userId: sofia.id,
+          productId: products[2].id,
+          body: "Tried it on our staging DB — the index suggestions alone are worth it.",
+        },
+        {
+          userId: luis.id,
+          productId: products[5].id,
+          body: "The per-topic timer changed our standups. Great launch!",
+        },
+        {
+          userId: ana.id,
+          productId: products[6].id,
+          body: "Schema-contract alerts are something I didn't know I needed.",
+        },
+        {
+          userId: mod.id,
+          productId: products[7].id,
+          body: "The streak with real news keeps me coming back. Nice touch.",
+        },
+      ],
+    });
+  }
+
+  // --- Notifications (sample data for the frontend bell) ----------------------
+  const existingNotifications = await prisma.notification.count();
+  if (existingNotifications === 0) {
+    await prisma.notification.createMany({
+      data: [
+        { userId: ana.id, actorId: luis.id, type: "UPVOTE", productId: products[0].id },
+        { userId: ana.id, actorId: marco.id, type: "COMMENT", productId: products[0].id },
+        { userId: luis.id, actorId: sofia.id, type: "UPVOTE", productId: products[2].id },
+        { userId: sofia.id, actorId: luis.id, type: "COMMENT", productId: products[5].id },
+        { userId: marco.id, actorId: ana.id, type: "UPVOTE", productId: products[6].id },
       ],
     });
   }
@@ -228,6 +359,8 @@ async function main() {
   console.log("  mod@example.com   (MODERATOR)");
   console.log("  ana@example.com   (USER)");
   console.log("  luis@example.com  (USER)");
+  console.log("  sofia@example.com (USER)");
+  console.log("  marco@example.com (USER)");
 }
 
 main()
