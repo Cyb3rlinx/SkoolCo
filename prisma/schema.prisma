@@ -146,6 +146,7 @@ model ModerationReport {
   reason     String
   status     ReportStatus @default(OPEN)
   resolvedById String?    @map("resolved_by_id")
+  resolvedAt DateTime?    @map("resolved_at") // audit: when it was resolved/dismissed
   createdAt  DateTime     @default(now()) @map("created_at")
 
   reporter   User     @relation("ReportsFiled", fields: [reporterId], references: [id], onDelete: Cascade)

@@ -19,13 +19,15 @@ export const PATCH = withErrorHandling(async (req: Request, { params }: Params) 
   });
   if (!existing) throw new ApiError(404, "Report not found");
 
+  const terminal = input.status === "RESOLVED" || input.status === "DISMISSED";
   const report = await prisma.moderationReport.update({
     where: { id: params.id },
     data: {
       status: input.status,
-      resolvedById: input.status === "REVIEWING" ? null : moderator.id,
+      resolvedById: terminal ? moderator.id : null,
+      resolvedAt: terminal ? new Date() : null,
     },
-    select: { id: true, status: true, resolvedById: true },
+    select: { id: true, status: true, resolvedById: true, resolvedAt: true },
   });
 
   return ok(report);

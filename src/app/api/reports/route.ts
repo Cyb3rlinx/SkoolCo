@@ -67,6 +67,8 @@ export const GET = withErrorHandling(async (req: Request) => {
       reason: true,
       status: true,
       createdAt: true,
+      resolvedAt: true,
+      resolvedBy: { select: { id: true, name: true } },
       reporter: { select: { id: true, name: true } },
       product: { select: { id: true, name: true, slug: true } },
       comment: { select: { id: true, body: true } },
