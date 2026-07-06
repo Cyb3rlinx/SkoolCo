@@ -8,7 +8,7 @@ import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 /**
  * GET /api/products
- * Query: status? category? (slug) sort? (newest|top|launching) page? pageSize?
+ * Query: status? category? (slug) q? (search) sort? (newest|top|launching) page? pageSize?
  *
  * Anonymous users only ever see LIVE products. Signed-in users may pass
  * status filters, but non-LIVE results are restricted to their own products
@@ -35,6 +35,16 @@ export const GET = withErrorHandling(async (req: Request) => {
 
   if (query.category) {
     where.category = { slug: query.category };
+  }
+
+  if (query.q) {
+    // MVP search: case-insensitive substring match. Move to Postgres
+    // full-text (tsvector) only if catalog size ever makes this slow.
+    where.OR = [
+      { name: { contains: query.q, mode: "insensitive" } },
+      { tagline: { contains: query.q, mode: "insensitive" } },
+      { description: { contains: query.q, mode: "insensitive" } },
+    ];
   }
 
   const orderBy: Prisma.ProductOrderByWithRelationInput =

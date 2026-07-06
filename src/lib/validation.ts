@@ -38,6 +38,7 @@ export const updateProductSchema = createProductSchema
 export const listProductsQuerySchema = z.object({
   status: z.enum(["DRAFT", "SCHEDULED", "LIVE", "ARCHIVED"]).optional(),
   category: z.string().optional(), // category slug
+  q: z.string().trim().min(1).max(100).optional(), // free-text search
   sort: z.enum(["newest", "top", "launching"]).default("newest"),
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(50).default(20),
