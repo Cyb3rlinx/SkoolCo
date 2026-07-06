@@ -3,6 +3,8 @@ import { prisma } from "@/lib/db";
 import { registerSchema } from "@/lib/validation";
 import { withErrorHandling, parseBody, created, errorResponse, clientIp } from "@/lib/api";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
+import { isPasswordPwned } from "@/lib/password";
+import { createEmailVerification, sendVerificationEmail } from "@/lib/tokens";
 
 /**
  * POST /api/auth/register
@@ -25,12 +27,20 @@ export const POST = withErrorHandling(async (req: Request) => {
     return errorResponse(409, "An account with this email already exists");
   }
 
+  if (await isPasswordPwned(input.password)) {
+    return errorResponse(400, "Esa contraseña apareció en filtraciones conocidas. Elige otra.");
+  }
+
   const passwordHash = await bcrypt.hash(input.password, 12);
 
   const user = await prisma.user.create({
     data: { name: input.name, email: input.email, passwordHash },
     select: { id: true, name: true, email: true, role: true, createdAt: true },
   });
+
+  // Fire off email verification (non-fatal if the mailer is unconfigured — it logs).
+  const token = await createEmailVerification(user.id);
+  await sendVerificationEmail(user.email, token);
 
   return created(user);
 });
