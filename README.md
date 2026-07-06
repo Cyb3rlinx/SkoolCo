@@ -112,6 +112,10 @@ Sliding-window rate limits (see `src/lib/rate-limit.ts`): upvotes 30/min, commen
 | `NEXTAUTH_SECRET` | ✅ | JWT signing secret (`openssl rand -base64 32`) |
 | `NEXTAUTH_URL` | ✅ | Canonical app URL |
 | `SEED_USER_PASSWORD` | — | Dev-only seed account password |
+| `RESEND_API_KEY` | — | Resend API key for transactional email. **Without it, reset/verification emails are logged to the console (dev mode).** |
+| `EMAIL_FROM` | — | From address for outgoing email (e.g. `no-reply@tudominio.com`). |
+| `APP_URL` | — | Base URL used in email links (default `http://localhost:3000`). |
+| `ALLOWED_EXTENSION_ORIGINS` | — | Comma-separated origins allowed to call the extension API cross-origin (e.g. `chrome-extension://<id>`). Empty = no cross-origin access. |
 
 No secrets are hardcoded anywhere in the codebase.
 
