@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { detectPlatform } from "@/lib/platforms";
 
 // ---------------------------------------------------------------------------
 // Auth
@@ -71,9 +72,11 @@ export const resolveReportSchema = z.object({
 // ---------------------------------------------------------------------------
 
 /**
- * Only public Skool post URLs are accepted, and only when a signed-in user
- * explicitly submits one. The backend never fetches private data, never
- * stores third-party credentials, and never triggers actions on Skool.
+ * Only public https URLs from the platform allowlist (src/lib/platforms.ts:
+ * Skool, Discord, YouTube, X, Facebook, LinkedIn, Instagram, Telegram,
+ * Circle) are accepted, and only when a signed-in user explicitly submits
+ * one. The backend never fetches private data, never stores third-party
+ * credentials, and never triggers actions on those platforms.
  */
 export const createCommunityLinkSchema = z.object({
   title: z.string().trim().min(2).max(140),
@@ -82,14 +85,10 @@ export const createCommunityLinkSchema = z.object({
     .trim()
     .url()
     .max(2048)
-    .refine((u) => {
-      try {
-        const parsed = new URL(u);
-        return parsed.protocol === "https:" && parsed.hostname.endsWith("skool.com");
-      } catch {
-        return false;
-      }
-    }, "Only public https://…skool.com links are accepted"),
+    .refine(
+      (u) => detectPlatform(u) !== null,
+      "Only public https links from supported community platforms are accepted"
+    ),
   type: z.enum(["logro", "milestone", "announcement", "other"]).default("logro"),
 });
 

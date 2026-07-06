@@ -29,12 +29,18 @@ describe("createReportSchema", () => {
 });
 
 describe("createCommunityLinkSchema", () => {
-  it("accepts https skool.com links", () => {
-    expect(
-      createCommunityLinkSchema.safeParse({ title: "Logro", url: "https://www.skool.com/x" }).success
-    ).toBe(true);
+  it("accepts https links from allowlisted platforms", () => {
+    for (const url of [
+      "https://www.skool.com/x",
+      "https://discord.com/channels/1/2/3",
+      "https://www.youtube.com/watch?v=abc",
+      "https://x.com/user/status/1",
+      "https://t.me/canal/123",
+    ]) {
+      expect(createCommunityLinkSchema.safeParse({ title: "Logro", url }).success).toBe(true);
+    }
   });
-  it("rejects non-skool or non-https", () => {
+  it("rejects non-allowlisted or non-https", () => {
     expect(createCommunityLinkSchema.safeParse({ title: "x", url: "https://evil.com/x" }).success).toBe(false);
     expect(createCommunityLinkSchema.safeParse({ title: "x", url: "http://www.skool.com/x" }).success).toBe(false);
   });

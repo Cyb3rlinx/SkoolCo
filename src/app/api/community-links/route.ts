@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { createCommunityLinkSchema } from "@/lib/validation";
+import { detectPlatform } from "@/lib/platforms";
 import { withErrorHandling, parseBody, ok, created, errorResponse } from "@/lib/api";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
@@ -10,12 +11,13 @@ import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
  * Safety model (deliberate constraints):
  * 1. Submissions require a signed-in platform user and an explicit action
  *    (a click in the extension popup). There is no background capture.
- * 2. The backend never talks to Skool. It stores only a title + public URL
- *    the user chose to share. No scraping, no session cookies, no Skool
- *    credentials — the schema has no place to put them.
+ * 2. The backend never talks to the source platforms (Skool, Discord,
+ *    YouTube, etc. — see src/lib/platforms.ts). It stores only a title +
+ *    public URL the user chose to share. No scraping, no session cookies,
+ *    no third-party credentials — the schema has no place to put them.
  * 3. No automation exists on the write path: there is no endpoint that
- *    upvotes, posts, or performs any action on Skool, so bulk/auto
- *    engagement is impossible by construction.
+ *    upvotes, posts, or performs any action on those platforms, so
+ *    bulk/auto engagement is impossible by construction.
  * 4. Rate limits + a per-user unique URL constraint prevent spam.
  * 5. Links start as PENDING and are shown publicly only after a moderator
  *    marks them VERIFIED.
@@ -63,7 +65,7 @@ export const GET = withErrorHandling(async (req: Request) => {
 
 /**
  * POST /api/community-links — manually submit a public achievement link.
- * Body: { title, url (https://…skool.com only), type }
+ * Body: { title, url (https, plataformas del allowlist), type }
  */
 export const POST = withErrorHandling(async (req: Request) => {
   const user = await requireUser();
@@ -87,7 +89,8 @@ export const POST = withErrorHandling(async (req: Request) => {
       submittedById: user.id,
       title: input.title,
       url: input.url,
-      sourcePlatform: "skool",
+      // Derived from the URL's host; the Zod refine guarantees a match.
+      sourcePlatform: detectPlatform(input.url) ?? "unknown",
       type: input.type,
     },
     select: linkSelect,
