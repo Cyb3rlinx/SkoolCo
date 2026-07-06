@@ -98,6 +98,27 @@ export const extensionEventSchema = z.object({
 });
 
 // ---------------------------------------------------------------------------
+// Password reset & email verification
+// ---------------------------------------------------------------------------
+
+export const forgotPasswordSchema = z.object({
+  email: z.string().trim().toLowerCase().email().max(254),
+});
+
+export const resetPasswordSchema = z.object({
+  token: z.string().min(10).max(256),
+  password: z.string().min(8).max(128),
+});
+
+export const verifyEmailSchema = z.object({
+  token: z.string().min(10).max(256),
+});
+
+export const resendVerificationSchema = z.object({
+  email: z.string().trim().toLowerCase().email().max(254),
+});
+
+// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
