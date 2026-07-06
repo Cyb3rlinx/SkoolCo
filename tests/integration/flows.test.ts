@@ -1,0 +1,232 @@
+/**
+ * Integration tests against a real Postgres. They call the actual route
+ * handlers (register, upvote, comments, leaderboard, password reset) with
+ * real Requests and assert on real DB state.
+ *
+ * Requirements:
+ *   - DATABASE_URL pointing at a migrated test database
+ *     (npx prisma migrate deploy). Without it the whole suite is skipped.
+ *
+ * NextAuth is mocked at the getServerSession boundary — we test OUR
+ * authorization logic, not NextAuth itself. Outbound fetch (HIBP) is
+ * stubbed to fail so the pwned-check fails open deterministically.
+ */
+import { describe, it, expect, vi, beforeAll, afterAll } from "vitest";
+import bcrypt from "bcryptjs";
+
+type SessionUser = { id: string; role: string; name: string; email: string };
+const session: { current: { user: SessionUser } | null } = { current: null };
+
+vi.mock("next-auth", () => ({
+  getServerSession: vi.fn(() => Promise.resolve(session.current)),
+}));
+
+const HAS_DB = Boolean(process.env.DATABASE_URL);
+const uniq = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+
+describe.skipIf(!HAS_DB)("integration flows", () => {
+  let prisma: (typeof import("@/lib/db"))["prisma"];
+
+  beforeAll(async () => {
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("network disabled in tests")));
+    ({ prisma } = await import("@/lib/db"));
+  });
+
+  afterAll(async () => {
+    vi.unstubAllGlobals();
+    await prisma.$disconnect();
+  });
+
+  function jsonRequest(url: string, method: string, body?: unknown): Request {
+    return new Request(url, {
+      method,
+      headers: { "content-type": "application/json" },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+  }
+
+  // -------------------------------------------------------------------------
+  it("register: creates the user, rejects duplicates", async () => {
+    const { POST } = await import("@/app/api/auth/register/route");
+    const email = `reg-${uniq}@example.com`;
+
+    const res = await POST(
+      jsonRequest("http://test/api/auth/register", "POST", {
+        name: "Integration Tester",
+        email,
+        password: `Sup3r-unique-${uniq}!`,
+      })
+    );
+    expect(res.status).toBe(201);
+    const body = (await res.json()) as { data: { id: string; email: string } };
+    expect(body.data.email).toBe(email);
+
+    const inDb = await prisma.user.findUnique({ where: { email } });
+    expect(inDb).not.toBeNull();
+    expect(inDb!.emailVerified).toBeNull(); // pending verification
+
+    // A verification token was minted for the new user.
+    const tokens = await prisma.emailVerificationToken.count({
+      where: { userId: body.data.id },
+    });
+    expect(tokens).toBe(1);
+
+    const dup = await POST(
+      jsonRequest("http://test/api/auth/register", "POST", {
+        name: "Someone Else",
+        email,
+        password: `Other-pass-${uniq}!`,
+      })
+    );
+    expect(dup.status).toBe(409);
+  });
+
+  // -------------------------------------------------------------------------
+  it("upvote flow: count, maker notification, leaderboard", async () => {
+    const passwordHash = await bcrypt.hash("irrelevant-here", 4);
+    const category = await prisma.category.upsert({
+      where: { slug: `it-cat-${uniq}` },
+      update: {},
+      create: { name: `IT Cat ${uniq}`, slug: `it-cat-${uniq}` },
+    });
+    const maker = await prisma.user.create({
+      data: { name: "Maker IT", email: `maker-${uniq}@example.com`, passwordHash },
+    });
+    const voter = await prisma.user.create({
+      data: { name: "Voter IT", email: `voter-${uniq}@example.com`, passwordHash },
+    });
+    const product = await prisma.product.create({
+      data: {
+        makerId: maker.id,
+        name: `IT Product ${uniq}`,
+        slug: `it-product-${uniq}`,
+        tagline: "Integration test product",
+        description: "Created directly for the upvote integration test.",
+        categoryId: category.id,
+        launchDate: new Date(),
+        status: "LIVE",
+      },
+    });
+
+    session.current = {
+      user: { id: voter.id, role: "USER", name: voter.name, email: voter.email },
+    };
+
+    const { POST: upvote } = await import("@/app/api/products/[slug]/upvote/route");
+    const res = await upvote(jsonRequest("http://test/upvote", "POST"), {
+      params: { slug: product.slug },
+    });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { data: { upvoted: boolean; upvoteCount: number } };
+    expect(body.data).toEqual({ upvoted: true, upvoteCount: 1 });
+
+    // Idempotent repeat: still one upvote.
+    const again = await upvote(jsonRequest("http://test/upvote", "POST"), {
+      params: { slug: product.slug },
+    });
+    expect(((await again.json()) as { data: { upvoteCount: number } }).data.upvoteCount).toBe(1);
+
+    // The maker got exactly one UPVOTE notification (repeat didn't duplicate).
+    const notifications = await prisma.notification.findMany({
+      where: { userId: maker.id, productId: product.id, type: "UPVOTE" },
+    });
+    expect(notifications).toHaveLength(1);
+    expect(notifications[0].actorId).toBe(voter.id);
+
+    // Leaderboard: maker appears with launch + upvote credit (10*1 + 2*1 = 12).
+    const { GET: leaderboard } = await import("@/app/api/leaderboard/route");
+    const lbRes = await leaderboard(new Request("http://test/api/leaderboard?limit=100"));
+    const lb = (await lbRes.json()) as {
+      data: Array<{ userId: string; score: number; upvotesReceived: number }>;
+    };
+    const makerEntry = lb.data.find((e) => e.userId === maker.id);
+    expect(makerEntry).toBeDefined();
+    expect(makerEntry!.upvotesReceived).toBe(1);
+    expect(makerEntry!.score).toBe(12);
+  });
+
+  // -------------------------------------------------------------------------
+  it("comment flow: creates comment and notifies the maker", async () => {
+    const passwordHash = await bcrypt.hash("irrelevant-here", 4);
+    const category = await prisma.category.upsert({
+      where: { slug: `it-cat2-${uniq}` },
+      update: {},
+      create: { name: `IT Cat2 ${uniq}`, slug: `it-cat2-${uniq}` },
+    });
+    const maker = await prisma.user.create({
+      data: { name: "Maker C", email: `makerc-${uniq}@example.com`, passwordHash },
+    });
+    const commenter = await prisma.user.create({
+      data: { name: "Commenter", email: `commenter-${uniq}@example.com`, passwordHash },
+    });
+    const product = await prisma.product.create({
+      data: {
+        makerId: maker.id,
+        name: `IT Comment Product ${uniq}`,
+        slug: `it-comment-product-${uniq}`,
+        tagline: "Comment integration test",
+        description: "Created directly for the comment integration test.",
+        categoryId: category.id,
+        launchDate: new Date(),
+        status: "LIVE",
+      },
+    });
+
+    session.current = {
+      user: { id: commenter.id, role: "USER", name: commenter.name, email: commenter.email },
+    };
+
+    const { POST: comment } = await import("@/app/api/products/[slug]/comments/route");
+    const res = await comment(
+      jsonRequest("http://test/comments", "POST", { body: "Great launch! (integration)" }),
+      { params: { slug: product.slug } }
+    );
+    expect(res.status).toBe(201);
+
+    const notif = await prisma.notification.findFirst({
+      where: { userId: maker.id, productId: product.id, type: "COMMENT" },
+    });
+    expect(notif).not.toBeNull();
+    expect(notif!.actorId).toBe(commenter.id);
+  });
+
+  // -------------------------------------------------------------------------
+  it("password reset flow: forgot → reset → old token dies", async () => {
+    const oldPassword = `Old-pass-${uniq}!`;
+    const newPassword = `New-pass-${uniq}!`;
+    const passwordHash = await bcrypt.hash(oldPassword, 4);
+    const user = await prisma.user.create({
+      data: { name: "Reset IT", email: `reset-${uniq}@example.com`, passwordHash },
+    });
+
+    // Capture the dev-mode email log to extract the plaintext token.
+    const infoSpy = vi.spyOn(console, "info").mockImplementation(() => {});
+    const { POST: forgot } = await import("@/app/api/auth/forgot-password/route");
+    const res = await forgot(
+      jsonRequest("http://test/forgot", "POST", { email: user.email })
+    );
+    expect(res.status).toBe(200);
+
+    const logged = infoSpy.mock.calls.map((c) => c.join(" ")).join("\n");
+    infoSpy.mockRestore();
+    const match = logged.match(/token=([A-Za-z0-9_-]+)/);
+    expect(match).not.toBeNull();
+    const token = match![1];
+
+    const { POST: reset } = await import("@/app/api/auth/reset-password/route");
+    const ok = await reset(
+      jsonRequest("http://test/reset", "POST", { token, password: newPassword })
+    );
+    expect(ok.status).toBe(200);
+
+    const updated = await prisma.user.findUniqueOrThrow({ where: { id: user.id } });
+    expect(await bcrypt.compare(newPassword, updated.passwordHash)).toBe(true);
+    expect(await bcrypt.compare(oldPassword, updated.passwordHash)).toBe(false);
+
+    // Single-use: the same token is now rejected.
+    const reuse = await reset(
+      jsonRequest("http://test/reset", "POST", { token, password: `Again-${uniq}!` })
+    );
+    expect(reuse.status).toBe(400);
+  });
+});
