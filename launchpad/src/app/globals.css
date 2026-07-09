@@ -8,22 +8,25 @@
  * `.dark` selector later, no component changes needed.
  * ------------------------------------------------------------------------- */
 :root {
-  --background: 250 40% 99%;
-  --foreground: 246 22% 12%;
+  /* Palette (hex reference): bg #FFFFFF · text #0B1020 · secondary #5F6472 ·
+     primary #5B2CFF · deep #32128A · gradient #6D3DFF · lavender #EEE8FF ·
+     border #E7E3F2 · soft bg #F7F4FF / #FAFAFC */
+  --background: 0 0% 100%;
+  --foreground: 226 49% 8%;
 
   --card: 0 0% 100%;
-  --card-foreground: 246 22% 12%;
+  --card-foreground: 226 49% 8%;
 
-  --muted: 250 25% 96%;
-  --muted-foreground: 246 8% 44%;
+  --muted: 240 25% 98%;
+  --muted-foreground: 224 9% 41%;
 
   /* Brand: violet → indigo. Deliberately far from the orange/red family of
      existing launch platforms — original identity. */
-  --primary: 258 82% 56%;
+  --primary: 253 100% 59%;
   --primary-foreground: 0 0% 100%;
 
-  --accent: 258 90% 96.5%;
-  --accent-foreground: 258 60% 40%;
+  --accent: 256 100% 96%;
+  --accent-foreground: 256 77% 31%;
 
   --destructive: 0 72% 48%;
   --destructive-foreground: 0 0% 100%;
@@ -34,11 +37,11 @@
   --warning: 34 94% 44%;
   --warning-foreground: 0 0% 100%;
 
-  --border: 246 18% 90%;
-  --input: 246 18% 87%;
-  --ring: 258 82% 62%;
+  --border: 256 37% 92%;
+  --input: 256 37% 89%;
+  --ring: 253 100% 63%;
 
-  --radius: 0.75rem;
+  --radius: 0.875rem;
 }
 
 @layer base {
@@ -62,11 +65,16 @@
 
   /* Brand gradient (logo tile, primary CTAs, highlights). */
   .brand-gradient {
-    background-image: linear-gradient(135deg, hsl(262 83% 58%) 0%, hsl(243 75% 59%) 100%);
+    background-image: linear-gradient(135deg, #6d3dff 0%, #5b2cff 100%);
+  }
+
+  /* Deep premium gradient (extension banner, dark surfaces). */
+  .brand-gradient-deep {
+    background-image: linear-gradient(120deg, #32128a 0%, #5b2cff 100%);
   }
 
   .brand-text-gradient {
-    background-image: linear-gradient(120deg, hsl(262 83% 52%), hsl(243 75% 55%));
+    background-image: linear-gradient(120deg, #6d3dff, #5b2cff);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;

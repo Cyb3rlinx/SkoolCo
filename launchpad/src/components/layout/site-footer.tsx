@@ -1,52 +1,67 @@
 import Link from "next/link";
 import { Logo } from "./logo";
 
+// TODO(content): Normas, Novedades, Guías, Centro de ayuda, Contacto, Acerca de,
+// Privacidad y Términos aún no existen como páginas — el 404 con marca los cubre
+// mientras tanto. Reemplazar cuando haya contenido real (Privacidad/Términos son
+// requisito para publicar la extensión en la Chrome Web Store).
 const COLUMNS: { title: string; links: { label: string; href: string }[] }[] = [
   {
     title: "Plataforma",
     links: [
       { label: "Lanzamientos", href: "/launches" },
-      { label: "Ranking de la comunidad", href: "/leaderboard" },
+      { label: "Ranking", href: "/leaderboard" },
+      { label: "Extensión", href: "/extension" },
       { label: "Publicar un producto", href: "/submit" },
     ],
   },
   {
     title: "Comunidad",
     links: [
-      { label: "Extensión Logros", href: "/extension" },
-      { label: "Crear cuenta", href: "/signup" },
-      { label: "Iniciar sesión", href: "/login" },
+      { label: "Cómo funciona", href: "/#como-funciona" },
+      { label: "Makers", href: "/leaderboard" },
+      { label: "Normas", href: "/normas" },
+      { label: "Novedades", href: "/novedades" },
     ],
   },
   {
     title: "Recursos",
     links: [
-      // TODO(content): replace with real docs/blog/terms pages when they exist.
+      { label: "Guías", href: "/guias" },
+      { label: "Centro de ayuda", href: "/ayuda" },
+      { label: "Contacto", href: "/contacto" },
       { label: "API para desarrolladores", href: "/api/docs" },
-      { label: "Moderación", href: "/admin" },
+    ],
+  },
+  {
+    title: "Compañía",
+    links: [
+      { label: "Acerca de", href: "/acerca" },
+      { label: "Privacidad", href: "/privacidad" },
+      { label: "Términos", href: "/terminos" },
     ],
   },
 ];
 
 export function SiteFooter() {
   return (
-    <footer className="border-t bg-card">
-      <div className="container-page grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="space-y-3">
+    <footer className="border-t bg-white">
+      <div className="container-page grid grid-cols-2 gap-x-6 gap-y-10 py-14 sm:grid-cols-3 lg:grid-cols-6">
+        <div className="col-span-2 space-y-3 sm:col-span-3 lg:col-span-2">
           <Logo />
           <p className="max-w-xs text-sm text-muted-foreground">
-            La plataforma de lanzamientos impulsada por tu comunidad: publica tu proyecto,
-            recibe feedback real y gana visibilidad.
+            El lugar donde las comunidades apoyan productos reales. Votos honestos,
+            feedback útil y visibilidad desde el día uno.
           </p>
         </div>
         {COLUMNS.map((col) => (
           <nav key={col.title} aria-label={col.title} className="space-y-3">
-            <p className="text-sm font-bold uppercase tracking-wide text-muted-foreground">
+            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
               {col.title}
             </p>
-            <ul className="space-y-2">
+            <ul className="space-y-2.5">
               {col.links.map((link) => (
-                <li key={link.href}>
+                <li key={link.label}>
                   <Link
                     href={link.href}
                     className="text-sm text-muted-foreground transition-colors hover:text-foreground"

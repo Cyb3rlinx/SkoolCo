@@ -16,6 +16,7 @@ const NAV_LINKS = [
   { href: "/launches", label: "Lanzamientos" },
   { href: "/leaderboard", label: "Ranking" },
   { href: "/extension", label: "Extensión" },
+  { href: "/#como-funciona", label: "Recursos" },
 ];
 
 export function SiteHeader() {
