@@ -2,6 +2,13 @@
 
 Guía completa: qué está listo, qué copiar/pegar en la ficha, y los pasos exactos.
 
+## ⭐ Datos del item (creado 12-jul-2026)
+
+- **ID de la extensión:** `agimlgkodopeehnedcidphgbooefdkod`
+- **Para el env de producción:** `ALLOWED_EXTENSION_ORIGINS=chrome-extension://agimlgkodopeehnedcidphgbooefdkod`
+- **Estado:** Draft completo en la consola (ficha, privacy, permisos, ícono, visibility Unlisted).
+  Para "Submit for review" solo faltan: 1 captura 1280×800 y la URL pública de /privacidad (deploy).
+
 ## 0. Estado
 
 | Pieza | Estado |
@@ -10,7 +17,7 @@ Guía completa: qué está listo, qué copiar/pegar en la ficha, y los pasos exa
 | Manifest v0.3.0 con íconos | ✅ |
 | ZIP listo para subir | ✅ `extension/release/launchpad-logros-v0.3.0.zip` (regenerar: `npm run build` y comprimir `dist/`) |
 | Política de privacidad | ✅ página `/privacidad` — **necesita URL pública** (bloqueado por deploy/dominio) |
-| Cuenta de developer de Chrome | ⏳ Willy — registro único de $5 en https://chrome.google.com/webstore/devconsole |
+| Cuenta de developer de Chrome | ✅ Registrada y verificada (non-trader, email verificado) |
 | Captura(s) 1280×800 | ⏳ tomar del popup real una vez cargada (abajo cómo) |
 
 ## 1. Antes de subir (requisitos duros)
