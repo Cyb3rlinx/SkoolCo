@@ -141,7 +141,15 @@ export function ProductDetailClient({ slug }: { slug: string }) {
       {/* Body */}
       <div className="grid gap-10 lg:grid-cols-[1fr_320px]">
         <div className="min-w-0 space-y-10">
-          <ProductGallery name={product.name} logoUrl={product.logoUrl} tagline={product.tagline} />
+          <ProductGallery
+            name={product.name}
+            logoUrl={product.logoUrl}
+            tagline={product.tagline}
+            slug={product.slug}
+            makerId={product.maker.id}
+            images={product.images}
+            onChanged={refetch}
+          />
 
           <section aria-labelledby="about-title" className="space-y-3">
             <h2 id="about-title" className="text-xl font-extrabold">

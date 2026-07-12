@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: LaunchPad API
-  version: 0.5.0
+  version: 0.6.0
   description: |
     Backend de la plataforma comunitaria de lanzamiento de productos.
 
@@ -189,6 +189,54 @@ paths:
       responses:
         '200': { description: Bytes de la imagen con su Content-Type real }
         '404': { description: Imagen no encontrada }
+
+  /api/products/{slug}/images:
+    post:
+      tags: [Productos]
+      summary: Agregar captura a la galería (maker/staff, máx. 5)
+      security:
+        - sessionCookie: []
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [url]
+              properties:
+                url: { type: string, description: 'URL https o /api/uploads/:id' }
+      responses:
+        '201': { description: 'Imagen agregada — `{ data: { id, url, sort } }`' }
+        '400': { description: 'URL inválida o galería llena (5 máx.)' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { description: Solo el maker o staff }
+        '404': { description: Producto no encontrado }
+
+  /api/products/{slug}/images/{id}:
+    delete:
+      tags: [Productos]
+      summary: Quitar captura de la galería (maker/staff)
+      security:
+        - sessionCookie: []
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema: { type: string }
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '204': { description: Eliminada }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { description: Solo el maker o staff }
+        '404': { description: Imagen o producto no encontrado }
 
   /api/auth/register:
     post:

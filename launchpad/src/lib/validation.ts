@@ -46,6 +46,11 @@ export const updateProductSchema = createProductSchema
   .partial()
   .extend({ status: z.enum(["DRAFT", "SCHEDULED", "LIVE", "ARCHIVED"]).optional() });
 
+export const addProductImageSchema = z.object({ url: imageUrlSchema });
+
+/** Gallery cap per product — keeps pages fast and abuse bounded. */
+export const MAX_PRODUCT_IMAGES = 5;
+
 export const listProductsQuerySchema = z.object({
   status: z.enum(["DRAFT", "SCHEDULED", "LIVE", "ARCHIVED"]).optional(),
   category: z.string().optional(), // category slug

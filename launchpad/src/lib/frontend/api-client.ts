@@ -149,6 +149,22 @@ export async function uploadImage(file: File): Promise<{ id: string; url: string
   return (json as { data: { id: string; url: string } }).data;
 }
 
+/** POST /api/products/:slug/images (auth) — add a gallery screenshot. */
+export function addProductImage(slug: string, url: string) {
+  return request<{ id: string; url: string; sort: number }>(
+    `/api/products/${encodeURIComponent(slug)}/images`,
+    { method: "POST", body: JSON.stringify({ url }) }
+  );
+}
+
+/** DELETE /api/products/:slug/images/:id (auth). */
+export function deleteProductImage(slug: string, imageId: string) {
+  return request<void>(
+    `/api/products/${encodeURIComponent(slug)}/images/${encodeURIComponent(imageId)}`,
+    { method: "DELETE" }
+  );
+}
+
 /** POST /api/products/:slug/upvote (auth, idempotent). */
 export function upvoteProduct(slug: string) {
   return request<UpvoteResult>(`/api/products/${encodeURIComponent(slug)}/upvote`, {

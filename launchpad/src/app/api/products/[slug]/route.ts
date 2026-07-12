@@ -11,6 +11,10 @@ const detailSelect = {
   ...productListSelect,
   description: true,
   updatedAt: true,
+  images: {
+    select: { id: true, url: true, sort: true },
+    orderBy: { sort: "asc" as const },
+  },
 } as const;
 
 /**

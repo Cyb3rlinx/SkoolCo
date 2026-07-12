@@ -88,10 +88,18 @@ export interface ProductListItem {
 }
 
 /** GET /api/products/:slug adds description, updatedAt and upvotedByMe. */
+export interface ProductImage {
+  id: string;
+  url: string;
+  sort: number;
+}
+
 export interface ProductDetail extends ProductListItem {
   description: string;
   updatedAt: string;
   upvotedByMe: boolean;
+  /** Gallery screenshots (empty for older mocks). */
+  images?: ProductImage[];
 }
 
 export interface ProductListQuery {
