@@ -16,6 +16,7 @@ import { UpvoteButton } from "@/components/product/upvote-button";
 import { ProductGallery } from "@/components/product/product-gallery";
 import { CommentSection } from "@/components/product/comment-section";
 import { MakerCard } from "@/components/product/maker-card";
+import { ChangeLogoButton } from "@/components/product/change-logo-button";
 import { RelatedLaunches } from "@/components/product/related-launches";
 import { ReportButton } from "@/components/product/report-button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -96,7 +97,10 @@ export function ProductDetailClient({ slug }: { slug: string }) {
 
       {/* Header */}
       <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-        <ProductLogo name={product.name} src={product.logoUrl} size="lg" />
+        <div className="flex flex-col items-start gap-2 sm:items-center">
+          <ProductLogo name={product.name} src={product.logoUrl} size="lg" />
+          <ChangeLogoButton slug={product.slug} makerId={product.maker.id} onUpdated={refetch} />
+        </div>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">{product.name}</h1>

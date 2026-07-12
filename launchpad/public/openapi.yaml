@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: LaunchPad API
-  version: 0.3.0
+  version: 0.4.0
   description: |
     Backend de la plataforma comunitaria de lanzamiento de productos.
 
@@ -22,6 +22,7 @@ tags:
   - name: Salud
   - name: Auth
   - name: Perfil
+  - name: Subidas
   - name: Productos
   - name: Engagement
   - name: Leaderboard
@@ -147,6 +148,47 @@ paths:
           description: 'OK — `{ status: "ok", db: "ok" }`'
         '503':
           description: 'DB caída — `{ status: "degraded", db: "down" }`'
+
+  /api/uploads:
+    post:
+      tags: [Subidas]
+      summary: Subir una imagen (logo de producto, avatar)
+      description: |
+        Requiere sesión. Rate limit: 20/hora/usuario. `multipart/form-data`
+        con el campo `file`. Acepta PNG, JPEG o WebP hasta 2MB; el contenido
+        se verifica contra los magic bytes del formato (un archivo renombrado
+        se rechaza). La imagen queda pública e inmutable en `/api/uploads/{id}`.
+      security:
+        - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201': { description: 'Imagen creada — `{ data: { id, url } }`' }
+        '400': { description: 'Archivo faltante, tipo no permitido o >2MB' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+
+  /api/uploads/{id}:
+    get:
+      tags: [Subidas]
+      summary: Servir una imagen subida (pública, cacheable)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Bytes de la imagen con su Content-Type real }
+        '404': { description: Imagen no encontrada }
 
   /api/auth/register:
     post:

@@ -102,6 +102,52 @@ export function createProduct(input: CreateProductInput) {
   });
 }
 
+/** PATCH /api/products/:slug (auth) — maker/staff only. */
+export function updateProduct(
+  slug: string,
+  input: Partial<CreateProductInput> & { status?: string }
+) {
+  return request<ProductDetail>(`/api/products/${encodeURIComponent(slug)}`, {
+    method: "PATCH",
+    body: JSON.stringify(input),
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Uploads
+// ---------------------------------------------------------------------------
+
+/**
+ * POST /api/uploads (auth) — upload an image (PNG/JPEG/WebP, ≤2MB).
+ * Multipart, so it bypasses the JSON `request()` helper on purpose.
+ * Returns a stable public URL to use as logoUrl / avatarUrl.
+ */
+export async function uploadImage(file: File): Promise<{ id: string; url: string }> {
+  const form = new FormData();
+  form.append("file", file);
+
+  let res: Response;
+  try {
+    res = await fetch("/api/uploads", { method: "POST", body: form });
+  } catch {
+    throw new ApiClientError(0, "No se pudo conectar con el servidor.");
+  }
+
+  let json: unknown;
+  try {
+    json = await res.json();
+  } catch {
+    throw new ApiClientError(res.status, "Respuesta inválida del servidor.");
+  }
+
+  if (!res.ok) {
+    const err = (json as { error?: { message?: string; details?: unknown } }).error;
+    throw new ApiClientError(res.status, err?.message ?? `Error ${res.status}`, err?.details);
+  }
+
+  return (json as { data: { id: string; url: string } }).data;
+}
+
 /** POST /api/products/:slug/upvote (auth, idempotent). */
 export function upvoteProduct(slug: string) {
   return request<UpvoteResult>(`/api/products/${encodeURIComponent(slug)}/upvote`, {

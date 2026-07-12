@@ -5,7 +5,7 @@ import { useMemo, useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { CalendarDays, ImagePlus, Link2, PartyPopper } from "lucide-react";
-import { ApiClientError, createProduct, fetchCategories } from "@/lib/frontend/api-client";
+import { ApiClientError, createProduct, fetchCategories, uploadImage } from "@/lib/frontend/api-client";
 import { mockCategories } from "@/lib/frontend/mock-data";
 import { useApi } from "@/lib/frontend/hooks";
 import { toDateInputValue } from "@/lib/frontend/format";
@@ -51,17 +51,45 @@ export function SubmitLaunchForm() {
   const [mode, setMode] = useState<LaunchMode>("LIVE");
 
   const [filePreview, setFilePreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [errors, setErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  function onPickFile(e: React.ChangeEvent<HTMLInputElement>) {
+  async function onPickFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Client-side pre-checks (UX only — the server re-validates everything).
+    if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
+      setErrors((prev) => ({ ...prev, logoUrl: "Formato no soportado. Usa PNG, JPG o WebP." }));
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      setErrors((prev) => ({ ...prev, logoUrl: "La imagen supera el máximo de 2MB." }));
+      return;
+    }
+
     if (filePreview) URL.revokeObjectURL(filePreview);
     setFilePreview(URL.createObjectURL(file));
+    setErrors((prev) => ({ ...prev, logoUrl: undefined }));
+    setUploading(true);
+    try {
+      const { url } = await uploadImage(file);
+      setLogoUrl(url);
+    } catch (err) {
+      setFilePreview(null);
+      setErrors((prev) => ({
+        ...prev,
+        logoUrl:
+          err instanceof ApiClientError ? err.message : "No pudimos subir la imagen. Intenta de nuevo.",
+      }));
+    } finally {
+      setUploading(false);
+      e.target.value = ""; // allow re-picking the same file
+    }
   }
 
   function validate(): FieldErrors {
@@ -72,8 +100,8 @@ export function SubmitLaunchForm() {
       errs.description = "Cuéntanos un poco más (mínimo 10 caracteres).";
     if (websiteUrl && !/^https?:\/\//.test(websiteUrl))
       errs.websiteUrl = "Debe ser una URL completa (https://…).";
-    if (logoUrl && !/^https?:\/\//.test(logoUrl))
-      errs.logoUrl = "Debe ser una URL completa (https://…).";
+    if (logoUrl && !/^https?:\/\//.test(logoUrl) && !logoUrl.startsWith("/api/uploads/"))
+      errs.logoUrl = "Debe ser una URL completa (https://…) o una imagen subida.";
     if (!categoryId) errs.categoryId = "Elige una categoría.";
     if (!launchDate) errs.launchDate = "Elige la fecha de lanzamiento.";
     return errs;
@@ -226,24 +254,28 @@ export function SubmitLaunchForm() {
           </Field>
         </div>
 
-        {/* Logo: local file preview + public URL (real upload pending backend) */}
+        {/* Logo: real upload (POST /api/uploads) or a public URL as fallback */}
         <Field
           id="p-logo-url"
           label="Logo"
           error={errors.logoUrl}
           optional
-          hint="La subida de archivos llega con el backend de storage; mientras tanto pega una URL pública de imagen."
+          hint="Sube una imagen PNG, JPG o WebP (máx. 2MB), o pega una URL pública."
         >
           <div className="flex items-start gap-4">
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="flex h-20 w-20 shrink-0 flex-col items-center justify-center gap-1 overflow-hidden rounded-2xl border-2 border-dashed text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary"
+              disabled={uploading}
+              className="flex h-20 w-20 shrink-0 flex-col items-center justify-center gap-1 overflow-hidden rounded-2xl border-2 border-dashed text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary disabled:opacity-60"
               aria-label="Elegir imagen de logo"
+              aria-busy={uploading}
             >
-              {filePreview || logoUrl ? (
+              {uploading ? (
+                <span className="text-[10px] font-semibold">Subiendo…</span>
+              ) : filePreview || logoUrl ? (
                 <img
-                  src={logoUrl.trim() || filePreview || ""}
+                  src={filePreview || logoUrl.trim()}
                   alt="Vista previa del logo"
                   className="h-full w-full object-cover"
                 />
@@ -254,13 +286,10 @@ export function SubmitLaunchForm() {
                 </>
               )}
             </button>
-            {/* TODO(backend): subir el archivo a storage (S3/Supabase) y usar
-                la URL resultante como logoUrl. El input de archivo hoy solo
-                genera una vista previa local. */}
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/png,image/jpeg,image/webp,image/svg+xml"
+              accept="image/png,image/jpeg,image/webp"
               className="sr-only"
               onChange={onPickFile}
               aria-hidden

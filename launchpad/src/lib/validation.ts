@@ -11,10 +11,20 @@ export const registerSchema = z.object({
   password: z.string().min(8).max(128),
 });
 
+/** Absolute http(s) URL or an internal uploaded-image path (/api/uploads/:id). */
+export const imageUrlSchema = z
+  .string()
+  .trim()
+  .max(2048)
+  .refine(
+    (v) => /^https?:\/\/.+/.test(v) || /^\/api\/uploads\/[a-z0-9]+$/i.test(v),
+    "Must be a full URL (https://…) or an uploaded image path"
+  );
+
 export const updateProfileSchema = z.object({
   name: z.string().trim().min(2).max(80).optional(),
   bio: z.string().trim().max(500).optional(),
-  avatarUrl: z.string().url().max(2048).optional().nullable(),
+  avatarUrl: imageUrlSchema.optional().nullable(),
 });
 
 // ---------------------------------------------------------------------------
@@ -26,7 +36,7 @@ export const createProductSchema = z.object({
   tagline: z.string().trim().min(4).max(140),
   description: z.string().trim().min(10).max(5000),
   websiteUrl: z.string().url().max(2048).optional().nullable(),
-  logoUrl: z.string().url().max(2048).optional().nullable(),
+  logoUrl: imageUrlSchema.optional().nullable(),
   categoryId: z.string().min(1),
   launchDate: z.coerce.date(),
   status: z.enum(["DRAFT", "SCHEDULED", "LIVE"]).default("DRAFT"),

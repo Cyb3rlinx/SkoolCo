@@ -42,8 +42,26 @@ model User {
   emailVerificationTokens EmailVerificationToken[]
   notificationsReceived   Notification[] @relation("NotificationsReceived")
   notificationsActed      Notification[] @relation("NotificationsActed")
+  uploadedImages          UploadedImage[]
 
   @@map("users")
+}
+
+// User-uploaded images (product logos, avatars). Stored as bytea for MVP —
+// small files (≤2MB), zero external services, portable to any Postgres host.
+// Swapping to object storage later only changes the /api/uploads internals;
+// the public `/api/uploads/:id` URLs stay stable.
+model UploadedImage {
+  id         String   @id @default(cuid())
+  uploaderId String   @map("uploader_id")
+  mime       String
+  size       Int
+  data       Bytes
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  uploader User @relation(fields: [uploaderId], references: [id], onDelete: Cascade)
+
+  @@map("uploaded_images")
 }
 
 // ---------------------------------------------------------------------------
