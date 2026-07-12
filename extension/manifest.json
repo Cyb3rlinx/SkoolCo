@@ -1,9 +1,24 @@
 {
   "manifest_version": 3,
   "name": "LaunchPad — Logros",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Envía posts públicos de tus comunidades (Skool, Discord, YouTube y más) como logros a LaunchPad, con tu consentimiento y un clic.",
-  "action": { "default_popup": "popup.html", "default_title": "LaunchPad Logros" },
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "LaunchPad Logros",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
   "options_page": "options.html",
   "permissions": ["activeTab", "storage", "tabs"],
   "host_permissions": ["http://localhost:3000/*"],

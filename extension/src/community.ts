@@ -1,6 +1,7 @@
 // Importa la ÚNICA fuente de verdad del allowlist desde el backend
 // (módulo puro, sin dependencias — esbuild lo bundlea sin problema).
-import { PLATFORMS, detectPlatform } from "../../src/lib/platforms";
+// La app vive en launchpad/ desde la reestructuración del frontend.
+import { PLATFORMS, detectPlatform } from "../../launchpad/src/lib/platforms";
 
 const RESERVED_FIRST_SEGMENTS = new Set([
   "login",

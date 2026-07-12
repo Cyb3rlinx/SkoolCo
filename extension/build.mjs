@@ -12,4 +12,5 @@ await build({
 for (const f of ["src/popup.html", "src/options.html", "src/popup.css", "manifest.json"]) {
   cpSync(f, `dist/${f.split("/").pop()}`);
 }
+cpSync("icons", "dist/icons", { recursive: true });
 console.log("dist/ listo — carga esa carpeta como extensión descomprimida");
