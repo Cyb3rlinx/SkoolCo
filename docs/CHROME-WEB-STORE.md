@@ -6,8 +6,10 @@ Guía completa: qué está listo, qué copiar/pegar en la ficha, y los pasos exa
 
 - **ID de la extensión:** `agimlgkodopeehnedcidphgbooefdkod`
 - **Para el env de producción:** `ALLOWED_EXTENSION_ORIGINS=chrome-extension://agimlgkodopeehnedcidphgbooefdkod`
-- **Estado:** Draft completo en la consola (ficha, privacy, permisos, ícono, visibility Unlisted).
-  Para "Submit for review" solo faltan: 1 captura 1280×800 y la URL pública de /privacidad (deploy).
+- **Estado:** ✅ ENVIADA A REVISIÓN el 12-jul-2026 (publicación automática al aprobarse).
+  Paquete v0.3.1 apuntando a https://skool-co.vercel.app · captura subida · privacidad https://skool-co.vercel.app/privacidad
+- **Link de instalación (al aprobarse):** https://chromewebstore.google.com/detail/agimlgkodopeehnedcidphgbooefdkod
+- **Pendiente del lado backend:** ✅ ya hecho — ALLOWED_EXTENSION_ORIGINS configurado en Vercel + redeploy (Kevin, 12-jul).
 
 ## 0. Estado
 
