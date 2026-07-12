@@ -14,7 +14,7 @@ import { withErrorHandling, created } from "@/lib/api";
 export const POST = withErrorHandling(async (req: Request) => {
   const user = await requireUser();
 
-  if (!checkRateLimit(`upload:${user.id}`, RATE_LIMITS.upload)) {
+  if (!(await checkRateLimit(`upload:${user.id}`, RATE_LIMITS.upload))) {
     throw new ApiError(429, "Too many uploads. Try again later.");
   }
 

@@ -35,6 +35,16 @@ export interface UserRef {
   avatarUrl: string | null;
 }
 
+/** GET /api/users/:id — public maker profile. */
+export interface PublicUser {
+  id: string;
+  name: string;
+  avatarUrl: string | null;
+  bio: string | null;
+  createdAt: string;
+  _count: { products: number; upvotes: number; comments: number };
+}
+
 /** GET /api/me */
 export interface MeProfile {
   id: string;
@@ -88,6 +98,7 @@ export interface ProductListQuery {
   status?: ProductStatus;
   category?: string; // category slug
   q?: string;
+  maker?: string; // "me" or a user id
   sort?: "newest" | "top" | "launching";
   page?: number;
   pageSize?: number;

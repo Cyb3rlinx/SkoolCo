@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: LaunchPad API
-  version: 0.4.0
+  version: 0.5.0
   description: |
     Backend de la plataforma comunitaria de lanzamiento de productos.
 
@@ -353,6 +353,7 @@ paths:
         - { name: status, in: query, schema: { type: string, enum: [DRAFT, SCHEDULED, LIVE, ARCHIVED] } }
         - { name: category, in: query, schema: { type: string }, description: slug de categoría }
         - { name: q, in: query, schema: { type: string, maxLength: 100 }, description: búsqueda en nombre/tagline/descripción }
+        - { name: maker, in: query, schema: { type: string }, description: '"me" (auth; todos tus estados) o un id de usuario (solo LIVE)' }
         - { name: sort, in: query, schema: { type: string, enum: [newest, top, launching], default: newest } }
         - { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
         - { name: pageSize, in: query, schema: { type: integer, minimum: 1, maximum: 50, default: 20 } }
@@ -588,11 +589,22 @@ paths:
         '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
 
+  /api/users/{id}:
+    get:
+      tags: [Perfil]
+      summary: Perfil público de un maker
+      description: Solo campos comunitarios (sin email ni rol) + conteos de actividad pública. Sus lanzamientos: GET /api/products?maker={id}.
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: '`{ data: { id, name, avatarUrl, bio, createdAt, _count } }`' }
+        '404': { description: Usuario no encontrado }
+
   /api/community-links:
     get:
       tags: [Extensión]
       summary: Links de logros (públicos = VERIFIED)
-      description: '`?mine=1` (auth) lista los propios, incluidos PENDING.'
+      description: '`?mine=1` (auth) lista los propios, incluidos PENDING. `?status=PENDING|VERIFIED|REJECTED` (staff) alimenta la cola de moderación.'
       parameters:
         - { name: mine, in: query, schema: { type: string, enum: ["1"] } }
       responses:

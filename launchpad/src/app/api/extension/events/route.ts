@@ -17,7 +17,7 @@ import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 export const POST = withErrorHandling(async (req: Request) => {
   const user = await requireUser();
 
-  if (!checkRateLimit(`ext-event:${user.id}`, RATE_LIMITS.extensionEvent)) {
+  if (!(await checkRateLimit(`ext-event:${user.id}`, RATE_LIMITS.extensionEvent))) {
     return errorResponse(429, "Too many events");
   }
 

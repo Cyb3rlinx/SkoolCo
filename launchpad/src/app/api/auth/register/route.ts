@@ -14,7 +14,7 @@ import { createEmailVerification, sendVerificationEmail } from "@/lib/tokens";
  * (POST /api/auth/callback/credentials or the signIn() client helper).
  */
 export const POST = withErrorHandling(async (req: Request) => {
-  if (!checkRateLimit(`register:${clientIp(req)}`, RATE_LIMITS.register)) {
+  if (!(await checkRateLimit(`register:${clientIp(req)}`, RATE_LIMITS.register))) {
     return errorResponse(429, "Too many signup attempts. Try again later.");
   }
 

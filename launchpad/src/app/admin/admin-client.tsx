@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Check, ExternalLink, Flag, Trophy, X } from "lucide-react";
 import {
-  ApiClientError,
+  fetchCommunityLinksByStatus,
   fetchReports,
   moderateCommunityLink,
   resolveReport,
@@ -187,19 +187,13 @@ function ReportRow({
 }
 
 // ---------------------------------------------------------------------------
-// Community links queue — PATCH /api/community-links/:id
-// (see api-client TODO: no GET-pending endpoint yet → mock fallback)
+// Community links queue — GET /api/community-links?status=PENDING (staff),
+// PATCH /api/community-links/:id. Mock fallback only if the API is down.
 // ---------------------------------------------------------------------------
 
 function CommunityLinksQueue() {
   const { data, loading, error, demo, refetch, setData } = useApi(
-    // No real "pending links" endpoint yet; force the mock fallback so the
-    // flow is demoable. Verify/reject actions DO hit the real PATCH endpoint.
-    // TODO(backend): replace with GET /api/community-links?status=PENDING.
-    () =>
-      Promise.reject(
-        new ApiClientError(501, "Listado de logros pendientes no implementado en el backend.")
-      ) as Promise<CommunityLink[]>,
+    () => fetchCommunityLinksByStatus("PENDING"),
     { fallback: () => mockCommunityLinks.map((l) => ({ ...l, status: "PENDING" as const })) }
   );
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -208,10 +202,15 @@ function CommunityLinksQueue() {
     setBusyId(id);
     try {
       await moderateCommunityLink(id, status);
-    } catch {
-      // In demo mode the id is a mock; just update the UI locally.
-    } finally {
       setData((prev) => (prev ? prev.map((l) => (l.id === id ? { ...l, status } : l)) : prev));
+    } catch (err) {
+      if (demo) {
+        // Demo mode: the id is a mock; just update the UI locally.
+        setData((prev) => (prev ? prev.map((l) => (l.id === id ? { ...l, status } : l)) : prev));
+      } else {
+        refetch();
+      }
+    } finally {
       setBusyId(null);
     }
   }

@@ -18,7 +18,7 @@ type Params = { params: { slug: string } };
 export const POST = withErrorHandling(async (_req: Request, { params }: Params) => {
   const user = await requireUser();
 
-  if (!checkRateLimit(`upvote:${user.id}`, RATE_LIMITS.upvote)) {
+  if (!(await checkRateLimit(`upvote:${user.id}`, RATE_LIMITS.upvote))) {
     return errorResponse(429, "Slow down a little — too many votes in a short time.");
   }
 
@@ -53,7 +53,7 @@ export const POST = withErrorHandling(async (_req: Request, { params }: Params) 
 export const DELETE = withErrorHandling(async (_req: Request, { params }: Params) => {
   const user = await requireUser();
 
-  if (!checkRateLimit(`upvote:${user.id}`, RATE_LIMITS.upvote)) {
+  if (!(await checkRateLimit(`upvote:${user.id}`, RATE_LIMITS.upvote))) {
     return errorResponse(429, "Slow down a little — too many votes in a short time.");
   }
 

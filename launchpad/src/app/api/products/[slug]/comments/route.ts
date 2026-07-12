@@ -42,7 +42,7 @@ export const GET = withErrorHandling(async (req: Request, { params }: Params) =>
 export const POST = withErrorHandling(async (req: Request, { params }: Params) => {
   const user = await requireUser();
 
-  if (!checkRateLimit(`comment:${user.id}`, RATE_LIMITS.comment)) {
+  if (!(await checkRateLimit(`comment:${user.id}`, RATE_LIMITS.comment))) {
     return errorResponse(429, "You're commenting too fast. Take a breath and try again.");
   }
 

@@ -11,7 +11,7 @@ const GENERIC = {
 };
 
 export const POST = withErrorHandling(async (req: Request) => {
-  if (!checkRateLimit(`forgot:${clientIp(req)}`, RATE_LIMITS.register)) {
+  if (!(await checkRateLimit(`forgot:${clientIp(req)}`, RATE_LIMITS.register))) {
     return errorResponse(429, "Demasiados intentos. Intenta más tarde.");
   }
   const { email } = await parseBody(req, forgotPasswordSchema);

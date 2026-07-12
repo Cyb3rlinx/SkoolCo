@@ -20,6 +20,7 @@ import type {
   Paginated,
   ProductDetail,
   ProductListItem,
+  PublicUser,
   ProductListQuery,
   ReportStatus,
   UpvoteResult,
@@ -303,6 +304,16 @@ export function createReport(input: { productId?: string; commentId?: string; re
 /** GET /api/community-links — public VERIFIED links (?mine=1 for your own). */
 export function fetchCommunityLinks(mine = false) {
   return request<CommunityLink[]>(`/api/community-links${mine ? "?mine=1" : ""}`);
+}
+
+/** GET /api/community-links?status=… (staff) — moderation queue. */
+export function fetchCommunityLinksByStatus(status: "PENDING" | "VERIFIED" | "REJECTED") {
+  return request<CommunityLink[]>(`/api/community-links?status=${status}`);
+}
+
+/** GET /api/users/:id — public maker profile. */
+export function fetchUser(id: string) {
+  return request<PublicUser>(`/api/users/${encodeURIComponent(id)}`);
 }
 
 /** POST /api/community-links (auth) — submit a public skool.com achievement link. */

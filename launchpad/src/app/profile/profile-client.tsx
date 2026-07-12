@@ -28,28 +28,10 @@ import { Field } from "@/components/forms/field";
 import { buttonVariants } from "@/components/ui/button";
 import Link from "next/link";
 
-/**
- * Own launches, all states.
- * TODO(backend): a `?maker=me` filter on GET /api/products would collapse
- * these parallel calls into one. Until then: LIVE is public (filter by
- * maker locally); DRAFT/SCHEDULED/ARCHIVED already return only your own.
- */
-async function fetchMyLaunches(myId: string): Promise<ProductListItem[]> {
-  const [live, draft, scheduled, archived] = await Promise.all([
-    fetchProducts({ pageSize: 50 }),
-    fetchProducts({ status: "DRAFT", pageSize: 50 }),
-    fetchProducts({ status: "SCHEDULED", pageSize: 50 }),
-    fetchProducts({ status: "ARCHIVED", pageSize: 50 }),
-  ]);
-  const all = [
-    ...live.items.filter((p) => p.maker.id === myId),
-    ...draft.items.filter((p) => p.maker.id === myId),
-    ...scheduled.items.filter((p) => p.maker.id === myId),
-    ...archived.items.filter((p) => p.maker.id === myId),
-  ];
-  return all.sort(
-    (a, b) => new Date(b.launchDate).getTime() - new Date(a.launchDate).getTime()
-  );
+/** Own launches, all states, in one call (GET /api/products?maker=me). */
+async function fetchMyLaunches(): Promise<ProductListItem[]> {
+  const mine = await fetchProducts({ maker: "me", pageSize: 50 });
+  return mine.items;
 }
 
 const STATUS_LABEL: Record<string, { text: string; variant: "success" | "warning" | "secondary" | "outline" }> = {
@@ -66,7 +48,7 @@ export function ProfileClient() {
 
   const me = useApi(fetchMe, {});
   const myId = session?.user?.id ?? "";
-  const launches = useApi(() => fetchMyLaunches(myId), {
+  const launches = useApi(fetchMyLaunches, {
     enabled: Boolean(myId),
     deps: [myId],
   });

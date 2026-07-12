@@ -13,12 +13,20 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
+  // Base for absolute OG/Twitter URLs. NEXTAUTH_URL is already required config,
+  // so social cards work in prod without adding a new env var.
+  metadataBase: new URL(process.env.NEXTAUTH_URL ?? "http://localhost:3000"),
   title: {
     default: "LaunchPad — lanza tu producto con la comunidad",
     template: "%s · LaunchPad",
   },
   description:
     "La plataforma de lanzamientos impulsada por la comunidad: publica tu proyecto, recibe votos y feedback real, y gana visibilidad.",
+  openGraph: {
+    siteName: "LaunchPad",
+    locale: "es",
+    type: "website",
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

@@ -12,7 +12,7 @@ import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 export const POST = withErrorHandling(async (req: Request) => {
   const user = await requireUser();
 
-  if (!checkRateLimit(`report:${user.id}`, RATE_LIMITS.report)) {
+  if (!(await checkRateLimit(`report:${user.id}`, RATE_LIMITS.report))) {
     return errorResponse(429, "Too many reports submitted. Try again later.");
   }
 

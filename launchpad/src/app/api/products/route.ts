@@ -9,11 +9,14 @@ import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 /**
  * GET /api/products
- * Query: status? category? (slug) q? (search) sort? (newest|top|launching) page? pageSize?
+ * Query: status? category? (slug) q? (search) maker? ("me" | user id)
+ *        sort? (newest|top|launching) page? pageSize?
  *
  * Anonymous users only ever see LIVE products. Signed-in users may pass
  * status filters, but non-LIVE results are restricted to their own products
- * (moderators/admins see everything).
+ * (moderators/admins see everything). `maker=me` returns all of your own
+ * products in one call; `maker=<id>` is the public (LIVE-only) view of a
+ * maker's launches.
  */
 export const GET = withErrorHandling(async (req: Request) => {
   const url = new URL(req.url);
@@ -23,7 +26,15 @@ export const GET = withErrorHandling(async (req: Request) => {
 
   const where: Prisma.ProductWhereInput = {};
 
-  if (!query.status || query.status === "LIVE") {
+  if (query.maker === "me") {
+    if (!user) return errorResponse(401, "Sign in to view your products");
+    where.makerId = user.id;
+    if (query.status) where.status = query.status; // omit = all own statuses
+  } else if (query.maker) {
+    where.makerId = query.maker;
+    // Someone else's launches: public sees LIVE only; staff may filter.
+    where.status = isStaff && query.status ? query.status : "LIVE";
+  } else if (!query.status || query.status === "LIVE") {
     where.status = "LIVE";
   } else if (isStaff) {
     where.status = query.status;
@@ -82,7 +93,7 @@ export const GET = withErrorHandling(async (req: Request) => {
 export const POST = withErrorHandling(async (req: Request) => {
   const user = await requireUser();
 
-  if (!checkRateLimit(`product:${user.id}`, RATE_LIMITS.productCreate)) {
+  if (!(await checkRateLimit(`product:${user.id}`, RATE_LIMITS.productCreate))) {
     return errorResponse(429, "You're submitting too fast. Try again later.");
   }
 

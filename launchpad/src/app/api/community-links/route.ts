@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
+import { z } from "zod";
 import { prisma } from "@/lib/db";
-import { requireUser } from "@/lib/auth";
+import { requireUser, requireModerator } from "@/lib/auth";
 import { createCommunityLinkSchema } from "@/lib/validation";
 import { detectPlatform } from "@/lib/platforms";
 import { withErrorHandling, parseBody, ok, created, errorResponse } from "@/lib/api";
@@ -38,11 +39,25 @@ const linkSelect = {
 /**
  * GET /api/community-links
  * Public: VERIFIED links only. Add ?mine=1 (auth) to list your own,
- * including pending ones.
+ * including pending ones. Staff may pass ?status=PENDING|VERIFIED|REJECTED
+ * to feed the moderation queue.
  */
 export const GET = withErrorHandling(async (req: Request) => {
   const url = new URL(req.url);
   const mine = url.searchParams.get("mine") === "1";
+  const status = url.searchParams.get("status");
+
+  if (status) {
+    await requireModerator();
+    const parsed = z.enum(["PENDING", "VERIFIED", "REJECTED"]).parse(status);
+    const links = await prisma.communityLink.findMany({
+      where: { status: parsed },
+      orderBy: { createdAt: "asc" }, // queue: oldest first
+      select: linkSelect,
+      take: 100,
+    });
+    return ok(links);
+  }
 
   if (mine) {
     const user = await requireUser();
@@ -71,7 +86,7 @@ export const GET = withErrorHandling(async (req: Request) => {
 export const POST = withErrorHandling(async (req: Request) => {
   const user = await requireUser();
 
-  if (!checkRateLimit(`community-link:${user.id}`, RATE_LIMITS.communityLink)) {
+  if (!(await checkRateLimit(`community-link:${user.id}`, RATE_LIMITS.communityLink))) {
     return errorResponse(429, "Too many link submissions. Try again later.");
   }
 

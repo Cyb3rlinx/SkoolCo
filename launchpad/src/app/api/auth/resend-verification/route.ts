@@ -10,7 +10,7 @@ const GENERIC = {
 };
 
 export const POST = withErrorHandling(async (req: Request) => {
-  if (!checkRateLimit(`resend-verif:${clientIp(req)}`, RATE_LIMITS.resendVerification)) {
+  if (!(await checkRateLimit(`resend-verif:${clientIp(req)}`, RATE_LIMITS.resendVerification))) {
     return errorResponse(429, "Demasiados intentos. Intenta más tarde.");
   }
   const { email } = await parseBody(req, resendVerificationSchema);

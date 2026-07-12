@@ -36,8 +36,8 @@ export const authOptions: NextAuthOptions = {
 
         // Anti brute-force: throttle by email AND by IP. Failing either
         // returns null (indistinguishable from bad credentials).
-        const okEmail = checkRateLimit(`login:email:${email}`, RATE_LIMITS.login);
-        const okIp = checkRateLimit(`login:ip:${ip}`, RATE_LIMITS.login);
+        const okEmail = await checkRateLimit(`login:email:${email}`, RATE_LIMITS.login);
+        const okIp = await checkRateLimit(`login:ip:${ip}`, RATE_LIMITS.login);
         if (!okEmail || !okIp) return null;
 
         const user = await prisma.user.findUnique({ where: { email } });
