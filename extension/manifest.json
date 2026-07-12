@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "LaunchPad — Logros",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Envía posts públicos de tus comunidades (Skool, Discord, YouTube y más) como logros a LaunchPad, con tu consentimiento y un clic.",
   "icons": {
     "16": "icons/icon-16.png",
@@ -21,6 +21,6 @@
   },
   "options_page": "options.html",
   "permissions": ["activeTab", "storage", "tabs"],
-  "host_permissions": ["http://localhost:3000/*"],
+  "host_permissions": ["https://skool-co.vercel.app/*"],
   "optional_host_permissions": ["https://*/*", "http://*/*"]
 }
