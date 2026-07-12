@@ -1,8 +1,8 @@
+export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/db";
 import { withErrorHandling, ok } from "@/lib/api";
 
 // Live DB data — never prerender/cache at build time.
-export const dynamic = "force-dynamic";
 
 /** GET /api/categories — all categories with live-product counts. */
 export const GET = withErrorHandling(async () => {

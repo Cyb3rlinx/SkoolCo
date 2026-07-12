@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { getSessionUser, requireUser } from "@/lib/auth";

@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { getLeaderboard } from "@/lib/leaderboard";
 import { withErrorHandling, ok } from "@/lib/api";
 

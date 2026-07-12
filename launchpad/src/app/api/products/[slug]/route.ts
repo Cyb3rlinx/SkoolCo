@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/db";
 import { getSessionUser, requireUser, ApiError } from "@/lib/auth";
 import { updateProductSchema } from "@/lib/validation";

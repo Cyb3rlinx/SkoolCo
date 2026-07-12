@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/db";
 import { resendVerificationSchema } from "@/lib/validation";
 import { createEmailVerification, sendVerificationEmail } from "@/lib/tokens";

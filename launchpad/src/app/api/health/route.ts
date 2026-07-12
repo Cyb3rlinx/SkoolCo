@@ -1,8 +1,8 @@
+export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 
 // A healthcheck must reflect live state — never a build-time snapshot.
-export const dynamic = "force-dynamic";
 
 /** GET /api/health — liveness + DB readiness. No auth. */
 export async function GET() {

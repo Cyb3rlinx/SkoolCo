@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/db";
 import { requireModerator, ApiError } from "@/lib/auth";
 import { resolveReportSchema } from "@/lib/validation";
