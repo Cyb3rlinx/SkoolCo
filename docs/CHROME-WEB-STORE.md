@@ -6,9 +6,14 @@ Guía completa: qué está listo, qué copiar/pegar en la ficha, y los pasos exa
 
 - **ID de la extensión:** `agimlgkodopeehnedcidphgbooefdkod`
 - **Para el env de producción:** `ALLOWED_EXTENSION_ORIGINS=chrome-extension://agimlgkodopeehnedcidphgbooefdkod`
+- **Dominio definitivo:** `https://denveler.com` (reemplaza a `skool-co.vercel.app`, que quedó
+  huérfano cuando se configuró el dominio propio — 13-jul-2026).
 - **Estado:** 🔴 RECHAZADA 13-jul-2026 por "Keyword Spam" (enumerar 9 plataformas en la
-  descripción). Corregido en v0.3.2: cero nombres de marcas en TODOS los metadatos.
-  ⏳ Pendiente: subir ZIP v0.3.2 + reemplazar resumen y descripción + reenviar.
+  descripción). Corregido en v0.3.2 (metadatos sin nombres de marcas) y v0.3.3
+  (`host_permissions` + backend por defecto actualizados a `denveler.com`).
+  ⏳ Pendiente: subir ZIP v0.3.3 en Package, revisar que Store listing/Privacy sigan
+  con los textos limpios (ya se corrigieron en v0.3.2), actualizar la URL de
+  privacidad a `https://denveler.com/privacidad` si aún dice el dominio viejo, y reenviar.
 - **Link de instalación (al aprobarse):** https://chromewebstore.google.com/detail/agimlgkodopeehnedcidphgbooefdkod
 - **Pendiente del lado backend:** ✅ ya hecho — ALLOWED_EXTENSION_ORIGINS configurado en Vercel + redeploy (Kevin, 12-jul).
 

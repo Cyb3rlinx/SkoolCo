@@ -1,4 +1,4 @@
-const DEFAULT_BASE_URL = "https://skool-co.vercel.app";
+const DEFAULT_BASE_URL = "https://denveler.com";
 
 export async function getBaseUrl(): Promise<string> {
   const { baseUrl } = await chrome.storage.sync.get({ baseUrl: DEFAULT_BASE_URL });

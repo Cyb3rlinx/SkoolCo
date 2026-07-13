@@ -16,7 +16,7 @@ Comunidad, hoy les traemos algo que construimos para ustedes.
 cada maker de esta comunidad puede publicar lo que está construyendo, recibir
 votos honestos y feedback real — sin algoritmos, sin bots, sin pay-to-win.
 
-👉 **https://skool-co.vercel.app**
+👉 **https://denveler.com**
 
 Qué puedes hacer desde hoy:
 ✅ Publicar tu producto (con logo y hasta 5 capturas)
@@ -38,7 +38,7 @@ Nos vemos en el ranking 🏆
 
 **Título:** 📌 Cómo publicar tu producto en LaunchPad (2 minutos)
 
-1. Entra a **https://skool-co.vercel.app** y crea tu cuenta (nombre, email, contraseña — listo).
+1. Entra a **https://denveler.com** y crea tu cuenta (nombre, email, contraseña — listo).
 2. Botón **"Publicar mi producto"**.
 3. Llena lo básico: nombre, tagline (tu pitch en una línea), descripción, categoría.
 4. Sube tu **logo** (PNG/JPG, máx. 2MB) — o pega una URL si lo tienes hosteado.

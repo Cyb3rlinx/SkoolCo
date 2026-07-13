@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "LaunchPad — Logros",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Comparte manualmente posts públicos de tu comunidad como logros en LaunchPad, con tu consentimiento y un solo clic.",
   "icons": {
     "16": "icons/icon-16.png",
@@ -21,6 +21,6 @@
   },
   "options_page": "options.html",
   "permissions": ["activeTab", "storage", "tabs"],
-  "host_permissions": ["https://skool-co.vercel.app/*"],
+  "host_permissions": ["https://denveler.com/*"],
   "optional_host_permissions": ["https://*/*", "http://*/*"]
 }
