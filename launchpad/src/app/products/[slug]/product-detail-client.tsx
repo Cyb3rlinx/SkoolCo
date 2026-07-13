@@ -16,6 +16,7 @@ import { UpvoteButton } from "@/components/product/upvote-button";
 import { ProductGallery } from "@/components/product/product-gallery";
 import { CommentSection } from "@/components/product/comment-section";
 import { MakerCard } from "@/components/product/maker-card";
+import { OfferCard } from "@/components/product/offer-card";
 import { ChangeLogoButton } from "@/components/product/change-logo-button";
 import { RelatedLaunches } from "@/components/product/related-launches";
 import { ReportButton } from "@/components/product/report-button";
@@ -165,6 +166,14 @@ export function ProductDetailClient({ slug }: { slug: string }) {
 
         <aside className="space-y-6">
           <MakerCard maker={product.maker} />
+
+          <OfferCard
+            slug={product.slug}
+            makerId={product.maker.id}
+            openToOffers={product.openToOffers}
+            declaredMrrUsd={product.declaredMrrUsd}
+            monetizationNote={product.monetizationNote}
+          />
 
           <Card>
             <CardContent className="space-y-3 p-5 text-sm">
