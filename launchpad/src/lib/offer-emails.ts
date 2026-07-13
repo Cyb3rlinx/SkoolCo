@@ -57,7 +57,7 @@ export async function sendContactSharedNotification(input: {
     text,
     html: `<p>Hola ${esc(input.buyerName)},</p>
 <p><strong>${esc(input.makerName)}</strong>, maker de <strong>${esc(input.productName)}</strong>, aceptó compartir su contacto contigo:</p>
-<p><a href="mailto:${input.makerEmail}">${input.makerEmail}</a></p>
+<p><a href="mailto:${esc(input.makerEmail)}">${esc(input.makerEmail)}</a></p>
 <p>Escríbele directamente para continuar la conversación. Denveler no participa en la negociación.</p>`,
   });
 }
