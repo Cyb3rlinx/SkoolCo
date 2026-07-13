@@ -100,6 +100,10 @@ export interface ProductDetail extends ProductListItem {
   upvotedByMe: boolean;
   /** Gallery screenshots (empty for older mocks). */
   images?: ProductImage[];
+  /** Puente de compraventa — declarado por el maker, NO verificado. */
+  openToOffers?: boolean;
+  declaredMrrUsd?: number | null;
+  monetizationNote?: string | null;
 }
 
 export interface ProductListQuery {
@@ -122,6 +126,20 @@ export interface CreateProductInput {
   categoryId: string;
   launchDate: string; // ISO date
   status?: "DRAFT" | "SCHEDULED" | "LIVE";
+  openToOffers?: boolean;
+  declaredMrrUsd?: number | null;
+  monetizationNote?: string | null;
+}
+
+export type ContactRequestStatus = "PENDING" | "SHARED" | "DISMISSED";
+
+export interface ContactRequestItem {
+  id: string;
+  message: string;
+  status: ContactRequestStatus;
+  createdAt: string;
+  buyer: { name: string };
+  product: { name: string; slug: string };
 }
 
 // ---------------------------------------------------------------------------

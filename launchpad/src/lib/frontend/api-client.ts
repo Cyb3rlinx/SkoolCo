@@ -12,6 +12,7 @@ import type {
   Category,
   CommentItem,
   CommunityLink,
+  ContactRequestItem,
   CreateProductInput,
   LeaderboardEntry,
   MeProfile,
@@ -162,6 +163,31 @@ export function deleteProductImage(slug: string, imageId: string) {
   return request<void>(
     `/api/products/${encodeURIComponent(slug)}/images/${encodeURIComponent(imageId)}`,
     { method: "DELETE" }
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Puente de compraventa (Fase 2)
+// ---------------------------------------------------------------------------
+
+/** POST /api/products/:slug/contact-requests (auth) — pedir contacto al maker. */
+export function requestContact(slug: string, message: string) {
+  return request<{ id: string; status: string; createdAt: string }>(
+    `/api/products/${encodeURIComponent(slug)}/contact-requests`,
+    { method: "POST", body: JSON.stringify({ message }) }
+  );
+}
+
+/** GET /api/me/contact-requests (auth) — solicitudes recibidas por mis productos. */
+export function fetchMyContactRequests() {
+  return request<ContactRequestItem[]>(`/api/me/contact-requests`);
+}
+
+/** PATCH /api/contact-requests/:id (auth) — compartir email o descartar. */
+export function resolveContactRequest(id: string, status: "SHARED" | "DISMISSED") {
+  return request<{ id: string; status: string }>(
+    `/api/contact-requests/${encodeURIComponent(id)}`,
+    { method: "PATCH", body: JSON.stringify({ status }) }
   );
 }
 
