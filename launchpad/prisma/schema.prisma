@@ -43,6 +43,7 @@ model User {
   notificationsReceived   Notification[] @relation("NotificationsReceived")
   notificationsActed      Notification[] @relation("NotificationsActed")
   uploadedImages          UploadedImage[]
+  contactRequestsSent     ContactRequest[]
 
   @@map("users")
 }
@@ -96,6 +97,12 @@ model Product {
   categoryId  String        @map("category_id")
   launchDate  DateTime      @map("launch_date")
   status      ProductStatus @default(DRAFT)
+
+  // --- Puente de compraventa (Fase 2): métricas declaradas + interés ---
+  openToOffers     Boolean @default(false) @map("open_to_offers")
+  declaredMrrUsd   Int?    @map("declared_mrr_usd") // USD/mes, declarado por el maker, NO verificado
+  monetizationNote String? @map("monetization_note")
+
   createdAt   DateTime      @default(now()) @map("created_at")
   updatedAt   DateTime      @updatedAt @map("updated_at")
 
@@ -106,6 +113,7 @@ model Product {
   reports       ModerationReport[]
   notifications Notification[]
   images        ProductImage[]
+  contactRequests ContactRequest[]
 
   @@index([status, launchDate])
   @@index([makerId])
@@ -126,6 +134,32 @@ model ProductImage {
 
   @@index([productId, sort])
   @@map("product_images")
+}
+
+/// Solicitud de contacto de un comprador interesado en un producto
+/// "abierto a ofertas". El maker decide compartir su email (SHARED) o
+/// descartar (DISMISSED). Sin mensajería interna: el contacto sigue por email.
+enum ContactRequestStatus {
+  PENDING
+  SHARED
+  DISMISSED
+}
+
+model ContactRequest {
+  id        String               @id @default(cuid())
+  productId String               @map("product_id")
+  buyerId   String               @map("buyer_id")
+  message   String
+  status    ContactRequestStatus @default(PENDING)
+  createdAt DateTime             @default(now()) @map("created_at")
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  buyer   User    @relation(fields: [buyerId], references: [id], onDelete: Cascade)
+
+  // Un comprador solo puede solicitar contacto una vez por producto (anti-spam).
+  @@unique([productId, buyerId])
+  @@index([productId, status])
+  @@map("contact_requests")
 }
 
 // ---------------------------------------------------------------------------
