@@ -4,20 +4,20 @@ import { ProsePage } from "@/components/layout/prose-page";
 
 export const metadata: Metadata = {
   title: "Términos de uso",
-  description: "Las reglas de uso de LaunchPad, claras y sin letra pequeña.",
+  description: "Las reglas de uso de Denveler, claras y sin letra pequeña.",
 };
 
 export default function TerminosPage() {
   return (
-    <ProsePage title="Términos de uso" updated="12 de julio de 2026">
+    <ProsePage title="Términos de uso" updated="13 de julio de 2026">
       <p>
-        Al crear una cuenta en LaunchPad aceptas estos términos. Son cortos a propósito: queremos
+        Al crear una cuenta en Denveler aceptas estos términos. Son cortos a propósito: queremos
         que los leas de verdad.
       </p>
 
       <h2>El servicio</h2>
       <p>
-        LaunchPad permite publicar productos, recibir votos y comentarios de la comunidad y ganar
+        Denveler permite publicar productos, recibir votos y comentarios de la comunidad y ganar
         visibilidad. Es un servicio en evolución (MVP): puede cambiar, tener errores o
         interrumpirse; lo ofrecemos “tal cual”, sin garantías de disponibilidad.
       </p>
@@ -47,7 +47,7 @@ export default function TerminosPage() {
 
       <h2>Votos y reputación</h2>
       <p>
-        El valor de LaunchPad es que los votos son de personas reales. Comprar votos, usar bots,
+        El valor de Denveler es que los votos son de personas reales. Comprar votos, usar bots,
         cuentas múltiples o intercambios de votos (“vota y te voto”) está prohibido y es causa de
         eliminación de cuenta.
       </p>
@@ -60,7 +60,7 @@ export default function TerminosPage() {
 
       <h2>Responsabilidad</h2>
       <p>
-        Los productos publicados pertenecen a sus makers; LaunchPad no garantiza su calidad ni se
+        Los productos publicados pertenecen a sus makers; Denveler no garantiza su calidad ni se
         hace responsable de acuerdos entre usuarios. En la medida que permita la ley, nuestra
         responsabilidad se limita al uso gratuito del servicio.
       </p>
@@ -68,7 +68,7 @@ export default function TerminosPage() {
       <h2>Cambios</h2>
       <p>
         Si cambiamos estos términos de forma relevante, actualizaremos la fecha y lo anunciaremos
-        en la plataforma. Seguir usando LaunchPad después implica aceptar la versión nueva.
+        en la plataforma. Seguir usando Denveler después implica aceptar la versión nueva.
       </p>
     </ProsePage>
   );

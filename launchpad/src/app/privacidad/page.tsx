@@ -3,14 +3,14 @@ import { ProsePage } from "@/components/layout/prose-page";
 
 export const metadata: Metadata = {
   title: "Política de privacidad",
-  description: "Qué datos recoge LaunchPad, para qué se usan y qué control tienes sobre ellos.",
+  description: "Qué datos recoge Denveler, para qué se usan y qué control tienes sobre ellos.",
 };
 
 export default function PrivacidadPage() {
   return (
-    <ProsePage title="Política de privacidad" updated="12 de julio de 2026">
+    <ProsePage title="Política de privacidad" updated="13 de julio de 2026">
       <p>
-        LaunchPad es una plataforma comunitaria para lanzar productos. Esta política explica, sin
+        Denveler es una plataforma comunitaria para lanzar productos. Esta política explica, sin
         letra pequeña, qué datos recogemos, para qué los usamos y qué control tienes sobre ellos.
       </p>
 

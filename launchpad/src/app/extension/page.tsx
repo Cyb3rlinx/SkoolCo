@@ -167,7 +167,7 @@ export default function ExtensionPage() {
           <Lock className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" aria-hidden />
           <p className="text-sm text-muted-foreground">
             <strong className="text-foreground">Privacidad por diseño.</strong> La extensión usa
-            tu misma sesión de LaunchPad (sin tokens aparte) y solo envía el título y la URL
+            tu misma sesión de Denveler (sin tokens aparte) y solo envía el título y la URL
             pública que tú eliges compartir. No lee mensajes privados, no guarda cookies de Skool
             y no envía nada sin tu clic.
           </p>

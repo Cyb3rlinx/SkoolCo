@@ -3,14 +3,14 @@ import { ProsePage } from "@/components/layout/prose-page";
 
 export const metadata: Metadata = {
   title: "Normas de la comunidad",
-  description: "Las reglas que mantienen a LaunchPad útil, honesto y humano.",
+  description: "Las reglas que mantienen a Denveler útil, honesto y humano.",
 };
 
 export default function NormasPage() {
   return (
-    <ProsePage title="Normas de la comunidad" updated="12 de julio de 2026">
+    <ProsePage title="Normas de la comunidad" updated="13 de julio de 2026">
       <p>
-        LaunchPad funciona porque los votos y el feedback son reales. Estas normas protegen eso.
+        Denveler funciona porque los votos y el feedback son reales. Estas normas protegen eso.
         Son pocas y van en serio.
       </p>
 

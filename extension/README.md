@@ -1,6 +1,6 @@
-# LaunchPad — Logros (extensión Chrome)
+# Denveler — Logros (extensión Chrome)
 
-Extensión MV3 para enviar posts públicos de Skool como logros a LaunchPad
+Extensión MV3 para enviar posts públicos de Skool como logros a Denveler
 (manual, con consentimiento — ver el modelo de seguridad en el README raíz).
 
 ## Instalación (dev, carga local)
@@ -18,7 +18,7 @@ Extensión MV3 para enviar posts públicos de Skool como logros a LaunchPad
    ```bash
    ALLOWED_EXTENSION_ORIGINS=chrome-extension://<ese-id>
    ```
-5. Iniciar sesión en LaunchPad (`http://localhost:3000`) en el mismo Chrome —
+5. Iniciar sesión en Denveler (`http://localhost:3000`) en el mismo Chrome —
    la extensión usa esa misma sesión.
 
 > Si cambias la URL del backend (deploy futuro): clic derecho en el ícono →

@@ -29,7 +29,7 @@ async function request<T>(base: string, path: string, init?: RequestInit): Promi
     return {
       ok: false,
       kind: "network",
-      message: "No se pudo conectar con LaunchPad. ¿El servidor está corriendo?",
+      message: "No se pudo conectar con Denveler. ¿El servidor está corriendo?",
     };
   }
   const body = (await res.json().catch(() => null)) as

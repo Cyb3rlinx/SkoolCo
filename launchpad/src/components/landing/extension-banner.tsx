@@ -31,7 +31,7 @@ export function ExtensionBanner() {
 
             <p className="max-w-lg text-white/80">
               Descubre publicaciones públicas de logros, ábrelas más rápido y participa con
-              apoyo real desde LaunchPad. Sin automatización, sin bots, sin romper reglas.
+              apoyo real desde Denveler. Sin automatización, sin bots, sin romper reglas.
             </p>
 
             <ul className="flex flex-wrap gap-x-5 gap-y-2">

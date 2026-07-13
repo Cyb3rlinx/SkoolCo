@@ -82,7 +82,7 @@ export function LogrosWall() {
         ))}
       </div>
       <p className="text-center text-xs text-muted-foreground">
-        Apoyar un logro siempre es un clic tuyo en el post original. LaunchPad nunca interactúa
+        Apoyar un logro siempre es un clic tuyo en el post original. Denveler nunca interactúa
         por ti.
       </p>
     </div>

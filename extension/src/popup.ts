@@ -19,7 +19,7 @@ function switchTab(which: "send" | "links") {
 function showLogin(base: string) {
   const guard = $("send-guard");
   guard.hidden = false;
-  $("guard-msg").textContent = "Necesitas iniciar sesión en LaunchPad.";
+  $("guard-msg").textContent = "Necesitas iniciar sesión en Denveler.";
   const btn = $<HTMLButtonElement>("open-site");
   btn.hidden = false;
   btn.onclick = () => chrome.tabs.create({ url: base });
@@ -57,7 +57,7 @@ async function initSend(base: string) {
       void postEvent(base, "link_submitted");
     } else {
       const map: Record<string, string> = {
-        unauthorized: "Inicia sesión en LaunchPad y vuelve a intentar.",
+        unauthorized: "Inicia sesión en Denveler y vuelve a intentar.",
         duplicate: "Ya enviaste este link antes.",
         rate_limited: "Demasiados envíos por ahora. Intenta más tarde.",
         invalid: result.message,
@@ -79,7 +79,7 @@ async function initLinks(base: string) {
   if (!result.ok) {
     msg.textContent =
       result.kind === "unauthorized"
-        ? "Inicia sesión en LaunchPad para ver tus envíos."
+        ? "Inicia sesión en Denveler para ver tus envíos."
         : "⚠️ " + result.message;
     if (result.kind === "unauthorized") showLogin(base);
     return;

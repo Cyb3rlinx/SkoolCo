@@ -1,5 +1,5 @@
 /**
- * Typed client for the LaunchPad REST API (contract: /api/docs).
+ * Typed client for the Denveler REST API (contract: /api/docs).
  *
  * All calls are same-origin (`/api/...`), so the NextAuth session cookie is
  * sent automatically — no tokens to manage. Every function here maps 1:1 to

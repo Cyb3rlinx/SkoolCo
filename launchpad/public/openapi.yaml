@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
-  title: LaunchPad API
-  version: 0.6.0
+  title: Denveler API
+  version: 0.6.1
   description: |
     Backend de la plataforma comunitaria de lanzamiento de productos.
 

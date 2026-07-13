@@ -1,4 +1,4 @@
-# SkoolCo — LaunchPad
+# SkoolCo — Denveler
 
 Community-powered product launch platform: creators submit projects, members discover launches, upvote, comment, and build credibility. Two pieces live here — the full-stack web app and its companion browser extension — plus the shared handoff docs. No third-party branding, content, or proprietary functionality is copied.
 

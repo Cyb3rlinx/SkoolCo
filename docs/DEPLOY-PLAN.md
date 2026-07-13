@@ -1,4 +1,4 @@
-# Plan de Deploy — LaunchPad Backend (Render + Postgres gestionado)
+# Plan de Deploy — Denveler Backend (Render + Postgres gestionado)
 
 **Fecha:** 6 de julio de 2026
 **Para:** el desarrollador que ejecute el deploy

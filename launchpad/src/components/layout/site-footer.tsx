@@ -76,7 +76,7 @@ export function SiteFooter() {
       </div>
       <div className="border-t">
         <div className="container-page flex flex-col items-center justify-between gap-2 py-5 text-xs text-muted-foreground sm:flex-row">
-          <p>Hecho con cariño por y para la comunidad. © {new Date().getFullYear()} LaunchPad.</p>
+          <p>Hecho con cariño por y para la comunidad. © {new Date().getFullYear()} Denveler.</p>
           <p>MVP — feedback bienvenido 💜</p>
         </div>
       </div>

@@ -8,11 +8,11 @@ el (3) para el día que Google apruebe la extensión.
 
 ## 1. Post de anuncio (publicar ya)
 
-**Título:** 🚀 Abrimos LaunchPad — la plataforma de lanzamientos DE esta comunidad
+**Título:** 🚀 Abrimos Denveler — la plataforma de lanzamientos DE esta comunidad
 
 Comunidad, hoy les traemos algo que construimos para ustedes.
 
-**LaunchPad** es nuestra plataforma de lanzamiento de productos: el lugar donde
+**Denveler** es nuestra plataforma de lanzamiento de productos: el lugar donde
 cada maker de esta comunidad puede publicar lo que está construyendo, recibir
 votos honestos y feedback real — sin algoritmos, sin bots, sin pay-to-win.
 
@@ -36,7 +36,7 @@ Nos vemos en el ranking 🏆
 
 ## 2. Tutorial "Publica tu producto en 2 minutos" (fijar)
 
-**Título:** 📌 Cómo publicar tu producto en LaunchPad (2 minutos)
+**Título:** 📌 Cómo publicar tu producto en Denveler (2 minutos)
 
 1. Entra a **https://denveler.com** y crea tu cuenta (nombre, email, contraseña — listo).
 2. Botón **"Publicar mi producto"**.
@@ -59,13 +59,13 @@ Consejos que suman votos:
 
 **Título:** 🧩 Llegó la extensión: celebra los logros de la comunidad con un clic
 
-Ya está disponible nuestra extensión de Chrome **LaunchPad — Logros**:
+Ya está disponible nuestra extensión de Chrome **Denveler — Logros**:
 
 👉 [PEGAR LINK: https://chromewebstore.google.com/detail/agimlgkodopeehnedcidphgbooefdkod]
 
 ¿Qué hace? Cuando veas un post de logro aquí en Skool (alguien llegó a sus
 primeros clientes, lanzó su producto, cerró una venta…), la extensión te deja
-compartirlo al muro de Logros de LaunchPad **con un clic** — para darle
+compartirlo al muro de Logros de Denveler **con un clic** — para darle
 visibilidad al que lo logró.
 
 Cómo funciona (diseño consent-first, en serio):
