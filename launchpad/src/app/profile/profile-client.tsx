@@ -23,6 +23,7 @@ import { Alert } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState, ErrorState } from "@/components/ui/states";
 import { ProductCard } from "@/components/product/product-card";
+import { ContactRequestsSection } from "@/components/profile/contact-requests-section";
 import { ProfileForm } from "@/components/forms/profile-form";
 import { Field } from "@/components/forms/field";
 import { buttonVariants } from "@/components/ui/button";
@@ -191,6 +192,9 @@ export function ProfileClient() {
           })}
         </div>
       </section>
+
+      {/* Solicitudes de contacto (puente de compraventa) */}
+      <ContactRequestsSection />
 
       {/* Danger zone */}
       <Card className="border-destructive/30">

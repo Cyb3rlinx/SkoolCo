@@ -40,6 +40,10 @@ export const createProductSchema = z.object({
   categoryId: z.string().min(1),
   launchDate: z.coerce.date(),
   status: z.enum(["DRAFT", "SCHEDULED", "LIVE"]).default("DRAFT"),
+  // --- Puente de compraventa: métricas DECLARADAS por el maker (no verificadas) ---
+  openToOffers: z.boolean().optional(),
+  declaredMrrUsd: z.number().int().min(0).max(10_000_000).optional().nullable(),
+  monetizationNote: z.string().trim().max(200).optional().nullable(),
 });
 
 export const updateProductSchema = createProductSchema
@@ -50,6 +54,10 @@ export const addProductImageSchema = z.object({ url: imageUrlSchema });
 
 /** Gallery cap per product — keeps pages fast and abuse bounded. */
 export const MAX_PRODUCT_IMAGES = 5;
+
+export const createContactRequestSchema = z.object({
+  message: z.string().trim().min(20).max(1000),
+});
 
 export const listProductsQuerySchema = z.object({
   status: z.enum(["DRAFT", "SCHEDULED", "LIVE", "ARCHIVED"]).optional(),
