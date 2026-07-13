@@ -11,6 +11,9 @@ const detailSelect = {
   ...productListSelect,
   description: true,
   updatedAt: true,
+  openToOffers: true,
+  declaredMrrUsd: true,
+  monetizationNote: true,
   images: {
     select: { id: true, url: true, sort: true },
     orderBy: { sort: "asc" as const },
