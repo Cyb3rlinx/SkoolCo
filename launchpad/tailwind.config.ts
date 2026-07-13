@@ -53,8 +53,8 @@ const config: Config = {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
       },
       boxShadow: {
-        soft: "0 1px 2px rgba(35, 20, 80, 0.05), 0 6px 20px -6px rgba(35, 20, 80, 0.10)",
-        lift: "0 2px 6px rgba(35, 20, 80, 0.06), 0 16px 40px -12px rgba(91, 44, 255, 0.22)",
+        soft: "0 1px 2px rgba(0, 27, 77, 0.05), 0 6px 20px -6px rgba(0, 27, 77, 0.10)",
+        lift: "0 2px 6px rgba(0, 27, 77, 0.06), 0 16px 40px -12px rgba(0, 74, 173, 0.22)",
       },
       keyframes: {
         "fade-up": {

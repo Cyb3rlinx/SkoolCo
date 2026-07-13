@@ -8,25 +8,25 @@
  * `.dark` selector later, no component changes needed.
  * ------------------------------------------------------------------------- */
 :root {
-  /* Palette (hex reference): bg #FFFFFF · text #0B1020 · secondary #5F6472 ·
-     primary #5B2CFF · deep #32128A · gradient #6D3DFF · lavender #EEE8FF ·
-     border #E7E3F2 · soft bg #F7F4FF / #FAFAFC */
+  /* Palette (hex reference, from the real Denveler brand assets):
+     bg #FFFFFF · text #0B1020 · secondary #5F6472 ·
+     primary #004AAD · gradient cyan #5DE0E6 → blue #004AAD ·
+     deep navy #001B4D · accent tint #EAFBFC · border #DCEEF0 */
   --background: 0 0% 100%;
   --foreground: 226 49% 8%;
 
   --card: 0 0% 100%;
   --card-foreground: 226 49% 8%;
 
-  --muted: 240 25% 98%;
+  --muted: 195 30% 98%;
   --muted-foreground: 224 9% 41%;
 
-  /* Brand: violet → indigo. Deliberately far from the orange/red family of
-     existing launch platforms — original identity. */
-  --primary: 253 100% 59%;
+  /* Brand: cyan → deep blue, taken directly from the Denveler logo gradient. */
+  --primary: 214 100% 34%;
   --primary-foreground: 0 0% 100%;
 
-  --accent: 256 100% 96%;
-  --accent-foreground: 256 77% 31%;
+  --accent: 190 100% 96%;
+  --accent-foreground: 214 80% 32%;
 
   --destructive: 0 72% 48%;
   --destructive-foreground: 0 0% 100%;
@@ -37,9 +37,9 @@
   --warning: 34 94% 44%;
   --warning-foreground: 0 0% 100%;
 
-  --border: 256 37% 92%;
-  --input: 256 37% 89%;
-  --ring: 253 100% 63%;
+  --border: 195 35% 90%;
+  --input: 195 35% 87%;
+  --ring: 214 100% 45%;
 
   --radius: 0.875rem;
 }
@@ -63,18 +63,20 @@
     @apply mx-auto w-full max-w-6xl px-4 sm:px-6;
   }
 
-  /* Brand gradient (logo tile, primary CTAs, highlights). */
+  /* Brand gradient (logo tile, primary CTAs, highlights) — matches the logo exactly. */
   .brand-gradient {
-    background-image: linear-gradient(135deg, #6d3dff 0%, #5b2cff 100%);
+    background-image: linear-gradient(135deg, #5de0e6 0%, #004aad 100%);
   }
 
   /* Deep premium gradient (extension banner, dark surfaces). */
   .brand-gradient-deep {
-    background-image: linear-gradient(120deg, #32128a 0%, #5b2cff 100%);
+    background-image: linear-gradient(120deg, #001b4d 0%, #004aad 100%);
   }
 
+  /* Two close-in-lightness blues (not the full cyan span) so gradient headline
+     text stays readable at body/heading sizes. */
   .brand-text-gradient {
-    background-image: linear-gradient(120deg, #6d3dff, #5b2cff);
+    background-image: linear-gradient(120deg, #0064d6, #004aad);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;

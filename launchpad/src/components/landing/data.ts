@@ -115,7 +115,7 @@ export const LAUNCHES: LaunchItem[] = [
     makerInitials: "MM",
     comments: 0,
     votes: 54,
-    color: "#5B2CFF",
+    color: "#8B5CF6",
     initial: "P",
     spark: [4, 8, 7, 12, 10, 15, 16, 19],
   },

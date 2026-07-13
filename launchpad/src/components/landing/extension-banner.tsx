@@ -14,7 +14,7 @@ export function ExtensionBanner() {
       <div className="brand-gradient-deep relative overflow-hidden rounded-[28px] text-white shadow-lift">
         {/* Soft glow accents */}
         <div
-          className="pointer-events-none absolute inset-0 [background-image:radial-gradient(420px_circle_at_85%_-10%,rgba(255,255,255,0.14),transparent_60%),radial-gradient(380px_circle_at_-5%_110%,rgba(109,61,255,0.5),transparent_60%)]"
+          className="pointer-events-none absolute inset-0 [background-image:radial-gradient(420px_circle_at_85%_-10%,rgba(255,255,255,0.14),transparent_60%),radial-gradient(380px_circle_at_-5%_110%,rgba(93,224,230,0.35),transparent_60%)]"
           aria-hidden
         />
 
@@ -45,7 +45,7 @@ export function ExtensionBanner() {
 
             <Link
               href="/extension"
-              className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-[#32128A] shadow-soft transition-transform duration-200 hover:-translate-y-0.5"
+              className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-[#001B4D] shadow-soft transition-transform duration-200 hover:-translate-y-0.5"
             >
               Conocer la extensión
               <ArrowRight className="h-4 w-4" aria-hidden />
@@ -87,7 +87,7 @@ export function ExtensionBanner() {
 
                 <div className="space-y-2 py-3">
                   {MOCK_LOGROS.map((l) => (
-                    <div key={l.text} className="rounded-xl border bg-[#FAFAFC] p-3">
+                    <div key={l.text} className="rounded-xl border bg-[#F5FBFC] p-3">
                       <p className="text-xs font-bold">{l.text}</p>
                       <p className="mt-0.5 text-[10px] text-muted-foreground">{l.meta}</p>
                     </div>

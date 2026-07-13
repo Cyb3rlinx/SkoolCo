@@ -12,7 +12,7 @@ function toPoints(data: number[], width: number, height: number, pad = 2): [numb
   ]);
 }
 
-/** Violet line sparkline with optional soft gradient fill. Pure SVG, no deps. */
+/** Brand-blue line sparkline with optional soft gradient fill. Pure SVG, no deps. */
 export function Sparkline({
   data,
   width = 96,
@@ -42,8 +42,8 @@ export function Sparkline({
         <>
           <defs>
             <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#6D3DFF" stopOpacity="0.28" />
-              <stop offset="100%" stopColor="#6D3DFF" stopOpacity="0.02" />
+              <stop offset="0%" stopColor="#004AAD" stopOpacity="0.28" />
+              <stop offset="100%" stopColor="#004AAD" stopOpacity="0.02" />
             </linearGradient>
           </defs>
           <polygon points={area} fill={`url(#${gradId})`} />
@@ -52,7 +52,7 @@ export function Sparkline({
       <polyline
         points={line}
         fill="none"
-        stroke="#5B2CFF"
+        stroke="#004AAD"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -61,7 +61,7 @@ export function Sparkline({
   );
 }
 
-/** Violet mini bar chart (community momentum). Pure SVG, no deps. */
+/** Brand-blue mini bar chart (community momentum). Pure SVG, no deps. */
 export function MiniBars({
   data,
   width = 120,
@@ -89,7 +89,7 @@ export function MiniBars({
             width={barW}
             height={h}
             rx={1.5}
-            fill={i === data.length - 1 ? "#5B2CFF" : "#C9B8FF"}
+            fill={i === data.length - 1 ? "#004AAD" : "#B8E4F0"}
           />
         );
       })}

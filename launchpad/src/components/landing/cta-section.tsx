@@ -23,7 +23,7 @@ export function CTASection() {
         {CTAS.map((cta) => (
           <div
             key={cta.title}
-            className="group rounded-[24px] border bg-[#F7F4FF] p-8 shadow-soft transition-shadow duration-300 hover:shadow-lift"
+            className="group rounded-[24px] border bg-[#EDFBFC] p-8 shadow-soft transition-shadow duration-300 hover:shadow-lift"
           >
             <span
               className="flex h-14 w-14 items-center justify-center rounded-2xl border border-primary/15 bg-white text-primary shadow-soft"

@@ -48,7 +48,7 @@ export default async function OgImage({ params }: { params: { slug: string } }) 
           flexDirection: "column",
           justifyContent: "space-between",
           padding: 72,
-          backgroundImage: "linear-gradient(120deg, #32128A 0%, #5B2CFF 70%, #6D3DFF 100%)",
+          backgroundImage: "linear-gradient(120deg, #001B4D 0%, #004AAD 70%, #0064D6 100%)",
           color: "#fff",
           fontFamily: "sans-serif",
         }}

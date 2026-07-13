@@ -73,10 +73,10 @@ function TrendArrow({ trend }: { trend: "up" | "down" }) {
 export function Hero() {
   const f = FEATURED_LAUNCH;
   return (
-    <section className="relative overflow-hidden bg-[#F7F4FF]">
+    <section className="relative overflow-hidden bg-[#EDFBFC]">
       {/* Soft radial brand washes */}
       <div
-        className="pointer-events-none absolute inset-0 [background-image:radial-gradient(560px_circle_at_12%_0%,rgba(109,61,255,0.10),transparent_60%),radial-gradient(640px_circle_at_92%_18%,rgba(91,44,255,0.08),transparent_60%)]"
+        className="pointer-events-none absolute inset-0 [background-image:radial-gradient(560px_circle_at_12%_0%,rgba(0,100,214,0.10),transparent_60%),radial-gradient(640px_circle_at_92%_18%,rgba(0,74,173,0.08),transparent_60%)]"
         aria-hidden
       />
 
