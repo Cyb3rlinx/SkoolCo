@@ -17,6 +17,7 @@ import { ProductGallery } from "@/components/product/product-gallery";
 import { CommentSection } from "@/components/product/comment-section";
 import { MakerCard } from "@/components/product/maker-card";
 import { OfferCard } from "@/components/product/offer-card";
+import { OfferSettings } from "@/components/product/offer-settings";
 import { ChangeLogoButton } from "@/components/product/change-logo-button";
 import { RelatedLaunches } from "@/components/product/related-launches";
 import { ReportButton } from "@/components/product/report-button";
@@ -173,6 +174,15 @@ export function ProductDetailClient({ slug }: { slug: string }) {
             openToOffers={product.openToOffers}
             declaredMrrUsd={product.declaredMrrUsd}
             monetizationNote={product.monetizationNote}
+          />
+
+          <OfferSettings
+            slug={product.slug}
+            makerId={product.maker.id}
+            openToOffers={product.openToOffers}
+            declaredMrrUsd={product.declaredMrrUsd}
+            monetizationNote={product.monetizationNote}
+            onUpdated={refetch}
           />
 
           <Card>
