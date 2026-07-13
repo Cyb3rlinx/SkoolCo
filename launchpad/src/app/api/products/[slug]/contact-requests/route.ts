@@ -23,6 +23,10 @@ export const POST = withErrorHandling(
     }
 
     const base = await findProduct(params.slug);
+    if (base.status !== "LIVE" && base.makerId !== user.id) {
+      throw new ApiError(404, "Product not found");
+    }
+
     if (base.makerId === user.id) {
       throw new ApiError(400, "No puedes solicitar contacto por tu propio producto.");
     }
