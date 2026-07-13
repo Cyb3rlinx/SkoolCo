@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "LaunchPad — Logros",
-  "version": "0.3.1",
-  "description": "Envía posts públicos de tus comunidades (Skool, Discord, YouTube y más) como logros a LaunchPad, con tu consentimiento y un clic.",
+  "version": "0.3.2",
+  "description": "Comparte manualmente posts públicos de tu comunidad como logros en LaunchPad, con tu consentimiento y un solo clic.",
   "icons": {
     "16": "icons/icon-16.png",
     "32": "icons/icon-32.png",

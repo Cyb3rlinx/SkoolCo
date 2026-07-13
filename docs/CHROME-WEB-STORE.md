@@ -6,8 +6,9 @@ Guía completa: qué está listo, qué copiar/pegar en la ficha, y los pasos exa
 
 - **ID de la extensión:** `agimlgkodopeehnedcidphgbooefdkod`
 - **Para el env de producción:** `ALLOWED_EXTENSION_ORIGINS=chrome-extension://agimlgkodopeehnedcidphgbooefdkod`
-- **Estado:** ✅ ENVIADA A REVISIÓN el 12-jul-2026 (publicación automática al aprobarse).
-  Paquete v0.3.1 apuntando a https://skool-co.vercel.app · captura subida · privacidad https://skool-co.vercel.app/privacidad
+- **Estado:** 🔴 RECHAZADA 13-jul-2026 por "Keyword Spam" (enumerar 9 plataformas en la
+  descripción). Corregido en v0.3.2: cero nombres de marcas en TODOS los metadatos.
+  ⏳ Pendiente: subir ZIP v0.3.2 + reemplazar resumen y descripción + reenviar.
 - **Link de instalación (al aprobarse):** https://chromewebstore.google.com/detail/agimlgkodopeehnedcidphgbooefdkod
 - **Pendiente del lado backend:** ✅ ya hecho — ALLOWED_EXTENSION_ORIGINS configurado en Vercel + redeploy (Kevin, 12-jul).
 
@@ -36,13 +37,12 @@ Guía completa: qué está listo, qué copiar/pegar en la ficha, y los pasos exa
 
 **Nombre:** LaunchPad — Logros
 
-**Resumen corto (≤132 chars):**
-> Celebra los logros de tu comunidad: comparte posts públicos a LaunchPad con un clic. Sin bots, sin automatización.
+**Resumen corto (≤132 chars) — v0.3.2 sin marcas:**
+> Comparte manualmente posts públicos de tu comunidad como logros en LaunchPad. Sin bots, sin automatización: cada envío es un clic tuyo.
 
-**Descripción larga:**
+**Descripción larga — v0.3.2 (SIN nombres de plataformas — motivo del rechazo):**
 > LaunchPad — Logros te ayuda a dar visibilidad a los logros reales de tu
-> comunidad (Skool, Discord, YouTube, X, Facebook, LinkedIn, Instagram,
-> Telegram y Circle).
+> comunidad online.
 >
 > ¿Cómo funciona?
 > 1. Abre un post público de logro en tu comunidad.
@@ -56,7 +56,7 @@ Guía completa: qué está listo, qué copiar/pegar en la ficha, y los pasos exa
 > • Solo actúa cuando TÚ haces clic — no captura nada en segundo plano.
 > • Solo posts públicos — nunca contenido privado.
 > • Cero automatización — no vota, no publica, no hace scraping.
-> • No almacena credenciales de otras plataformas.
+> • No almacena credenciales de otros sitios.
 > • Respeta las reglas de las comunidades de origen.
 >
 > Pensada para makers y comunidades que celebran el progreso real de su gente.
