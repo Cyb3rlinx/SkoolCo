@@ -58,6 +58,17 @@ export default function TerminosPage() {
         respetando las reglas de las plataformas donde participas.
       </p>
 
+      <h2>Métricas declaradas y contacto entre usuarios</h2>
+      <p>
+        Un maker puede declarar métricas de su producto (como MRR) y marcarse
+        “abierto a ofertas”. Esas métricas las declara el maker bajo su exclusiva
+        responsabilidad: Denveler <strong>no las verifica</strong> ni garantiza su
+        exactitud. Las solicitudes de contacto solo intercambian mensajes y, si el
+        maker acepta, su email. Cualquier conversación, acuerdo o transacción
+        posterior ocurre fuera de la plataforma y es responsabilidad exclusiva de
+        las partes; Denveler no participa, no intermedia ni cobra por ello.
+      </p>
+
       <h2>Responsabilidad</h2>
       <p>
         Los productos publicados pertenecen a sus makers; Denveler no garantiza su calidad ni se

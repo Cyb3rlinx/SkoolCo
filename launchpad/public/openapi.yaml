@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Denveler API
-  version: 0.6.1
+  version: 0.7.0
   description: |
     Backend de la plataforma comunitaria de lanzamiento de productos.
 
@@ -237,6 +237,72 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '403': { description: Solo el maker o staff }
         '404': { description: Imagen o producto no encontrado }
+
+  /api/products/{slug}/contact-requests:
+    post:
+      tags: [Productos]
+      summary: Solicitar contacto al maker (producto abierto a ofertas)
+      description: |
+        Requiere sesión. Rate limit: 5/día/usuario. Solo productos LIVE con
+        openToOffers=true. Una solicitud por comprador por producto (409 si repite).
+      security:
+        - sessionCookie: []
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message]
+              properties:
+                message: { type: string, minLength: 20, maxLength: 1000 }
+      responses:
+        '201': { description: 'Creada — `{ data: { id, status, createdAt } }`' }
+        '400': { description: Producto no abierto a ofertas, o propio producto }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409': { description: Ya existe una solicitud de este comprador }
+        '429': { $ref: '#/components/responses/RateLimited' }
+
+  /api/me/contact-requests:
+    get:
+      tags: [Perfil]
+      summary: Solicitudes de contacto recibidas por mis productos
+      security:
+        - sessionCookie: []
+      responses:
+        '200': { description: 'Lista — `{ data: [{ id, message, status, createdAt, buyer, product }] }`' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /api/contact-requests/{id}:
+    patch:
+      tags: [Perfil]
+      summary: Resolver una solicitud (compartir email o descartar)
+      security:
+        - sessionCookie: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status: { type: string, enum: [SHARED, DISMISSED] }
+      responses:
+        '200': { description: 'Actualizada — `{ data: { id, status } }`. SHARED envía email al comprador' }
+        '400': { description: Ya resuelta }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { description: No encontrada o no es tu producto }
 
   /api/auth/register:
     post:
