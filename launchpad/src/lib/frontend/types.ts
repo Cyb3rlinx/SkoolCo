@@ -104,6 +104,8 @@ export interface ProductDetail extends ProductListItem {
   openToOffers?: boolean;
   declaredMrrUsd?: number | null;
   monetizationNote?: string | null;
+  /** Vistas de la oferta (sin deduplicar); solo tiene sentido para el maker. */
+  offerViewCount?: number;
 }
 
 export interface ProductListQuery {

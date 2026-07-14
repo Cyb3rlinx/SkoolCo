@@ -19,6 +19,7 @@ export function OfferSettings({
   openToOffers,
   declaredMrrUsd,
   monetizationNote,
+  offerViewCount,
   onUpdated,
 }: {
   slug: string;
@@ -26,6 +27,7 @@ export function OfferSettings({
   openToOffers?: boolean;
   declaredMrrUsd?: number | null;
   monetizationNote?: string | null;
+  offerViewCount?: number;
   onUpdated: () => void;
 }) {
   const { data: session } = useSession();
@@ -81,6 +83,15 @@ export function OfferSettings({
                   }.`
                 : "Activa esto si te interesa recibir solicitudes de compra por tu producto."}
             </p>
+            {openToOffers && (
+              <p className="text-xs text-muted-foreground">
+                {(offerViewCount ?? 0) > 0
+                  ? `👀 ${(offerViewCount ?? 0).toLocaleString("en-US")} ${
+                      offerViewCount === 1 ? "vista" : "vistas"
+                    } en tu oferta`
+                  : "Todavía nadie vio tu oferta."}
+              </p>
+            )}
             <Button variant="outline" size="sm" onClick={() => setEditing(true)}>
               Configurar
             </Button>

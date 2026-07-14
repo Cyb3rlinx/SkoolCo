@@ -14,6 +14,7 @@ const detailSelect = {
   openToOffers: true,
   declaredMrrUsd: true,
   monetizationNote: true,
+  offerViewCount: true,
   images: {
     select: { id: true, url: true, sort: true },
     orderBy: { sort: "asc" as const },
@@ -46,6 +47,19 @@ export const GET = withErrorHandling(async (_req: Request, { params }: Params) =
         })
       )
     : false;
+
+  // Señal del puente: una vista de la oferta por cada carga de un no-maker.
+  // Efecto secundario: si falla, no tumba la respuesta.
+  if (product.openToOffers && user?.id !== base.makerId) {
+    try {
+      await prisma.product.update({
+        where: { id: base.id },
+        data: { offerViewCount: { increment: 1 } },
+      });
+    } catch (err) {
+      console.error("[offer-views] no se pudo incrementar:", err);
+    }
+  }
 
   return ok({ ...product, upvotedByMe });
 });

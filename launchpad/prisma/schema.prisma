@@ -102,6 +102,9 @@ model Product {
   openToOffers     Boolean @default(false) @map("open_to_offers")
   declaredMrrUsd   Int?    @map("declared_mrr_usd") // USD/mes, declarado por el maker, NO verificado
   monetizationNote String? @map("monetization_note")
+  // Señal del puente: vistas de la oferta (sin deduplicar) y candado del email de tracción.
+  offerViewCount   Int       @default(0) @map("offer_view_count")
+  offerNudgeSentAt DateTime? @map("offer_nudge_sent_at")
 
   createdAt   DateTime      @default(now()) @map("created_at")
   updatedAt   DateTime      @updatedAt @map("updated_at")
