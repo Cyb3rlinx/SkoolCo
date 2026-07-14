@@ -61,3 +61,32 @@ export async function sendContactSharedNotification(input: {
 <p>Escríbele directamente para continuar la conversación. Denveler no participa en la negociación.</p>`,
   });
 }
+
+/** Invita al maker a activar "Abierto a ofertas" cuando su producto tiene tracción. */
+export async function sendOfferNudgeEmail(input: {
+  makerEmail: string;
+  makerName: string;
+  productName: string;
+  upvoteCount: number;
+  productUrl: string;
+}): Promise<void> {
+  const subject = `Tu producto ${input.productName} está generando interés en Denveler`;
+  const text = [
+    `Hola ${input.makerName},`,
+    ``,
+    `${input.productName} ya tiene ${input.upvoteCount} votos de la comunidad.`,
+    `Si te interesa recibir ofertas de compra, puedes activar "Abierto a ofertas" desde la página de tu producto:`,
+    input.productUrl,
+    ``,
+    `Es opcional y puedes desactivarlo cuando quieras. Denveler no participa en la negociación.`,
+  ].join("\n");
+  await sendEmail({
+    to: input.makerEmail,
+    subject,
+    text,
+    html: `<p>Hola ${esc(input.makerName)},</p>
+<p><strong>${esc(input.productName)}</strong> ya tiene <strong>${input.upvoteCount}</strong> votos de la comunidad.</p>
+<p>Si te interesa recibir ofertas de compra, puedes activar "Abierto a ofertas" desde <a href="${input.productUrl}">la página de tu producto</a>.</p>
+<p>Es opcional y puedes desactivarlo cuando quieras. Denveler no participa en la negociación.</p>`,
+  });
+}
