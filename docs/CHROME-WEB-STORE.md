@@ -8,15 +8,35 @@ Guía completa: qué está listo, qué copiar/pegar en la ficha, y los pasos exa
 - **Para el env de producción:** `ALLOWED_EXTENSION_ORIGINS=chrome-extension://agimlgkodopeehnedcidphgbooefdkod`
 - **Dominio definitivo:** `https://denveler.com` (reemplaza a `skool-co.vercel.app`, que quedó
   huérfano cuando se configuró el dominio propio — 13-jul-2026).
-- **Estado:** 🔴 RECHAZADA 13-jul-2026 por "Keyword Spam" (enumerar 9 plataformas en la
-  descripción). Corregido en v0.3.2 (metadatos sin nombres de marcas), v0.3.3
-  (`host_permissions` + backend por defecto actualizados a `denveler.com`) y v0.3.4
-  (rebrand completo: la extensión y el producto ya no se llaman LaunchPad, se llaman Denveler).
-  ⏳ Pendiente: subir ZIP v0.3.4 en Package, revisar que Store listing/Privacy sigan
-  con los textos limpios y actualizados a "Denveler" (ya se corrigieron en v0.3.2/v0.3.4),
-  confirmar que la URL de privacidad diga `https://denveler.com/privacidad`, y reenviar.
+- **Estado:** 🟡 EN REVISIÓN (reenviada 14-jul-2026). Historial: rechazada 13-jul-2026
+  por "Keyword Spam" (enumerar 9 plataformas en la descripción) → corregido en v0.3.2
+  (metadatos sin nombres de marcas), v0.3.3 (`host_permissions` + backend por defecto
+  actualizados a `denveler.com`), v0.3.4 (rebrand completo: la extensión y el producto
+  ya no se llaman LaunchPad, se llaman Denveler).
+  El 14-jul se encontraron y corrigieron varios campos del dashboard que habían quedado
+  con contenido viejo (independientes del ZIP/manifest — hay que editarlos a mano en
+  cada ítem existente, no se actualizan solos al subir un ZIP nuevo):
+  - Store listing → Description: decía "LaunchPad" → corregido a "Denveler".
+  - Graphic assets → Store icon: tenía el cohete violeta viejo → reemplazado por
+    `extension/icons/icon-128.png` (logo real Denveler, cian→azul).
+  - Graphic assets → Screenshots: tenía el mockup violeta con "LaunchPad" y
+    enumeraba plataformas (mismo motivo del rechazo original) → reemplazado por
+    `extension/store-assets/screenshot-1.png` (regenerado 14-jul con la paleta
+    cian→azul real y copy sin nombres de plataformas; fuente HTML del mockup en
+    `extension/store-assets/screenshot-1-source.html` — para regenerar el PNG:
+    abrir ese HTML en un navegador a 1280×800 y capturar, o
+    `Google Chrome --headless --screenshot=screenshot-1.png --window-size=1280,800 <url-servida-del-html>`).
+  - Additional fields → Homepage URL / Support URL: decían `https://skool-co.vercel.app`
+    (dominio huérfano) → corregidas a `https://denveler.com`.
+  - Privacy → Single purpose / storage / tabs / host permission justification:
+    mencionaban "LaunchPad" y la URL vieja → corregidas a "Denveler" / `https://denveler.com`.
+  - Privacy → Privacy policy URL: apuntaba a `https://skool-co.vercel.app/privacidad`
+    (404 — dominio huérfano, confirmado con curl) → corregida a
+    `https://denveler.com/privacidad` (200 OK, confirmado con curl). Este era el
+    campo que bloqueaba "Submit for review" ("Privacy policy link is not reachable").
+  Enviada a revisión el 14-jul-2026 — normalmente tarda 1–3 días.
 - **Link de instalación (al aprobarse):** https://chromewebstore.google.com/detail/agimlgkodopeehnedcidphgbooefdkod
-- **Pendiente del lado backend:** ✅ ya hecho — ALLOWED_EXTENSION_ORIGINS configurado en Vercel + redeploy (Kevin, 12-jul).
+- **Pendiente del lado backend:** ✅ ya hecho — ALLOWED_EXTENSION_ORIGINS configurado en Vercel + redeploy (Kevin, 12-jul). El ID no cambia entre reenvíos de una actualización (ya estaba asignado desde el primer envío), así que no hace falta tocar esta variable de nuevo salvo que Google lo reasigne.
 
 ## 0. Estado
 

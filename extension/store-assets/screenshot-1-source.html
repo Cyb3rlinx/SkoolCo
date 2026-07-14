@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 1280px; height: 800px; overflow: hidden; font-family: -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .canvas {
+    width: 1280px; height: 800px; display: flex; align-items: center; gap: 72px;
+    padding: 0 96px;
+    background: linear-gradient(120deg, #001b4d 0%, #004aad 100%);
+    position: relative;
+  }
+  .glow { position: absolute; inset: 0;
+    background: radial-gradient(560px circle at 88% -8%, rgba(93,224,230,.22), transparent 60%),
+                radial-gradient(480px circle at -4% 108%, rgba(0,74,173,.55), transparent 60%);
+  }
+  .copy { position: relative; flex: 1.1; color: #fff; }
+  .brand { display: flex; align-items: center; gap: 14px; margin-bottom: 40px; }
+  .brand .tile { width: 52px; height: 52px; border-radius: 14px; background: rgba(255,255,255,.18);
+    display: flex; align-items: center; justify-content: center; font-size: 28px; }
+  .brand span { font-size: 30px; font-weight: 800; letter-spacing: -.02em; }
+  h1 { font-size: 56px; font-weight: 800; line-height: 1.08; letter-spacing: -.02em; max-width: 520px; }
+  .sub { margin-top: 22px; font-size: 22px; line-height: 1.45; color: rgba(255,255,255,.82); max-width: 470px; }
+  .bullets { margin-top: 34px; display: flex; flex-direction: column; gap: 14px; }
+  .bullet { display: flex; align-items: center; gap: 12px; font-size: 19px; font-weight: 600; }
+  .bullet .check { width: 26px; height: 26px; border-radius: 999px; background: rgba(255,255,255,.16);
+    display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .popup { position: relative; width: 420px; border-radius: 24px; background: rgba(255,255,255,.97);
+    box-shadow: 0 40px 90px -20px rgba(10,4,40,.55); padding: 8px; }
+  .chrome { display: flex; align-items: center; gap: 7px; padding: 12px 16px; }
+  .dot { width: 11px; height: 11px; border-radius: 999px; }
+  .chrome span { margin-left: 8px; font-size: 12px; font-weight: 600; color: #8A8FA3; }
+  .inner { background: #fff; border-radius: 18px; padding: 20px; color: #0B1020; }
+  .head { display: flex; gap: 12px; align-items: center; border-bottom: 1px solid #E7E3F2; padding-bottom: 16px; }
+  .head .tile { width: 42px; height: 42px; border-radius: 12px;
+    background: linear-gradient(135deg, #5DE0E6, #004AAD); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+  .head b { font-size: 18px; display: block; }
+  .head small { font-size: 12px; color: #5F6472; }
+  .tabs { display: flex; gap: 8px; margin: 16px 0; }
+  .tab { flex: 1; text-align: center; padding: 9px 0; border-radius: 999px; font-size: 13px; font-weight: 700; }
+  .tab.on { background: #E6F7F8; color: #004AAD; }
+  .tab.off { color: #8A8FA3; }
+  .detected { border: 1.5px dashed #E7E3F2; border-radius: 14px; padding: 12px 14px; font-size: 12px; color: #5F6472; }
+  .detected b { color: #0B1020; font-size: 13px; }
+  .label { font-size: 12px; font-weight: 700; margin: 14px 0 6px; }
+  .field { border: 1.5px solid #E7E3F2; border-radius: 12px; padding: 12px 14px; font-size: 14px; font-weight: 600; }
+  .cta { margin-top: 18px; text-align: center; padding: 14px 0; border-radius: 12px; color: #fff;
+    font-size: 15px; font-weight: 800; background: linear-gradient(135deg, #5DE0E6, #004AAD); }
+  .note { margin-top: 12px; text-align: center; font-size: 11px; color: #8A8FA3; }
+</style>
+</head>
+<body>
+  <div class="canvas">
+    <div class="glow"></div>
+    <div class="copy">
+      <div class="brand"><div class="tile">🚀</div><span>Denveler — Logros</span></div>
+      <h1>Celebra los logros de tu comunidad</h1>
+      <p class="sub">Comparte manualmente posts públicos de tu comunidad como logros en Denveler. Sin bots, sin automatización: cada envío es un clic tuyo.</p>
+      <div class="bullets">
+        <div class="bullet"><div class="check">✓</div> Solo posts públicos</div>
+        <div class="bullet"><div class="check">✓</div> Sin automatización, sin bots</div>
+        <div class="bullet"><div class="check">✓</div> Verificado por moderadores humanos</div>
+      </div>
+    </div>
+    <div class="popup">
+      <div class="chrome">
+        <div class="dot" style="background:#D9289D99"></div>
+        <div class="dot" style="background:#F9731699"></div>
+        <div class="dot" style="background:#0F8F8A99"></div>
+        <span>Extensión · Logros</span>
+      </div>
+      <div class="inner">
+        <div class="head">
+          <div class="tile">🏆</div>
+          <div><b>Logros</b><small>Apoya a tu comunidad, con tu permiso</small></div>
+        </div>
+        <div class="tabs"><div class="tab on">Enviar</div><div class="tab off">Mis links</div></div>
+        <div class="detected">Post detectado en la pestaña activa:<br><b>tu-comunidad.com/post</b></div>
+        <div class="label">Título (editable)</div>
+        <div class="field">¡Llegué a 100 usuarios! 🎉</div>
+        <div class="label">Tipo</div>
+        <div class="field">Logro</div>
+        <div class="cta">Enviar como logro</div>
+        <div class="note">Solo se envía cuando tú haces clic. Nada automático.</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
