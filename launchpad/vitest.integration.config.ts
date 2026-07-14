@@ -1,5 +1,10 @@
 import { defineConfig } from "vitest/config";
 import { resolve } from "node:path";
+import { loadEnvConfig } from "@next/env";
+
+// Carga .env/.env.local igual que Next, para que DATABASE_URL esté disponible
+// sin exportarla a mano. Sin .env, la suite se salta sola (comportamiento actual).
+loadEnvConfig(__dirname);
 
 /**
  * Integration tests — they hit a REAL Postgres (DATABASE_URL required) and

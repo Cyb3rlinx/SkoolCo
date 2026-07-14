@@ -229,4 +229,84 @@ describe.skipIf(!HAS_DB)("integration flows", () => {
     );
     expect(reuse.status).toBe(400);
   });
+
+  // -------------------------------------------------------------------------
+  it("offer views: suma para no-maker y anónimo, nunca para el maker", async () => {
+    const passwordHash = await bcrypt.hash("irrelevant-here", 4);
+    const category = await prisma.category.upsert({
+      where: { slug: `ov-cat-${uniq}` },
+      update: {},
+      create: { name: `OV Cat ${uniq}`, slug: `ov-cat-${uniq}` },
+    });
+    const maker = await prisma.user.create({
+      data: { name: "Maker OV", email: `maker-ov-${uniq}@example.com`, passwordHash },
+    });
+    const viewer = await prisma.user.create({
+      data: { name: "Viewer OV", email: `viewer-ov-${uniq}@example.com`, passwordHash },
+    });
+    const product = await prisma.product.create({
+      data: {
+        makerId: maker.id,
+        name: `OV Product ${uniq}`,
+        slug: `ov-product-${uniq}`,
+        tagline: "Producto para el test de vistas",
+        description: "Creado para el test de integración del contador de vistas.",
+        categoryId: category.id,
+        launchDate: new Date(),
+        status: "LIVE",
+        openToOffers: true,
+      },
+    });
+
+    const { GET: getProduct } = await import("@/app/api/products/[slug]/route");
+    const count = async () =>
+      (
+        await prisma.product.findUniqueOrThrow({
+          where: { id: product.id },
+          select: { offerViewCount: true },
+        })
+      ).offerViewCount;
+
+    // Un usuario logueado que no es el maker suma una vista.
+    session.current = {
+      user: { id: viewer.id, role: "USER", name: viewer.name, email: viewer.email },
+    };
+    let res = await getProduct(jsonRequest("http://test/p", "GET"), {
+      params: { slug: product.slug },
+    });
+    expect(res.status).toBe(200);
+    expect(await count()).toBe(1);
+    // La respuesta expone el campo (valor previo al incremento, da igual para la señal).
+    const body = (await res.json()) as { data: { offerViewCount: number } };
+    expect(typeof body.data.offerViewCount).toBe("number");
+
+    // El maker viendo su propio producto NO suma.
+    session.current = {
+      user: { id: maker.id, role: "USER", name: maker.name, email: maker.email },
+    };
+    res = await getProduct(jsonRequest("http://test/p", "GET"), {
+      params: { slug: product.slug },
+    });
+    expect(res.status).toBe(200);
+    expect(await count()).toBe(1);
+
+    // Un visitante anónimo suma.
+    session.current = null;
+    res = await getProduct(jsonRequest("http://test/p", "GET"), {
+      params: { slug: product.slug },
+    });
+    expect(res.status).toBe(200);
+    expect(await count()).toBe(2);
+
+    // Con la oferta cerrada, nadie suma.
+    await prisma.product.update({
+      where: { id: product.id },
+      data: { openToOffers: false },
+    });
+    res = await getProduct(jsonRequest("http://test/p", "GET"), {
+      params: { slug: product.slug },
+    });
+    expect(res.status).toBe(200);
+    expect(await count()).toBe(2);
+  });
 });
