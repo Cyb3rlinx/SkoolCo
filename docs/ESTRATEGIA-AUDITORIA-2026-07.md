@@ -177,7 +177,15 @@ Endpoints: extender `updateProductSchema` (3 campos), `POST /api/products/:slug/
 ## 19–20. Backlog priorizado y roadmap
 
 **Sprint 0 — Estabilización (pre-lanzamiento comunidad)** *(estimación total: pequeña)*
-- LP-01 Dominio + Resend SPF/DKIM — bloquea emails [dueño: Willy compra, agente configura]
+- ✅ LP-01 Dominio + Resend SPF/DKIM — bloquea emails [dueño: Willy compra, agente configura]
+  — resuelto 14-jul-2026: dominio `denveler.com` comprado y verificado en Resend (Kevin),
+  `RESEND_API_KEY`/`EMAIL_FROM` configuradas en Vercel. De paso se encontraron y corrigieron
+  dos bugs relacionados: `forgot-password`/verificación de email usaban una variable
+  `APP_URL` que nunca existió (corregido a `NEXTAUTH_URL`, igual que el resto del código),
+  y `NEXTAUTH_URL` en Vercel apuntaba al dominio huérfano `skool-co.vercel.app` en vez de
+  `denveler.com` (corregido por Kevin). Emails transaccionales confirmados funcionando
+  en producción de punta a punta (reset de contraseña, verificación, puente de compraventa,
+  cron de tracción).
 - LP-02 Upstash rate limiting (T1) — S
 - LP-03 Confirmar backups Supabase + pooler Prisma (T4/T6) — S
 - LP-04 Monitoreo (ping health + alerta) + Vercel Analytics — S
