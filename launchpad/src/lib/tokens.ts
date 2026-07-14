@@ -21,7 +21,7 @@ export async function createEmailVerification(userId: string): Promise<string> {
 }
 
 export async function sendVerificationEmail(to: string, token: string): Promise<void> {
-  const url = `${process.env.APP_URL ?? "http://localhost:3000"}/verify-email?token=${token}`;
+  const url = `${process.env.NEXTAUTH_URL ?? "http://localhost:3000"}/verify-email?token=${token}`;
   await sendEmail({
     to,
     subject: "Verifica tu email",

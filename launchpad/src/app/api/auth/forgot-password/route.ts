@@ -27,7 +27,7 @@ export const POST = withErrorHandling(async (req: Request) => {
         expiresAt: new Date(Date.now() + 60 * 60_000),
       },
     });
-    const url = `${process.env.APP_URL ?? "http://localhost:3000"}/reset-password?token=${token}`;
+    const url = `${process.env.NEXTAUTH_URL ?? "http://localhost:3000"}/reset-password?token=${token}`;
     await sendEmail({
       to: user.email,
       subject: "Restablece tu contraseña",
