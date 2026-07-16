@@ -399,4 +399,59 @@ describe.skipIf(!HAS_DB)("integration flows", () => {
       if (prevResend !== undefined) process.env.RESEND_API_KEY = prevResend;
     }
   });
+
+  // -------------------------------------------------------------------------
+  it("suspensión: bloquea acciones autenticadas y la reactivación las restaura", async () => {
+    const passwordHash = await bcrypt.hash("irrelevant-here", 4);
+    const category = await prisma.category.upsert({
+      where: { slug: `susp-cat-${uniq}` },
+      update: {},
+      create: { name: `Susp Cat ${uniq}`, slug: `susp-cat-${uniq}` },
+    });
+    const maker = await prisma.user.create({
+      data: { name: "Maker Susp", email: `maker-susp-${uniq}@example.com`, passwordHash },
+    });
+    const voter = await prisma.user.create({
+      data: { name: "Voter Susp", email: `voter-susp-${uniq}@example.com`, passwordHash },
+    });
+    const product = await prisma.product.create({
+      data: {
+        makerId: maker.id,
+        name: `Susp Product ${uniq}`,
+        slug: `susp-product-${uniq}`,
+        tagline: "Producto para el test de suspensión",
+        description: "Creado para el test de integración de suspensión.",
+        categoryId: category.id,
+        launchDate: new Date(),
+        status: "LIVE",
+      },
+    });
+
+    session.current = {
+      user: { id: voter.id, role: "USER", name: voter.name, email: voter.email },
+    };
+    const { POST: upvote } = await import("@/app/api/products/[slug]/upvote/route");
+
+    // Sin suspender: la acción funciona.
+    let res = await upvote(jsonRequest("http://test/upvote", "POST"), {
+      params: { slug: product.slug },
+    });
+    expect(res.status).toBe(200);
+
+    // Suspendido: 403 con el mensaje exacto.
+    await prisma.user.update({ where: { id: voter.id }, data: { suspendedAt: new Date() } });
+    res = await upvote(jsonRequest("http://test/upvote", "POST"), {
+      params: { slug: product.slug },
+    });
+    expect(res.status).toBe(403);
+    const body = (await res.json()) as { error: { message: string } };
+    expect(body.error.message).toBe("Tu cuenta está suspendida.");
+
+    // Reactivado: vuelve a funcionar.
+    await prisma.user.update({ where: { id: voter.id }, data: { suspendedAt: null } });
+    res = await upvote(jsonRequest("http://test/upvote", "POST"), {
+      params: { slug: product.slug },
+    });
+    expect(res.status).toBe(200);
+  });
 });
