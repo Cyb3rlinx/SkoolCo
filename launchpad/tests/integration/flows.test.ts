@@ -686,11 +686,31 @@ describe.skipIf(!HAS_DB)("integration flows", () => {
     expect(delSelf.status).toBe(400);
 
     // DELETE en cascada del target (tiene rol MODERATOR y está suspendido).
+    // Le creamos un producto para que el borrado ejercite de verdad el cascade FK.
+    const targetCategory = await prisma.category.upsert({
+      where: { slug: `au-cat-${uniq}` },
+      update: {},
+      create: { name: `AU Cat ${uniq}`, slug: `au-cat-${uniq}` },
+    });
+    const targetProduct = await prisma.product.create({
+      data: {
+        makerId: target.id,
+        name: `AU Product ${uniq}`,
+        slug: `au-product-${uniq}`,
+        tagline: "Producto del target para validar el borrado en cascada",
+        description: "Creado para validar que el DELETE borra el contenido del usuario.",
+        categoryId: targetCategory.id,
+        launchDate: new Date(),
+        status: "LIVE",
+      },
+    });
+
     res = await deleteUser(jsonRequest("http://test/del", "DELETE"), {
       params: { id: target.id },
     });
     expect(res.status).toBe(204);
     expect(await prisma.user.findUnique({ where: { id: target.id } })).toBeNull();
+    expect(await prisma.product.findUnique({ where: { id: targetProduct.id } })).toBeNull();
 
     // Restaurar el estado de los admins ajenos que suspendimos al inicio.
     await prisma.user.updateMany({
