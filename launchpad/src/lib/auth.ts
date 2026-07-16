@@ -46,6 +46,11 @@ export const authOptions: NextAuthOptions = {
         const valid = await bcrypt.compare(credentials.password, user.passwordHash);
         if (!valid) return null;
 
+        // Cuenta suspendida por un admin: rechazar el login con mensaje claro.
+        if (user.suspendedAt) {
+          throw new Error("Tu cuenta está suspendida.");
+        }
+
         return {
           id: user.id,
           name: user.name,
@@ -86,13 +91,31 @@ export async function getSessionUser() {
   };
 }
 
-/** Throws a 401-style error object if unauthenticated. Use in API routes. */
+/**
+ * Throws a 401-style error object if unauthenticated. Use in API routes.
+ * También aplica la suspensión: una cuenta suspendida por un admin no puede
+ * ejecutar NINGUNA acción autenticada aunque conserve una sesión JWT viva
+ * (cuesta un findUnique por request autenticada — aceptable a este volumen).
+ */
 export async function requireUser() {
   const user = await getSessionUser();
   if (!user) {
     throw new ApiError(401, "Authentication required");
   }
-  return user;
+  const dbUser = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { suspendedAt: true, role: true },
+  });
+  if (!dbUser) {
+    throw new ApiError(401, "Authentication required");
+  }
+  if (dbUser.suspendedAt) {
+    throw new ApiError(403, "Tu cuenta está suspendida.");
+  }
+  // El rol de la BD es autoritativo (no el del JWT, que puede tener hasta 30
+  // días de antigüedad): así los cambios de rol y las suspensiones aplican
+  // de inmediato a las sesiones ya activas.
+  return { ...user, role: dbUser.role };
 }
 
 /** Requires MODERATOR or ADMIN role. */
@@ -100,6 +123,15 @@ export async function requireModerator() {
   const user = await requireUser();
   if (user.role !== "MODERATOR" && user.role !== "ADMIN") {
     throw new ApiError(403, "Moderator access required");
+  }
+  return user;
+}
+
+/** Requires ADMIN role. */
+export async function requireAdmin() {
+  const user = await requireUser();
+  if (user.role !== "ADMIN") {
+    throw new ApiError(403, "Admin access required");
   }
   return user;
 }

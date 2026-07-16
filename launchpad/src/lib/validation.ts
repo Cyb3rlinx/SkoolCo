@@ -167,6 +167,20 @@ export const deleteAccountSchema = z.object({
 });
 
 // ---------------------------------------------------------------------------
+// Admin
+// ---------------------------------------------------------------------------
+
+/** PATCH /api/admin/users/:id — al menos un campo. */
+export const adminUpdateUserSchema = z
+  .object({
+    role: z.enum(["USER", "MODERATOR", "ADMIN"]).optional(),
+    suspended: z.boolean().optional(),
+  })
+  .refine((v) => v.role !== undefined || v.suspended !== undefined, {
+    message: "Debes enviar al menos un cambio (role o suspended).",
+  });
+
+// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 

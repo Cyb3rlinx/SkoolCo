@@ -9,6 +9,9 @@
  * thrown as ApiClientError so components can branch on `status`.
  */
 import type {
+  AdminProductItem,
+  AdminStats,
+  AdminUserItem,
   Category,
   CommentItem,
   CommunityLink,
@@ -113,6 +116,11 @@ export function updateProduct(
     method: "PATCH",
     body: JSON.stringify(input),
   });
+}
+
+/** DELETE /api/products/:slug (auth) — maker/staff only. Soft delete (status → ARCHIVED). */
+export function archiveProduct(slug: string) {
+  return request<void>(`/api/products/${encodeURIComponent(slug)}`, { method: "DELETE" });
 }
 
 // ---------------------------------------------------------------------------
@@ -383,4 +391,46 @@ export function moderateCommunityLink(id: string, status: "VERIFIED" | "REJECTED
     `/api/community-links/${encodeURIComponent(id)}`,
     { method: "PATCH", body: JSON.stringify({ status }) }
   );
+}
+
+// ---------------------------------------------------------------------------
+// Panel de administración (solo ADMIN)
+// ---------------------------------------------------------------------------
+
+/** GET /api/admin/stats */
+export function fetchAdminStats() {
+  return request<AdminStats>("/api/admin/stats");
+}
+
+/** GET /api/admin/users */
+export function fetchAdminUsers(q: string, page: number) {
+  const params = new URLSearchParams();
+  if (q) params.set("q", q);
+  params.set("page", String(page));
+  return request<Paginated<AdminUserItem>>(`/api/admin/users?${params}`);
+}
+
+/** PATCH /api/admin/users/:id */
+export function updateAdminUser(
+  id: string,
+  input: { role?: "USER" | "MODERATOR" | "ADMIN"; suspended?: boolean }
+) {
+  return request<AdminUserItem>(`/api/admin/users/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(input),
+  });
+}
+
+/** DELETE /api/admin/users/:id */
+export function deleteAdminUser(id: string) {
+  return request<void>(`/api/admin/users/${id}`, { method: "DELETE" });
+}
+
+/** GET /api/admin/products */
+export function fetchAdminProducts(q: string, status: string, page: number) {
+  const params = new URLSearchParams();
+  if (q) params.set("q", q);
+  if (status) params.set("status", status);
+  params.set("page", String(page));
+  return request<Paginated<AdminProductItem>>(`/api/admin/products?${params}`);
 }

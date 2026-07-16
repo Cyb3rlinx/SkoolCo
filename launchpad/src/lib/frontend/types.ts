@@ -233,3 +233,46 @@ export interface CommunityLink {
   createdAt: string;
   submittedBy: UserRef;
 }
+
+// ---------------------------------------------------------------------------
+// Panel de administración (endpoints /api/admin/*, solo ADMIN)
+// ---------------------------------------------------------------------------
+
+export interface AdminStatWindow {
+  total: number;
+  last7: number;
+  last30: number;
+}
+
+export interface AdminStats {
+  users: AdminStatWindow;
+  productsLive: AdminStatWindow;
+  upvotes: AdminStatWindow;
+  comments: AdminStatWindow;
+  contactRequests: AdminStatWindow;
+  offerViews: { total: number };
+  openToOffers: { total: number };
+  pending: { reports: number; communityLinks: number };
+}
+
+export interface AdminUserItem {
+  id: string;
+  name: string;
+  email: string;
+  role: "USER" | "MODERATOR" | "ADMIN";
+  createdAt: string;
+  suspendedAt: string | null;
+  _count?: { products: number };
+}
+
+export interface AdminProductItem {
+  id: string;
+  name: string;
+  slug: string;
+  status: ProductStatus;
+  launchDate: string;
+  createdAt: string;
+  logoUrl: string | null;
+  maker: { name: string; email: string };
+  _count: { upvotes: number; comments: number };
+}

@@ -32,7 +32,9 @@ export function LoginForm({ next }: { next?: string }) {
 
     if (res?.error) {
       setError(
-        "Email o contraseña incorrectos. Si fallaste varias veces seguidas, espera unos minutos e intenta de nuevo."
+        res.error === "Tu cuenta está suspendida."
+          ? "Tu cuenta está suspendida."
+          : "Email o contraseña incorrectos. Revisa e intenta de nuevo."
       );
       return;
     }
