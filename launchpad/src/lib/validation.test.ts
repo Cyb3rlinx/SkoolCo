@@ -6,6 +6,7 @@ import {
   createCommunityLinkSchema,
   createProductSchema,
   createContactRequestSchema,
+  adminUpdateUserSchema,
 } from "@/lib/validation";
 
 describe("password schemas", () => {
@@ -91,5 +92,18 @@ describe("createContactRequestSchema", () => {
   it("rejects short and giant messages", () => {
     expect(() => createContactRequestSchema.parse({ message: "hola" })).toThrow();
     expect(() => createContactRequestSchema.parse({ message: "x".repeat(1001) })).toThrow();
+  });
+});
+
+describe("adminUpdateUserSchema", () => {
+  it("acepta cambio de rol, de suspensión, o ambos", () => {
+    expect(adminUpdateUserSchema.safeParse({ role: "MODERATOR" }).success).toBe(true);
+    expect(adminUpdateUserSchema.safeParse({ suspended: true }).success).toBe(true);
+    expect(adminUpdateUserSchema.safeParse({ role: "USER", suspended: false }).success).toBe(true);
+  });
+
+  it("rechaza body vacío y rol inválido", () => {
+    expect(adminUpdateUserSchema.safeParse({}).success).toBe(false);
+    expect(adminUpdateUserSchema.safeParse({ role: "SUPERADMIN" }).success).toBe(false);
   });
 });
