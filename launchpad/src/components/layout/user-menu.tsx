@@ -37,7 +37,14 @@ export function UserMenu() {
       {open && (
         <div className="absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-2xl border bg-card py-1 shadow-lift">
           <div className="border-b px-4 py-3">
-            <p className="truncate text-sm font-bold">{user.name}</p>
+            <div className="flex items-center gap-2">
+              <p className="truncate text-sm font-bold">{user.name}</p>
+              {isStaff && (
+                <span className="shrink-0 rounded-full bg-gradient-to-r from-[#22d3ee] to-[#2563eb] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+                  {user.role === "ADMIN" ? "Admin" : "Mod"}
+                </span>
+              )}
+            </div>
             <p className="truncate text-xs text-muted-foreground">{user.email}</p>
           </div>
           <Link href="/profile" onClick={() => setOpen(false)} className={itemClass}>
@@ -51,7 +58,7 @@ export function UserMenu() {
           {isStaff && (
             <Link href="/admin" onClick={() => setOpen(false)} className={itemClass}>
               <Shield className="h-4 w-4 text-muted-foreground" aria-hidden />
-              Moderación
+              Panel de administración
             </Link>
           )}
           <button
