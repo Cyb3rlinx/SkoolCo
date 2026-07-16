@@ -66,10 +66,10 @@ export function ProductFeed({
   if (dateWindow !== "all") {
     const windowMs = dateWindow === "today" ? 86_400_000 : 7 * 86_400_000;
     const cutoff = Date.now() - windowMs;
-    items = items.filter((p) => {
-      const t = new Date(p.launchDate).getTime();
-      return t >= cutoff && t <= Date.now();
-    });
+    // Sin tope superior: launchDate se guarda como mediodía LOCAL del maker,
+    // así que un producto LIVE publicado "hoy" en otra zona horaria puede
+    // quedar unas horas en el futuro para quien lo mira — sigue siendo de hoy.
+    items = items.filter((p) => new Date(p.launchDate).getTime() >= cutoff);
   }
 
   if (limit) items = items.slice(0, limit);
