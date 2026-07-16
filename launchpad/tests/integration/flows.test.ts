@@ -718,4 +718,57 @@ describe.skipIf(!HAS_DB)("integration flows", () => {
       data: { suspendedAt: null },
     });
   });
+
+  // -------------------------------------------------------------------------
+  it("admin products: lista todos los estados y exige ADMIN", async () => {
+    const passwordHash = await bcrypt.hash("irrelevant-here", 4);
+    const category = await prisma.category.upsert({
+      where: { slug: `ap-cat-${uniq}` },
+      update: {},
+      create: { name: `AP Cat ${uniq}`, slug: `ap-cat-${uniq}` },
+    });
+    const admin = await prisma.user.create({
+      data: { name: "Admin AP", email: `admin-ap-${uniq}@example.com`, passwordHash, role: "ADMIN" },
+    });
+    const maker = await prisma.user.create({
+      data: { name: "Maker AP", email: `maker-ap-${uniq}@example.com`, passwordHash },
+    });
+    const draft = await prisma.product.create({
+      data: {
+        makerId: maker.id,
+        name: `AP Draft ${uniq}`,
+        slug: `ap-draft-${uniq}`,
+        tagline: "Borrador del test admin products",
+        description: "Borrador creado por el test de integración.",
+        categoryId: category.id,
+        launchDate: new Date(),
+        status: "DRAFT",
+      },
+    });
+
+    const { GET: listProducts } = await import("@/app/api/admin/products/route");
+
+    // USER → 403.
+    session.current = {
+      user: { id: maker.id, role: "USER", name: maker.name, email: maker.email },
+    };
+    let res = await listProducts(jsonRequest("http://test/api/admin/products", "GET"));
+    expect(res.status).toBe(403);
+
+    // ADMIN → el DRAFT aparece filtrando por estado y por búsqueda.
+    session.current = {
+      user: { id: admin.id, role: "ADMIN", name: admin.name, email: admin.email },
+    };
+    res = await listProducts(
+      jsonRequest(`http://test/api/admin/products?status=DRAFT&q=ap-draft-${uniq}`, "GET")
+    );
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      data: { items: { id: string; status: string; maker: { email: string } }[] };
+    };
+    const found = body.data.items.find((p) => p.id === draft.id);
+    expect(found).toBeDefined();
+    expect(found!.status).toBe("DRAFT");
+    expect(found!.maker.email).toBe(maker.email);
+  });
 });
