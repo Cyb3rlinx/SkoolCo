@@ -30,6 +30,8 @@ model User {
   role          UserRole  @default(USER)
   emailVerified DateTime? @map("email_verified")
   createdAt     DateTime  @default(now()) @map("created_at")
+  /// Cuenta suspendida por un admin: no puede iniciar sesión ni ejecutar acciones.
+  suspendedAt   DateTime? @map("suspended_at")
 
   products          Product[]
   upvotes           Upvote[]
