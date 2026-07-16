@@ -36,6 +36,7 @@ export const RATE_LIMITS = {
   extensionEvent: { limit: 60, windowMs: 60_000 }, // 60 events / minute
   upload: { limit: 20, windowMs: 60 * 60_000 }, // 20 image uploads / hour
   contactRequest: { limit: 5, windowMs: 24 * 60 * 60_000 }, // 5 solicitudes de contacto / día / usuario
+  contactForm: { limit: 3, windowMs: 60 * 60_000 }, // 3 mensajes de contacto / hora / IP
   login: { limit: 5, windowMs: 15 * 60_000 }, // 5 login attempts / 15 min (per email and per IP)
   resendVerification: { limit: 3, windowMs: 15 * 60_000 }, // 3 resends / 15 min / IP
 } satisfies Record<string, RateLimitRule>;
