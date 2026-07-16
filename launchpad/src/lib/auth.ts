@@ -104,12 +104,18 @@ export async function requireUser() {
   }
   const dbUser = await prisma.user.findUnique({
     where: { id: user.id },
-    select: { suspendedAt: true },
+    select: { suspendedAt: true, role: true },
   });
-  if (dbUser?.suspendedAt) {
+  if (!dbUser) {
+    throw new ApiError(401, "Authentication required");
+  }
+  if (dbUser.suspendedAt) {
     throw new ApiError(403, "Tu cuenta está suspendida.");
   }
-  return user;
+  // El rol de la BD es autoritativo (no el del JWT, que puede tener hasta 30
+  // días de antigüedad): así los cambios de rol y las suspensiones aplican
+  // de inmediato a las sesiones ya activas.
+  return { ...user, role: dbUser.role };
 }
 
 /** Requires MODERATOR or ADMIN role. */

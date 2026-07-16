@@ -570,10 +570,11 @@ describe.skipIf(!HAS_DB)("integration flows", () => {
       data: { suspendedAt: new Date() },
     });
 
-    session.current = {
-      user: { id: admin2.id, role: "ADMIN", name: admin2.name, email: admin2.email },
-    };
-    // admin2 suspende a admin → queda admin2 como único ADMIN activo.
+    try {
+      session.current = {
+        user: { id: admin2.id, role: "ADMIN", name: admin2.name, email: admin2.email },
+      };
+      // admin2 suspende a admin → queda admin2 como único ADMIN activo.
     res = await patchUser(jsonRequest("http://test/patch", "PATCH", { suspended: true }), {
       params: { id: admin.id },
     });
@@ -711,12 +712,14 @@ describe.skipIf(!HAS_DB)("integration flows", () => {
     expect(res.status).toBe(204);
     expect(await prisma.user.findUnique({ where: { id: target.id } })).toBeNull();
     expect(await prisma.product.findUnique({ where: { id: targetProduct.id } })).toBeNull();
-
-    // Restaurar el estado de los admins ajenos que suspendimos al inicio.
-    await prisma.user.updateMany({
-      where: { id: { in: otherAdmins.map((a) => a.id) } },
-      data: { suspendedAt: null },
-    });
+    } finally {
+      // Restaurar el estado de los admins ajenos que suspendimos al inicio,
+      // incluso si una aserción anterior falla — evita envenenar la BD compartida.
+      await prisma.user.updateMany({
+        where: { id: { in: otherAdmins.map((a) => a.id) } },
+        data: { suspendedAt: null },
+      });
+    }
   });
 
   // -------------------------------------------------------------------------
@@ -770,5 +773,22 @@ describe.skipIf(!HAS_DB)("integration flows", () => {
     expect(found).toBeDefined();
     expect(found!.status).toBe("DRAFT");
     expect(found!.maker.email).toBe(maker.email);
+  });
+
+  // -------------------------------------------------------------------------
+  it("admin endpoints: MODERATOR recibe 403 en los tres", async () => {
+    const passwordHash = await bcrypt.hash("irrelevant-here", 4);
+    const mod = await prisma.user.create({
+      data: { name: "Mod Gate", email: `mod-gate-${uniq}@example.com`, passwordHash, role: "MODERATOR" },
+    });
+    session.current = {
+      user: { id: mod.id, role: "MODERATOR", name: mod.name, email: mod.email },
+    };
+    const { GET: stats } = await import("@/app/api/admin/stats/route");
+    const { GET: users } = await import("@/app/api/admin/users/route");
+    const { GET: products } = await import("@/app/api/admin/products/route");
+    expect((await stats(jsonRequest("http://test/s", "GET"))).status).toBe(403);
+    expect((await users(jsonRequest("http://test/u", "GET"))).status).toBe(403);
+    expect((await products(jsonRequest("http://test/p", "GET"))).status).toBe(403);
   });
 });
