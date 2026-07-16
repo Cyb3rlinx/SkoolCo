@@ -180,6 +180,13 @@ export const adminUpdateUserSchema = z
     message: "Debes enviar al menos un cambio (role o suspended).",
   });
 
+/** POST /api/contact — formulario público de contacto. */
+export const contactMessageSchema = z.object({
+  name: z.string().trim().min(2).max(80),
+  email: z.string().trim().toLowerCase().email().max(254),
+  message: z.string().trim().min(10).max(2000),
+});
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
