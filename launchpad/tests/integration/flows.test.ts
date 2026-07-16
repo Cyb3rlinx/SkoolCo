@@ -454,4 +454,48 @@ describe.skipIf(!HAS_DB)("integration flows", () => {
     });
     expect(res.status).toBe(200);
   });
+
+  // -------------------------------------------------------------------------
+  it("admin stats: exige ADMIN y devuelve counts coherentes", async () => {
+    const passwordHash = await bcrypt.hash("irrelevant-here", 4);
+    const admin = await prisma.user.create({
+      data: { name: "Admin Stats", email: `admin-stats-${uniq}@example.com`, passwordHash, role: "ADMIN" },
+    });
+    const plain = await prisma.user.create({
+      data: { name: "User Stats", email: `user-stats-${uniq}@example.com`, passwordHash },
+    });
+
+    const { GET: stats } = await import("@/app/api/admin/stats/route");
+
+    // USER normal → 403.
+    session.current = {
+      user: { id: plain.id, role: "USER", name: plain.name, email: plain.email },
+    };
+    let res = await stats(jsonRequest("http://test/api/admin/stats", "GET"));
+    expect(res.status).toBe(403);
+
+    // ADMIN → 200 con la forma esperada y totales >= lo que este test creó.
+    session.current = {
+      user: { id: admin.id, role: "ADMIN", name: admin.name, email: admin.email },
+    };
+    res = await stats(jsonRequest("http://test/api/admin/stats", "GET"));
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      data: {
+        users: { total: number; last7: number; last30: number };
+        productsLive: { total: number; last7: number; last30: number };
+        upvotes: { total: number; last7: number; last30: number };
+        comments: { total: number; last7: number; last30: number };
+        contactRequests: { total: number; last7: number; last30: number };
+        offerViews: { total: number };
+        openToOffers: { total: number };
+        pending: { reports: number; communityLinks: number };
+      };
+    };
+    expect(body.data.users.total).toBeGreaterThanOrEqual(2);
+    expect(body.data.users.last7).toBeGreaterThanOrEqual(2); // los 2 recién creados
+    expect(body.data.users.last30).toBeGreaterThanOrEqual(body.data.users.last7);
+    expect(body.data.pending.reports).toBeGreaterThanOrEqual(0);
+    expect(body.data.offerViews.total).toBeGreaterThanOrEqual(0);
+  });
 });
