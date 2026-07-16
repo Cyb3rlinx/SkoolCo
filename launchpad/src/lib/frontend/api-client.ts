@@ -118,6 +118,11 @@ export function updateProduct(
   });
 }
 
+/** DELETE /api/products/:slug (auth) — maker/staff only. Soft delete (status → ARCHIVED). */
+export function archiveProduct(slug: string) {
+  return request<void>(`/api/products/${encodeURIComponent(slug)}`, { method: "DELETE" });
+}
+
 // ---------------------------------------------------------------------------
 // Uploads
 // ---------------------------------------------------------------------------

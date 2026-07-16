@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { Check, ExternalLink, Flag, Trophy, X } from "lucide-react";
 import {
   fetchCommunityLinksByStatus,
@@ -13,6 +14,9 @@ import { mockCommunityLinks, mockReports } from "@/lib/frontend/mock-data";
 import { useApi } from "@/lib/frontend/hooks";
 import { timeAgo } from "@/lib/frontend/format";
 import type { CommunityLink, ModerationReportItem, ReportStatus } from "@/lib/frontend/types";
+import { StatsSection } from "@/components/admin/stats-section";
+import { UsersSection } from "@/components/admin/users-section";
+import { ProductsSection } from "@/components/admin/products-section";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -28,22 +32,40 @@ const REPORT_STATUS_META: Record<ReportStatus, { label: string; variant: "warnin
   DISMISSED: { label: "Descartado", variant: "outline" },
 };
 
-type Section = "reports" | "links";
+type Section = "stats" | "users" | "products" | "reports" | "links";
 
 export function AdminClient() {
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.role === "ADMIN";
   const [section, setSection] = useState<Section>("reports");
+
+  // useSession() can resolve after the first render — without this, an
+  // ADMIN would land on "reports" instead of "stats" until they click
+  // around. MODERATOR (isAdmin === false) stays on "reports".
+  useEffect(() => {
+    if (isAdmin) setSection((s) => (s === "reports" ? "stats" : s));
+  }, [isAdmin]);
+
+  const items: { value: Section; label: string }[] = [
+    ...(isAdmin
+      ? [
+          { value: "stats" as const, label: "Resumen" },
+          { value: "users" as const, label: "Usuarios" },
+          { value: "products" as const, label: "Productos" },
+        ]
+      : []),
+    { value: "reports", label: "Reportes" },
+    { value: "links", label: "Logros de la extensión" },
+  ];
 
   return (
     <div className="space-y-6">
-      <Tabs
-        items={[
-          { value: "reports", label: "Reportes" },
-          { value: "links", label: "Logros de la extensión" },
-        ]}
-        value={section}
-        onChange={setSection}
-      />
-      {section === "reports" ? <ReportsQueue /> : <CommunityLinksQueue />}
+      <Tabs items={items} value={section} onChange={setSection} />
+      {section === "stats" && <StatsSection onGoToTab={setSection} />}
+      {section === "users" && <UsersSection />}
+      {section === "products" && <ProductsSection />}
+      {section === "reports" && <ReportsQueue />}
+      {section === "links" && <CommunityLinksQueue />}
     </div>
   );
 }
