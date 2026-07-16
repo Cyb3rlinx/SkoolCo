@@ -66,6 +66,17 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.role = (user as { role?: string }).role ?? "USER";
+        return token;
+      }
+      // Refresca el rol desde la base en cada verificación de sesión: así una
+      // promoción a ADMIN/MODERATOR (o una degradación) aplica a las sesiones
+      // vivas sin necesidad de cerrar sesión y volver a entrar.
+      if (token.id) {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: { role: true },
+        });
+        if (dbUser) token.role = dbUser.role;
       }
       return token;
     },
