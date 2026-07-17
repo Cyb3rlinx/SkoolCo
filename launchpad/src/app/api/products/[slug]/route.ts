@@ -15,6 +15,7 @@ const detailSelect = {
   declaredMrrUsd: true,
   monetizationNote: true,
   offerViewCount: true,
+  mrrVerifiedAt: true,
   images: {
     select: { id: true, url: true, sort: true },
     orderBy: { sort: "asc" as const },

@@ -295,6 +295,8 @@ export interface AdminProductItem {
   launchDate: string;
   createdAt: string;
   logoUrl: string | null;
+  declaredMrrUsd: number | null;
+  mrrVerifiedAt: string | null;
   maker: { name: string; email: string };
   _count: { upvotes: number; comments: number };
 }

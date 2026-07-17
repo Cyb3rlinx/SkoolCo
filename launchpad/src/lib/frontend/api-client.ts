@@ -437,6 +437,14 @@ export function fetchAdminProducts(q: string, status: string, page: number) {
   return request<Paginated<AdminProductItem>>(`/api/admin/products?${params}`);
 }
 
+/** POST /api/admin/products/:id/verify-mrr — alterna el estado de verificación. */
+export function toggleMrrVerified(id: string) {
+  return request<{ id: string; mrrVerifiedAt: string | null }>(
+    `/api/admin/products/${id}/verify-mrr`,
+    { method: "POST" }
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Colecciones curadas
 // ---------------------------------------------------------------------------

@@ -175,6 +175,7 @@ export function ProductDetailClient({ slug }: { slug: string }) {
             openToOffers={product.openToOffers}
             declaredMrrUsd={product.declaredMrrUsd}
             monetizationNote={product.monetizationNote}
+            mrrVerifiedAt={product.mrrVerifiedAt}
           />
 
           <OfferSettings
