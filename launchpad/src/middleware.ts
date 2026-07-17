@@ -32,15 +32,17 @@ export function middleware(req: NextRequest) {
     return res;
   }
 
-  // API routes, the admin panel, and root-level metadata files stay outside
+  // API routes, the admin panel, and static files (anything under public/,
+  // plus root-level metadata like robots.txt/sitemap.xml) stay outside
   // next-intl's locale routing (admin is Spanish-only and out of scope for
-  // this pass; API responses never carry a locale prefix; robots.txt and
-  // sitemap.xml are single files with no locale variant).
+  // this pass; API responses never carry a locale prefix; a static asset
+  // has no locale variant — without this, next-intl tried to rewrite every
+  // request for a filename with an extension, 404ing all of public/, e.g.
+  // the site logo, favicons, and openapi.yaml).
   const skipIntl =
     pathname.startsWith("/api") ||
     pathname.startsWith("/admin") ||
-    pathname === "/robots.txt" ||
-    pathname === "/sitemap.xml";
+    /\.[a-zA-Z0-9]+$/.test(pathname);
   const res = skipIntl ? NextResponse.next() : intlMiddleware(req);
   if (allowed) applyCors(res, origin!);
   applySecurity(res);
