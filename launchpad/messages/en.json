@@ -540,6 +540,22 @@
     "cancel": "Cancel",
     "publishing": "Publishing…",
     "publishAction": "Publish",
-    "errorGeneric": "We couldn't publish your collaboration."
+    "errorGeneric": "We couldn't publish your collaboration.",
+    "requestContact": "Request contact",
+    "loginToRequest": "Log in to request contact",
+    "requestSent": "Request sent. The author will decide whether to share their contact info.",
+    "contactDialogTitle": "Request contact",
+    "contactDialogDescription": "Tell the author who you are and why you're interested. If they accept, you'll receive their email.",
+    "messagePlaceholder": "E.g.: I saw your listing and I'm interested in talking, I have experience in…",
+    "minChars": "Minimum 20 characters. {count}/1000",
+    "sendRequest": "Send request",
+    "sending": "Sending…",
+    "deleteTitle": "Delete collaboration",
+    "deleteConfirm": "Are you sure you want to delete this listing? This can't be undone.",
+    "deleteAction": "Delete",
+    "deleting": "Deleting…",
+    "notFoundTitle": "This collaboration no longer exists",
+    "notFoundDescription": "The author may have deleted it, or it may have expired.",
+    "backToList": "Back to Collaborations"
   }
 }

@@ -540,6 +540,22 @@
     "cancel": "Cancelar",
     "publishing": "Publicando…",
     "publishAction": "Publicar",
-    "errorGeneric": "No pudimos publicar tu colaboración."
+    "errorGeneric": "No pudimos publicar tu colaboración.",
+    "requestContact": "Solicitar contacto",
+    "loginToRequest": "Inicia sesión para solicitar contacto",
+    "requestSent": "Solicitud enviada. El autor decidirá si comparte su contacto.",
+    "contactDialogTitle": "Solicitar contacto",
+    "contactDialogDescription": "Cuéntale al autor quién eres y por qué te interesa. Si acepta, vas a recibir su email.",
+    "messagePlaceholder": "Ej.: Vi tu anuncio y me interesa conversar, tengo experiencia en…",
+    "minChars": "Mínimo 20 caracteres. {count}/1000",
+    "sendRequest": "Enviar solicitud",
+    "sending": "Enviando…",
+    "deleteTitle": "Borrar colaboración",
+    "deleteConfirm": "¿Seguro que quieres borrar este anuncio? No se puede deshacer.",
+    "deleteAction": "Borrar",
+    "deleting": "Borrando…",
+    "notFoundTitle": "Esta colaboración ya no existe",
+    "notFoundDescription": "Puede que el autor la haya borrado o que haya expirado.",
+    "backToList": "Volver a Colaboraciones"
   }
 }

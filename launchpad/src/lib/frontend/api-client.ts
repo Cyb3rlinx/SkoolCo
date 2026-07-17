@@ -466,10 +466,11 @@ export function resolveReport(id: string, status: Exclude<ReportStatus, "OPEN">)
   });
 }
 
-/** POST /api/reports (auth) — report a product or a comment. */
+/** POST /api/reports (auth) — report a product, a comment, or a collaboration. */
 export function createReport(input: {
   productId?: string;
   commentId?: string;
+  collaborationId?: string;
   reason: string;
   category?: ReportCategory;
 }) {

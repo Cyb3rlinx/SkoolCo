@@ -540,6 +540,22 @@
     "cancel": "取消",
     "publishing": "发布中…",
     "publishAction": "发布",
-    "errorGeneric": "无法发布你的协作信息。"
+    "errorGeneric": "无法发布你的协作信息。",
+    "requestContact": "请求联系方式",
+    "loginToRequest": "登录以请求联系方式",
+    "requestSent": "请求已发送。作者将决定是否分享联系方式。",
+    "contactDialogTitle": "请求联系方式",
+    "contactDialogDescription": "告诉作者你是谁，为什么感兴趣。如果对方同意，你将收到对方的邮箱。",
+    "messagePlaceholder": "例如：我看到了你的信息，很感兴趣，我有相关经验…",
+    "minChars": "至少20个字符。{count}/1000",
+    "sendRequest": "发送请求",
+    "sending": "发送中…",
+    "deleteTitle": "删除协作信息",
+    "deleteConfirm": "确定要删除这条信息吗？此操作无法撤销。",
+    "deleteAction": "删除",
+    "deleting": "删除中…",
+    "notFoundTitle": "该协作信息已不存在",
+    "notFoundDescription": "作者可能已将其删除，或者它已过期。",
+    "backToList": "返回协作页面"
   }
 }

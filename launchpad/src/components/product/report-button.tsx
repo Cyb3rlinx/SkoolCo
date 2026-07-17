@@ -16,10 +16,11 @@ import { Label } from "@/components/ui/label";
 import { usePathname, useRouter } from "@/i18n/navigation";
 
 /**
- * Report-a-product flow → POST /api/reports. Reports land in the moderation
- * queue (/admin). Signed-out users are sent to /login first.
+ * Report flow → POST /api/reports. Reports land in the moderation queue
+ * (/admin). Signed-out users are sent to /login first. Accepts either a
+ * product or a collaboration as the report target.
  */
-export function ReportButton({ productId }: { productId: string }) {
+export function ReportButton({ productId, collaborationId }: { productId?: string; collaborationId?: string }) {
   const t = useTranslations("product.report");
   const { status } = useSession();
   const router = useRouter();
@@ -50,7 +51,7 @@ export function ReportButton({ productId }: { productId: string }) {
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    const result = await mutate({ productId, reason: reason.trim(), category });
+    const result = await mutate({ productId, collaborationId, reason: reason.trim(), category });
     if (result) setDone(true);
   }
 
