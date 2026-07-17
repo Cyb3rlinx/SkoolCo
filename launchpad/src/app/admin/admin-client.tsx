@@ -158,8 +158,10 @@ function ReportRow({
   const target = report.product
     ? { label: report.product.name, href: `/products/${report.product.slug}` }
     : report.comment
-      ? { label: `Comentario: “${report.comment.body.slice(0, 60)}…”`, href: null }
-      : { label: "Contenido eliminado", href: null };
+      ? { label: `Comentario: "${report.comment.body.slice(0, 60)}…"`, href: null }
+      : report.collaboration
+        ? { label: report.collaboration.title, href: `/colaboraciones/${report.collaboration.id}` }
+        : { label: "Contenido eliminado", href: null };
 
   return (
     <Card>
@@ -170,7 +172,7 @@ function ReportRow({
             <Badge variant="outline">{REPORT_CATEGORY_LABEL[report.category]}</Badge>
             <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
               <Flag className="h-3 w-3" aria-hidden />
-              {report.product ? "Producto" : "Comentario"} · {timeAgo(report.createdAt)}
+              {report.product ? "Producto" : report.comment ? "Comentario" : "Colaboración"} · {timeAgo(report.createdAt)}
             </span>
           </div>
 
@@ -186,7 +188,7 @@ function ReportRow({
           </p>
 
           <p className="rounded-lg bg-muted/60 px-3 py-2 text-sm text-foreground/90">
-            “{report.reason}”
+            "{report.reason}"
           </p>
 
           <p className="text-xs text-muted-foreground">

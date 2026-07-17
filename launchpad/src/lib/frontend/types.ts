@@ -297,6 +297,7 @@ export interface ModerationReportItem {
   reporter: { id: string; name: string } | null;
   product: { id: string; name: string; slug: string } | null;
   comment: { id: string; body: string } | null;
+  collaboration?: { id: string; title: string } | null;
 }
 
 // ---------------------------------------------------------------------------
