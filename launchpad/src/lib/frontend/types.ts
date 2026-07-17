@@ -216,7 +216,8 @@ export interface ModerationReportItem {
   createdAt: string;
   resolvedAt: string | null;
   resolvedBy: { id: string; name: string } | null;
-  reporter: { id: string; name: string };
+  /** null = reporte auto-generado por el sistema (detección de contenido sospechoso). */
+  reporter: { id: string; name: string } | null;
   product: { id: string; name: string; slug: string } | null;
   comment: { id: string; body: string } | null;
 }

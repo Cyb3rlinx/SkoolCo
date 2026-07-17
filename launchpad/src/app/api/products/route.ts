@@ -6,6 +6,7 @@ import { createProductSchema, listProductsQuerySchema } from "@/lib/validation";
 import { uniqueProductSlug, productListSelect } from "@/lib/products";
 import { withErrorHandling, parseBody, ok, created, errorResponse } from "@/lib/api";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
+import { detectSuspiciousContent } from "@/lib/auto-flag";
 
 /**
  * GET /api/products
@@ -126,6 +127,26 @@ export const POST = withErrorHandling(async (req: Request) => {
     },
     select: { ...productListSelect, description: true },
   });
+
+  // Auto-flagging: contenido evidentemente sospechoso entra directo a la cola
+  // de moderación (reporterId null = generado por el sistema, no por un usuario).
+  const suspiciousReason =
+    detectSuspiciousContent(input.name) ??
+    detectSuspiciousContent(input.tagline) ??
+    detectSuspiciousContent(input.description);
+  if (suspiciousReason) {
+    try {
+      await prisma.moderationReport.create({
+        data: {
+          reporterId: null,
+          productId: product.id,
+          reason: `Auto-detectado: ${suspiciousReason}`,
+        },
+      });
+    } catch (err) {
+      console.error("[auto-flag] no se pudo crear el reporte automático:", err);
+    }
+  }
 
   return created(product);
 });
