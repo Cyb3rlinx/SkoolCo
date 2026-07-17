@@ -445,6 +445,14 @@ export function toggleMrrVerified(id: string) {
   );
 }
 
+/** POST /api/products/:slug/mark-sold (auth) — el maker confirma la venta. */
+export function markProductSold(slug: string) {
+  return request<{ id: string; soldAt: string; openToOffers: boolean }>(
+    `/api/products/${encodeURIComponent(slug)}/mark-sold`,
+    { method: "POST" }
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Colecciones curadas
 // ---------------------------------------------------------------------------

@@ -185,6 +185,7 @@ export function ProductDetailClient({ slug }: { slug: string }) {
             declaredMrrUsd={product.declaredMrrUsd}
             monetizationNote={product.monetizationNote}
             offerViewCount={product.offerViewCount}
+            soldAt={product.soldAt}
             onUpdated={refetch}
           />
 
