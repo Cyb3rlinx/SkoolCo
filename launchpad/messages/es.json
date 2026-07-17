@@ -6,6 +6,7 @@
   "nav": {
     "launches": "Lanzamientos",
     "collections": "Colecciones",
+    "collaborations": "Colaboraciones",
     "leaderboard": "Ranking",
     "extension": "Extensión",
     "resources": "Recursos",
@@ -511,5 +512,34 @@
     "metaTitle": "Colecciones",
     "metaDescription": "Selecciones curadas de productos de la comunidad.",
     "detailMetaTitle": "Colección"
+  },
+  "collaborations": {
+    "metaTitle": "Colaboraciones",
+    "metaDescription": "Conecta con quien necesita un servicio o con quien puede brindarlo.",
+    "heading": "Colaboraciones",
+    "subheading": "Conecta con quien necesita un servicio o con quien puede brindarlo.",
+    "tabAll": "Todos",
+    "tabNeeds": "Necesito",
+    "tabOffers": "Ofrezco",
+    "search": "Buscar",
+    "searchPlaceholder": "Buscar por título o tag…",
+    "publish": "Publicar colaboración",
+    "emptyTitle": "Todavía no hay colaboraciones",
+    "emptyDescription": "Sé el primero en publicar un anuncio.",
+    "typeNeeds": "Necesito",
+    "typeOffers": "Ofrezco",
+    "createDialogTitle": "Publicar una colaboración",
+    "createDialogDescription": "Cuenta qué necesitas o qué puedes ofrecer. No se puede editar después de publicar.",
+    "fieldType": "Tipo",
+    "fieldTitle": "Título",
+    "fieldTitlePlaceholder": "Ej.: Necesito automatizar soporte al cliente",
+    "fieldDescription": "Descripción",
+    "fieldDescriptionPlaceholder": "Cuenta los detalles: qué necesitas, con qué herramientas, presupuesto si aplica…",
+    "fieldTags": "Tags (separados por coma)",
+    "fieldTagsPlaceholder": "automatización, whatsapp, ia",
+    "cancel": "Cancelar",
+    "publishing": "Publicando…",
+    "publishAction": "Publicar",
+    "errorGeneric": "No pudimos publicar tu colaboración."
   }
 }

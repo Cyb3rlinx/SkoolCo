@@ -6,6 +6,7 @@
   "nav": {
     "launches": "发布广场",
     "collections": "合集",
+    "collaborations": "协作",
     "leaderboard": "排行榜",
     "extension": "浏览器插件",
     "resources": "资源",
@@ -511,5 +512,34 @@
     "metaTitle": "合集",
     "metaDescription": "社区产品的精选合集。",
     "detailMetaTitle": "合集"
+  },
+  "collaborations": {
+    "metaTitle": "协作",
+    "metaDescription": "联系需要服务的人，或能够提供服务的人。",
+    "heading": "协作",
+    "subheading": "联系需要服务的人，或能够提供服务的人。",
+    "tabAll": "全部",
+    "tabNeeds": "需求",
+    "tabOffers": "提供",
+    "search": "搜索",
+    "searchPlaceholder": "按标题或标签搜索…",
+    "publish": "发布协作",
+    "emptyTitle": "暂时还没有协作信息",
+    "emptyDescription": "成为第一个发布信息的人。",
+    "typeNeeds": "需求",
+    "typeOffers": "提供",
+    "createDialogTitle": "发布一条协作信息",
+    "createDialogDescription": "说明你需要什么，或能提供什么。发布后无法编辑。",
+    "fieldType": "类型",
+    "fieldTitle": "标题",
+    "fieldTitlePlaceholder": "例如：需要实现客服自动化",
+    "fieldDescription": "描述",
+    "fieldDescriptionPlaceholder": "说明详情：你需要什么、使用什么工具、预算（如适用）…",
+    "fieldTags": "标签（逗号分隔）",
+    "fieldTagsPlaceholder": "自动化, whatsapp, 人工智能",
+    "cancel": "取消",
+    "publishing": "发布中…",
+    "publishAction": "发布",
+    "errorGeneric": "无法发布你的协作信息。"
   }
 }

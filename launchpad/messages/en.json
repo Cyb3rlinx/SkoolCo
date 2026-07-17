@@ -6,6 +6,7 @@
   "nav": {
     "launches": "Launches",
     "collections": "Collections",
+    "collaborations": "Collaborations",
     "leaderboard": "Leaderboard",
     "extension": "Extension",
     "resources": "Resources",
@@ -511,5 +512,34 @@
     "metaTitle": "Collections",
     "metaDescription": "Curated selections of community products.",
     "detailMetaTitle": "Collection"
+  },
+  "collaborations": {
+    "metaTitle": "Collaborations",
+    "metaDescription": "Connect with someone who needs a service or someone who can provide it.",
+    "heading": "Collaborations",
+    "subheading": "Connect with someone who needs a service or someone who can provide it.",
+    "tabAll": "All",
+    "tabNeeds": "Needs",
+    "tabOffers": "Offers",
+    "search": "Search",
+    "searchPlaceholder": "Search by title or tag…",
+    "publish": "Post a collaboration",
+    "emptyTitle": "No collaborations yet",
+    "emptyDescription": "Be the first to post a listing.",
+    "typeNeeds": "Needs",
+    "typeOffers": "Offers",
+    "createDialogTitle": "Post a collaboration",
+    "createDialogDescription": "Tell us what you need or what you can offer. It can't be edited after publishing.",
+    "fieldType": "Type",
+    "fieldTitle": "Title",
+    "fieldTitlePlaceholder": "E.g.: I need to automate customer support",
+    "fieldDescription": "Description",
+    "fieldDescriptionPlaceholder": "Share the details: what you need, which tools, budget if applicable…",
+    "fieldTags": "Tags (comma-separated)",
+    "fieldTagsPlaceholder": "automation, whatsapp, ai",
+    "cancel": "Cancel",
+    "publishing": "Publishing…",
+    "publishAction": "Publish",
+    "errorGeneric": "We couldn't publish your collaboration."
   }
 }
