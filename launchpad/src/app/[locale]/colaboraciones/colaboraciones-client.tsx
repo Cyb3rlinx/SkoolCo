@@ -70,7 +70,7 @@ export function ColaboracionesClient() {
         </div>
       )}
 
-      {!loading && error && <EmptyState title={t("errorGeneric")} description={error} />}
+      {!loading && error && <EmptyState title={t("loadError")} description={error} />}
 
       {!loading && !error && (data?.items.length ?? 0) === 0 && (
         <EmptyState title={t("emptyTitle")} description={t("emptyDescription")} />

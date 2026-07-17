@@ -39,7 +39,7 @@ export function CollaborationContactCard({
       setSent(true);
       setOpen(false);
     } catch (err) {
-      setError(err instanceof ApiClientError ? err.message : t("errorGeneric"));
+      setError(err instanceof ApiClientError ? err.message : t("errorSendRequest"));
     } finally {
       setBusy(false);
     }
