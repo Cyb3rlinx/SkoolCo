@@ -71,7 +71,9 @@ export default async function ProductDetailPage({ params }: Props) {
         <script
           type="application/ld+json"
           // eslint-disable-next-line react/no-danger
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          // Escape "<" so a maker-controlled name/description containing
+          // "</script>" can't break out of this tag and inject real markup.
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
         />
       )}
       <ProductDetailClient slug={params.slug} />
