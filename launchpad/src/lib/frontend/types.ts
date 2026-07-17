@@ -269,6 +269,24 @@ export interface AdminUserItem {
   _count?: { products: number };
 }
 
+export interface CollectionSummary {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  createdAt: string;
+  productCount: number;
+}
+
+export interface CollectionDetail {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  createdAt: string;
+  products: ProductListItem[];
+}
+
 export interface AdminProductItem {
   id: string;
   name: string;

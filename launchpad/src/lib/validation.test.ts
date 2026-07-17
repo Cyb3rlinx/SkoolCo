@@ -8,7 +8,29 @@ import {
   createContactRequestSchema,
   adminUpdateUserSchema,
   listProductsQuerySchema,
+  createCollectionSchema,
 } from "@/lib/validation";
+
+describe("createCollectionSchema", () => {
+  it("acepta título y descripción válidos", () => {
+    expect(
+      createCollectionSchema.safeParse({
+        title: "Mejores herramientas de IA",
+        description: "Una selección curada de productos de IA lanzados esta semana.",
+      }).success
+    ).toBe(true);
+  });
+
+  it("rechaza título muy corto", () => {
+    expect(createCollectionSchema.safeParse({ title: "ai", description: "x".repeat(20) }).success).toBe(false);
+  });
+
+  it("rechaza descripción muy corta", () => {
+    expect(
+      createCollectionSchema.safeParse({ title: "Título válido", description: "corta" }).success
+    ).toBe(false);
+  });
+});
 
 describe("listProductsQuerySchema", () => {
   it("openToOffers es opcional", () => {

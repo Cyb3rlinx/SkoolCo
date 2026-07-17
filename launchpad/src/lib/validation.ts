@@ -189,6 +189,19 @@ export const contactMessageSchema = z.object({
 });
 
 // ---------------------------------------------------------------------------
+// Colecciones curadas
+// ---------------------------------------------------------------------------
+
+export const createCollectionSchema = z.object({
+  title: z.string().trim().min(3).max(100),
+  description: z.string().trim().min(10).max(500),
+});
+
+export const addCollectionProductSchema = z.object({
+  productId: z.string().min(1),
+});
+
+// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 

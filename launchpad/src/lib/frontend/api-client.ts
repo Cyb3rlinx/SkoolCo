@@ -13,6 +13,8 @@ import type {
   AdminStats,
   AdminUserItem,
   Category,
+  CollectionDetail,
+  CollectionSummary,
   CommentItem,
   CommunityLink,
   ContactRequestItem,
@@ -433,4 +435,47 @@ export function fetchAdminProducts(q: string, status: string, page: number) {
   if (status) params.set("status", status);
   params.set("page", String(page));
   return request<Paginated<AdminProductItem>>(`/api/admin/products?${params}`);
+}
+
+// ---------------------------------------------------------------------------
+// Colecciones curadas
+// ---------------------------------------------------------------------------
+
+/** GET /api/collections — público. */
+export function fetchCollections() {
+  return request<CollectionSummary[]>(`/api/collections`);
+}
+
+/** GET /api/collections/:slug — público. */
+export function fetchCollection(slug: string) {
+  return request<CollectionDetail>(`/api/collections/${encodeURIComponent(slug)}`);
+}
+
+/** POST /api/admin/collections (solo ADMIN). */
+export function createCollection(input: { title: string; description: string }) {
+  return request<{ id: string; title: string; slug: string; description: string; createdAt: string }>(
+    `/api/admin/collections`,
+    { method: "POST", body: JSON.stringify(input) }
+  );
+}
+
+/** DELETE /api/admin/collections/:id (solo ADMIN). */
+export function deleteCollection(id: string) {
+  return request<void>(`/api/admin/collections/${id}`, { method: "DELETE" });
+}
+
+/** POST /api/admin/collections/:id/products (solo ADMIN). */
+export function addToCollection(collectionId: string, productId: string) {
+  return request<{ id: string; productId: string }>(
+    `/api/admin/collections/${collectionId}/products`,
+    { method: "POST", body: JSON.stringify({ productId }) }
+  );
+}
+
+/** DELETE /api/admin/collections/:id/products?productId= (solo ADMIN). */
+export function removeFromCollection(collectionId: string, productId: string) {
+  return request<void>(
+    `/api/admin/collections/${collectionId}/products?productId=${encodeURIComponent(productId)}`,
+    { method: "DELETE" }
+  );
 }
