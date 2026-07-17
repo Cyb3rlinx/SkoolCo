@@ -11,6 +11,9 @@ import {
   createCollectionSchema,
   createProductUpdateSchema,
   usernameSchema,
+  createCollaborationSchema,
+  listCollaborationsQuerySchema,
+  createCollaborationContactRequestSchema,
 } from "@/lib/validation";
 
 describe("createCollectionSchema", () => {
@@ -185,5 +188,95 @@ describe("adminUpdateUserSchema", () => {
   it("rechaza body vacío y rol inválido", () => {
     expect(adminUpdateUserSchema.safeParse({}).success).toBe(false);
     expect(adminUpdateUserSchema.safeParse({ role: "SUPERADMIN" }).success).toBe(false);
+  });
+});
+
+describe("createCollaborationSchema", () => {
+  const valid = {
+    type: "NEEDS" as const,
+    title: "Busco quien automatice mi soporte",
+    description: "Necesito integrar WhatsApp con Shopify y GPT-4o para atención al cliente automática.",
+    tags: ["automatizacion", "whatsapp"],
+  };
+
+  it("accepts a valid NEEDS listing", () => {
+    expect(createCollaborationSchema.parse(valid)).toMatchObject(valid);
+  });
+
+  it("accepts a valid OFFERS listing", () => {
+    expect(createCollaborationSchema.parse({ ...valid, type: "OFFERS" }).type).toBe("OFFERS");
+  });
+
+  it("rejects an invalid type", () => {
+    expect(() => createCollaborationSchema.parse({ ...valid, type: "MAYBE" })).toThrow();
+  });
+
+  it("rejects a title shorter than 5 chars", () => {
+    expect(() => createCollaborationSchema.parse({ ...valid, title: "Hi" })).toThrow();
+  });
+
+  it("rejects a description shorter than 20 chars", () => {
+    expect(() => createCollaborationSchema.parse({ ...valid, description: "muy corto" })).toThrow();
+  });
+
+  it("defaults tags to an empty array when omitted", () => {
+    const { tags, ...withoutTags } = valid;
+    expect(createCollaborationSchema.parse(withoutTags).tags).toEqual([]);
+  });
+
+  it("rejects more than 8 tags", () => {
+    expect(() =>
+      createCollaborationSchema.parse({ ...valid, tags: Array.from({ length: 9 }, (_, i) => `tag${i}`) })
+    ).toThrow();
+  });
+
+  it("lowercases tags", () => {
+    expect(createCollaborationSchema.parse({ ...valid, tags: ["Automatización"] }).tags).toEqual([
+      "automatización",
+    ]);
+  });
+});
+
+describe("listCollaborationsQuerySchema", () => {
+  it("defaults page/pageSize", () => {
+    const parsed = listCollaborationsQuerySchema.parse({});
+    expect(parsed.page).toBe(1);
+    expect(parsed.pageSize).toBe(20);
+  });
+
+  it("accepts an optional type filter", () => {
+    expect(listCollaborationsQuerySchema.parse({ type: "OFFERS" }).type).toBe("OFFERS");
+  });
+
+  it("rejects an invalid type filter", () => {
+    expect(() => listCollaborationsQuerySchema.parse({ type: "NOPE" })).toThrow();
+  });
+});
+
+describe("createCollaborationContactRequestSchema", () => {
+  it("accepts a message of at least 20 chars", () => {
+    const msg = "Hola, me interesa mucho tu propuesta, hablemos.";
+    expect(createCollaborationContactRequestSchema.parse({ message: msg }).message).toBe(msg);
+  });
+
+  it("rejects a message shorter than 20 chars", () => {
+    expect(() => createCollaborationContactRequestSchema.parse({ message: "muy corto" })).toThrow();
+  });
+});
+
+describe("createReportSchema with collaborationId", () => {
+  it("accepts a report targeting a collaboration", () => {
+    const parsed = createReportSchema.parse({ collaborationId: "abc123", reason: "Contenido de spam" });
+    expect(parsed.collaborationId).toBe("abc123");
+  });
+
+  it("rejects a report with both productId and collaborationId", () => {
+    expect(() =>
+      createReportSchema.parse({ productId: "p1", collaborationId: "c1", reason: "Motivo válido" })
+    ).toThrow();
+  });
+
+  it("rejects a report with no target", () => {
+    expect(() => createReportSchema.parse({ reason: "Motivo válido" })).toThrow();
   });
 });

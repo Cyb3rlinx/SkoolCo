@@ -1,6 +1,7 @@
 {
   "crons": [
     { "path": "/api/cron/offer-nudge", "schedule": "0 14 * * *" },
-    { "path": "/api/cron/top-month-badges", "schedule": "0 6 1 * *" }
+    { "path": "/api/cron/top-month-badges", "schedule": "0 6 1 * *" },
+    { "path": "/api/cron/collaboration-cleanup", "schedule": "0 5 * * *" }
   ]
 }

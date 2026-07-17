@@ -159,7 +159,9 @@ function ReportRow({
     ? { label: report.product.name, href: `/products/${report.product.slug}` }
     : report.comment
       ? { label: `Comentario: “${report.comment.body.slice(0, 60)}…”`, href: null }
-      : { label: "Contenido eliminado", href: null };
+      : report.collaboration
+        ? { label: report.collaboration.title, href: `/colaboraciones/${report.collaboration.id}` }
+        : { label: "Contenido eliminado", href: null };
 
   return (
     <Card>
@@ -170,7 +172,7 @@ function ReportRow({
             <Badge variant="outline">{REPORT_CATEGORY_LABEL[report.category]}</Badge>
             <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
               <Flag className="h-3 w-3" aria-hidden />
-              {report.product ? "Producto" : "Comentario"} · {timeAgo(report.createdAt)}
+              {report.product ? "Producto" : report.comment ? "Comentario" : "Colaboración"} · {timeAgo(report.createdAt)}
             </span>
           </div>
 

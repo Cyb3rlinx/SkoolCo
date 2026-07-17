@@ -160,6 +160,46 @@ export interface ContactRequestItem {
 }
 
 // ---------------------------------------------------------------------------
+// Colaboraciones
+// ---------------------------------------------------------------------------
+
+export type CollaborationType = "NEEDS" | "OFFERS";
+
+export interface CollaborationItem {
+  id: string;
+  type: CollaborationType;
+  title: string;
+  description: string;
+  tags: string[];
+  createdAt: string;
+  updatedAt: string;
+  author: { id: string; name: string; avatarUrl: string | null };
+}
+
+export interface CollaborationListQuery {
+  type?: CollaborationType;
+  q?: string;
+  page?: number;
+  pageSize?: number;
+}
+
+export interface CreateCollaborationInput {
+  type: CollaborationType;
+  title: string;
+  description: string;
+  tags?: string[];
+}
+
+export interface CollaborationContactRequestItem {
+  id: string;
+  message: string;
+  status: ContactRequestStatus;
+  createdAt: string;
+  responder?: { name: string };
+  collaboration: { id: string; title: string };
+}
+
+// ---------------------------------------------------------------------------
 // Engagement
 // ---------------------------------------------------------------------------
 
@@ -257,6 +297,7 @@ export interface ModerationReportItem {
   reporter: { id: string; name: string } | null;
   product: { id: string; name: string; slug: string } | null;
   comment: { id: string; body: string } | null;
+  collaboration?: { id: string; title: string } | null;
 }
 
 // ---------------------------------------------------------------------------

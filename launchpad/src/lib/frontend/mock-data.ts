@@ -9,6 +9,7 @@
  */
 import type {
   Category,
+  CollaborationItem,
   CommentItem,
   CommunityLink,
   LeaderboardEntry,
@@ -452,5 +453,30 @@ export const mockMyLinks: CommunityLink[] = [
     status: "PENDING",
     createdAt: hoursAgo(8),
     submittedBy: users.ana,
+  },
+];
+
+// --- Collaborations ---------------------------------------------------------------
+
+export const mockCollaborations: CollaborationItem[] = [
+  {
+    id: "mock-collab-1",
+    type: "NEEDS",
+    title: "Necesito automatizar soporte al cliente",
+    description: "Busco a alguien que integre WhatsApp + GPT-4o + Shopify para atención automática 24/7.",
+    tags: ["automatizacion", "whatsapp", "ia"],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    author: { id: "mock-user-1", name: "Ana Maker", avatarUrl: null },
+  },
+  {
+    id: "mock-collab-2",
+    type: "OFFERS",
+    title: "Ofrezco diseño UI/UX para SaaS",
+    description: "5 años diseñando dashboards y onboarding para productos B2B. Portfolio disponible.",
+    tags: ["diseño", "ui", "ux"],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    author: { id: "mock-user-2", name: "Luis Diseñador", avatarUrl: null },
   },
 ];

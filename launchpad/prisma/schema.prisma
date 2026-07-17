@@ -39,27 +39,29 @@ model User {
   /// Se puede editar una sola vez: NULL = todavía no lo cambió manualmente.
   usernameChangedAt DateTime? @map("username_changed_at")
 
-  products                Product[]
-  upvotes                 Upvote[]
-  comments                Comment[]
-  reportsFiled            ModerationReport[]       @relation("ReportsFiled")
-  reportsResolved         ModerationReport[]       @relation("ReportsResolved")
-  communityLinks          CommunityLink[]
-  extensionEvents         ExtensionEvent[]
-  passwordResetTokens     PasswordResetToken[]
-  emailVerificationTokens EmailVerificationToken[]
-  notificationsReceived   Notification[]           @relation("NotificationsReceived")
-  notificationsActed      Notification[]           @relation("NotificationsActed")
-  uploadedImages          UploadedImage[]
-  contactRequestsSent     ContactRequest[]
-  savedProducts           SavedProduct[]
+  products                         Product[]
+  upvotes                          Upvote[]
+  comments                         Comment[]
+  reportsFiled                     ModerationReport[]            @relation("ReportsFiled")
+  reportsResolved                  ModerationReport[]            @relation("ReportsResolved")
+  communityLinks                   CommunityLink[]
+  extensionEvents                  ExtensionEvent[]
+  passwordResetTokens              PasswordResetToken[]
+  emailVerificationTokens          EmailVerificationToken[]
+  notificationsReceived            Notification[]                @relation("NotificationsReceived")
+  notificationsActed               Notification[]                @relation("NotificationsActed")
+  uploadedImages                   UploadedImage[]
+  contactRequestsSent              ContactRequest[]
+  savedProducts                    SavedProduct[]
+  collaborations                   Collaboration[]
+  collaborationContactRequestsSent CollaborationContactRequest[]
   /// Un admin confirmó la identidad/legitimidad de esta cuenta como maker de confianza.
-  verifiedAt              DateTime?                @map("verified_at")
-  collectionsCreated      Collection[]             @relation("CollectionsCreated")
-  followedBy              Follow[]                 @relation("Followers")
-  following               Follow[]                 @relation("Following")
-  badges                  UserBadge[]
-  badgesGranted           UserBadge[]              @relation("BadgesGranted")
+  verifiedAt                       DateTime?                     @map("verified_at")
+  collectionsCreated               Collection[]                  @relation("CollectionsCreated")
+  followedBy                       Follow[]                      @relation("Followers")
+  following                        Follow[]                      @relation("Following")
+  badges                           UserBadge[]
+  badgesGranted                    UserBadge[]                   @relation("BadgesGranted")
 
   @@map("users")
 }
@@ -263,6 +265,56 @@ model ContactRequest {
   @@map("contact_requests")
 }
 
+enum CollaborationType {
+  NEEDS // "necesito" — busca que alguien le resuelva algo
+  OFFERS // "ofrezco" — puede resolverle algo a alguien
+}
+
+/// Tablón de anuncios de dos lados: alguien necesita un servicio, alguien
+/// puede brindarlo. Sin edición post-publicación (borrar y republicar si
+/// hace falta corregir algo) y sin estado de cierre: un anuncio vive hasta
+/// que el autor, un admin, o el cron de 35 días lo borra.
+model Collaboration {
+  id          String            @id @default(cuid())
+  authorId    String            @map("author_id")
+  type        CollaborationType
+  title       String
+  description String
+  tags        String[]
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
+
+  author          User                          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  contactRequests CollaborationContactRequest[]
+  reports         ModerationReport[]
+
+  @@index([type, createdAt])
+  @@index([authorId])
+  @@map("collaborations")
+}
+
+/// Solicitud de contacto sobre una Collaboration. Mismo patrón que
+/// ContactRequest (productos) pero en tabla separada: el "quién resuelve"
+/// es el autor del anuncio, no el maker de un producto, y mezclar ambos
+/// flujos en una sola tabla obligaría a volver nullable productId en
+/// ContactRequest y tocar todas sus queries existentes.
+model CollaborationContactRequest {
+  id              String               @id @default(cuid())
+  collaborationId String               @map("collaboration_id")
+  responderId     String               @map("responder_id")
+  message         String
+  status          ContactRequestStatus @default(PENDING)
+  createdAt       DateTime             @default(now()) @map("created_at")
+
+  collaboration Collaboration @relation(fields: [collaborationId], references: [id], onDelete: Cascade)
+  responder     User          @relation(fields: [responderId], references: [id], onDelete: Cascade)
+
+  // Un mismo usuario solo puede solicitar contacto una vez por anuncio.
+  @@unique([collaborationId, responderId], map: "collaboration_contact_requests_collab_responder_key")
+  @@index([collaborationId, status])
+  @@map("collaboration_contact_requests")
+}
+
 // ---------------------------------------------------------------------------
 // Engagement
 // ---------------------------------------------------------------------------
@@ -324,22 +376,24 @@ enum ReportCategory {
 }
 
 model ModerationReport {
-  id           String         @id @default(cuid())
+  id              String         @id @default(cuid())
   /// NULL = reporte auto-generado por el sistema (detección de contenido sospechoso), no por un usuario.
-  reporterId   String?        @map("reporter_id")
-  productId    String?        @map("product_id")
-  commentId    String?        @map("comment_id")
-  reason       String
-  category     ReportCategory @default(OTHER)
-  status       ReportStatus   @default(OPEN)
-  resolvedById String?        @map("resolved_by_id")
-  resolvedAt   DateTime?      @map("resolved_at") // audit: when it was resolved/dismissed
-  createdAt    DateTime       @default(now()) @map("created_at")
+  reporterId      String?        @map("reporter_id")
+  productId       String?        @map("product_id")
+  commentId       String?        @map("comment_id")
+  collaborationId String?        @map("collaboration_id")
+  reason          String
+  category        ReportCategory @default(OTHER)
+  status          ReportStatus   @default(OPEN)
+  resolvedById    String?        @map("resolved_by_id")
+  resolvedAt      DateTime?      @map("resolved_at") // audit: when it was resolved/dismissed
+  createdAt       DateTime       @default(now()) @map("created_at")
 
-  reporter   User?    @relation("ReportsFiled", fields: [reporterId], references: [id], onDelete: Cascade)
-  resolvedBy User?    @relation("ReportsResolved", fields: [resolvedById], references: [id])
-  product    Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
-  comment    Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  reporter      User?          @relation("ReportsFiled", fields: [reporterId], references: [id], onDelete: Cascade)
+  resolvedBy    User?          @relation("ReportsResolved", fields: [resolvedById], references: [id])
+  product       Product?       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  comment       Comment?       @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  collaboration Collaboration? @relation(fields: [collaborationId], references: [id], onDelete: Cascade)
 
   @@index([status])
   @@map("moderation_reports")

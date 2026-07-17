@@ -14,6 +14,7 @@ const STATIC_ROUTES = [
   "/novedades",
   "/privacidad",
   "/terminos",
+  "/colaboraciones",
 ];
 
 /**
@@ -24,15 +25,27 @@ const STATIC_ROUTES = [
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = process.env.NEXTAUTH_URL ?? "https://denveler.com";
 
-  const [products, makers] = await Promise.all([
-    prisma.product.findMany({
-      where: { status: "LIVE" },
-      select: { slug: true, updatedAt: true },
-    }),
-    prisma.user.findMany({
-      where: { products: { some: { status: "LIVE" } } },
-      select: { id: true },
-    }),
+  // .catch → []: el sitemap se prerenderiza en build; una tabla que aún no
+  // existe en prod (migración pendiente) o una BD caída no deben tumbar el
+  // deploy entero — solo omiten sus entradas.
+  const [products, makers, collaborations] = await Promise.all([
+    prisma.product
+      .findMany({
+        where: { status: "LIVE" },
+        select: { slug: true, updatedAt: true },
+      })
+      .catch(() => []),
+    prisma.user
+      .findMany({
+        where: { products: { some: { status: "LIVE" } } },
+        select: { id: true },
+      })
+      .catch(() => []),
+    prisma.collaboration
+      .findMany({
+        select: { id: true, updatedAt: true },
+      })
+      .catch(() => []),
   ]);
 
   const staticEntries: MetadataRoute.Sitemap = STATIC_ROUTES.map((path) => ({
@@ -51,5 +64,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: "weekly",
   }));
 
-  return [...staticEntries, ...productEntries, ...makerEntries];
+  const collaborationEntries: MetadataRoute.Sitemap = collaborations.map((c) => ({
+    url: `${siteUrl}/colaboraciones/${c.id}`,
+    lastModified: c.updatedAt,
+    changeFrequency: "daily",
+  }));
+
+  return [...staticEntries, ...productEntries, ...makerEntries, ...collaborationEntries];
 }

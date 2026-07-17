@@ -33,11 +33,20 @@ export const POST = withErrorHandling(async (req: Request) => {
     if (!exists) throw new ApiError(404, "Comment not found");
   }
 
+  if (input.collaborationId) {
+    const exists = await prisma.collaboration.findUnique({
+      where: { id: input.collaborationId },
+      select: { id: true },
+    });
+    if (!exists) throw new ApiError(404, "Collaboration not found");
+  }
+
   const report = await prisma.moderationReport.create({
     data: {
       reporterId: user.id,
       productId: input.productId ?? null,
       commentId: input.commentId ?? null,
+      collaborationId: input.collaborationId ?? null,
       reason: input.reason,
       category: input.category ?? "OTHER",
     },
@@ -75,6 +84,7 @@ export const GET = withErrorHandling(async (req: Request) => {
       reporter: { select: { id: true, name: true } },
       product: { select: { id: true, name: true, slug: true } },
       comment: { select: { id: true, body: true } },
+      collaboration: { select: { id: true, title: true } },
     },
   });
 

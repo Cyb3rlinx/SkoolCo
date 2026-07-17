@@ -70,6 +70,29 @@ export const createContactRequestSchema = z.object({
   message: z.string().trim().min(20).max(1000),
 });
 
+export const COLLABORATION_TYPES = ["NEEDS", "OFFERS"] as const;
+
+export const createCollaborationSchema = z.object({
+  type: z.enum(COLLABORATION_TYPES),
+  title: z.string().trim().min(5).max(120),
+  description: z.string().trim().min(20).max(2000),
+  tags: z
+    .array(z.string().trim().toLowerCase().min(2).max(30))
+    .max(8)
+    .default([]),
+});
+
+export const listCollaborationsQuerySchema = z.object({
+  type: z.enum(COLLABORATION_TYPES).optional(),
+  q: z.string().trim().min(1).max(100).optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  pageSize: z.coerce.number().int().min(1).max(50).default(20),
+});
+
+export const createCollaborationContactRequestSchema = z.object({
+  message: z.string().trim().min(20).max(1000),
+});
+
 export const listProductsQuerySchema = z.object({
   status: z.enum(["DRAFT", "SCHEDULED", "LIVE", "ARCHIVED"]).optional(),
   category: z.string().optional(), // category slug
@@ -101,11 +124,12 @@ export const createReportSchema = z
   .object({
     productId: z.string().optional(),
     commentId: z.string().optional(),
+    collaborationId: z.string().optional(),
     reason: z.string().trim().min(5).max(1000),
     category: z.enum(REPORT_CATEGORIES).optional(),
   })
-  .refine((v) => Boolean(v.productId) !== Boolean(v.commentId), {
-    message: "Provide exactly one of productId or commentId",
+  .refine((v) => [v.productId, v.commentId, v.collaborationId].filter(Boolean).length === 1, {
+    message: "Provide exactly one of productId, commentId, or collaborationId",
   });
 
 export const resolveReportSchema = z.object({
