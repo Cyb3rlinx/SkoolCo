@@ -66,7 +66,12 @@ export function ReportButton({ productId, collaborationId }: { productId?: strin
         {t("report")}
       </button>
 
-      <Dialog open={open} onClose={() => setOpen(false)} title={t("dialogTitle")} description={t("dialogDescription")}>
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        title={collaborationId ? t("dialogTitleCollaboration") : t("dialogTitle")}
+        description={t("dialogDescription")}
+      >
         {done ? (
           <div className="space-y-4">
             <Alert variant="success">{t("thanks")}</Alert>

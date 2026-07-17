@@ -316,7 +316,8 @@
       "categorySpam": "Spam",
       "categoryScam": "Scam or fraud",
       "categoryInappropriate": "Inappropriate content",
-      "categoryOther": "Other"
+      "categoryOther": "Other",
+      "dialogTitleCollaboration": "Report this collaboration"
     },
     "related": {
       "title": "Related launches"

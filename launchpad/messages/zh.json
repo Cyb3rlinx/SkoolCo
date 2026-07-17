@@ -316,7 +316,8 @@
       "categorySpam": "垃圾信息",
       "categoryScam": "诈骗",
       "categoryInappropriate": "不当内容",
-      "categoryOther": "其他"
+      "categoryOther": "其他",
+      "dialogTitleCollaboration": "举报此协作"
     },
     "related": {
       "title": "相关发布"
