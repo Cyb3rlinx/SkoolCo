@@ -53,11 +53,19 @@ export function NotificationsBell() {
     }
   }
 
+  function toggleOpen() {
+    const next = !open;
+    setOpen(next);
+    // Opening the panel is the "I looked at these" signal — mark them read
+    // the same way GitHub/most apps do, instead of requiring an extra click.
+    if (next && unread > 0) markAllRead();
+  }
+
   return (
     <div ref={panelRef} className="relative">
       <button
         type="button"
-        onClick={() => setOpen((o) => !o)}
+        onClick={toggleOpen}
         aria-label={unread > 0 ? t("bellLabelUnread", { count: unread }) : t("bellLabel")}
         aria-expanded={open}
         className="relative flex h-10 w-10 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
