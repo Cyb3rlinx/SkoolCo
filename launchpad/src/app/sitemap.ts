@@ -15,6 +15,7 @@ const STATIC_ROUTES = [
   "/privacidad",
   "/terminos",
   "/colaboraciones",
+  "/logros",
 ];
 
 /**

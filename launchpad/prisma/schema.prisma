@@ -53,6 +53,7 @@ model User {
   uploadedImages                   UploadedImage[]
   contactRequestsSent              ContactRequest[]
   savedProducts                    SavedProduct[]
+  savedCommunityLinks              SavedCommunityLink[]
   collaborations                   Collaboration[]
   collaborationContactRequestsSent CollaborationContactRequest[]
   /// Un admin confirmó la identidad/legitimidad de esta cuenta como maker de confianza.
@@ -422,12 +423,29 @@ model CommunityLink {
   status         LinkStatus @default(PENDING)
   createdAt      DateTime   @default(now()) @map("created_at")
 
-  submittedBy User @relation(fields: [submittedById], references: [id], onDelete: Cascade)
+  submittedBy User                 @relation(fields: [submittedById], references: [id], onDelete: Cascade)
+  savedBy     SavedCommunityLink[]
 
   // The same user cannot submit the same URL twice.
   @@unique([submittedById, url])
   @@index([status])
   @@map("community_links")
+}
+
+/// Logro de la extensión que un usuario guardó desde /logros (mismo patrón
+/// que SavedProduct: marcador puro, sin side effects).
+model SavedCommunityLink {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  linkId    String   @map("link_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  link CommunityLink @relation(fields: [linkId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, linkId])
+  @@index([userId])
+  @@map("saved_community_links")
 }
 
 model ExtensionEvent {

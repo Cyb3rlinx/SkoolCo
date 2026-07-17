@@ -6,7 +6,8 @@
   "nav": {
     "launches": "Launches",
     "collections": "Collections",
-    "collaborations": "Collaborations",
+    "achievements": "Achievements",
+    "collaborations": "Services",
     "leaderboard": "Leaderboard",
     "extension": "Extension",
     "resources": "Resources",
@@ -36,6 +37,7 @@
     "submit": "Submit a product",
     "howItWorks": "How it works",
     "makers": "Makers",
+    "achievements": "Achievements",
     "rules": "Guidelines",
     "news": "News",
     "guides": "Guides",
@@ -658,9 +660,9 @@
     "emptyDescription": "This collection is empty for now."
   },
   "collaborations": {
-    "metaTitle": "Collaborations",
+    "metaTitle": "Services",
     "metaDescription": "Connect with someone who needs a service or someone who can provide it.",
-    "heading": "Collaborations",
+    "heading": "Services",
     "subheading": "Connect with someone who needs a service or someone who can provide it.",
     "tabAll": "All",
     "tabNeeds": "Needs",
@@ -702,11 +704,11 @@
     "deleting": "Deleting…",
     "notFoundTitle": "This collaboration no longer exists",
     "notFoundDescription": "The author may have deleted it, or it may have expired.",
-    "backToList": "Back to Collaborations",
-    "myCollaborations": "My collaborations",
+    "backToList": "Back to Services",
+    "myCollaborations": "My services",
     "noneYet": "You haven't published any collaborations yet.",
-    "contactRequestsReceived": "Contact requests (collaborations)",
-    "contactRequestsSent": "My sent requests (collaborations)",
+    "contactRequestsReceived": "Contact requests (services)",
+    "contactRequestsSent": "My sent requests (services)",
     "shareEmail": "Share my email",
     "dismiss": "Dismiss",
     "pending": "Pending",
@@ -800,5 +802,23 @@
       "errorAdd": "Couldn't add.",
       "errorRemove": "Couldn't remove."
     }
+  },
+  "achievements": {
+    "metaTitle": "Achievements",
+    "metaDescription": "Real wins the community shared from Skool and beyond — verified by Denveler.",
+    "heading": "Community achievements",
+    "subheading": "Real wins, shared and verified. From new clients to finished challenges.",
+    "loadError": "We couldn't load the achievements.",
+    "emptyTitle": "No achievements yet",
+    "emptyDescription": "When the community shares wins from the extension, they'll show up here once verified.",
+    "footerLink": "Achievements",
+    "typeLogro": "Achievement",
+    "typeMilestone": "Milestone",
+    "typeAnnouncement": "Announcement",
+    "typeOther": "Achievement",
+    "viewPost": "View post",
+    "saveLabel": "Save this achievement",
+    "unsaveLabel": "Remove from saved",
+    "savedSectionTitle": "Saved achievements"
   }
 }

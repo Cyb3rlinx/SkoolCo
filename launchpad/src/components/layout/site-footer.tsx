@@ -23,6 +23,7 @@ function useColumns() {
       links: [
         { label: t("howItWorks"), href: "/#como-funciona" },
         { label: t("makers"), href: "/leaderboard" },
+        { label: t("achievements"), href: "/logros" },
         { label: t("rules"), href: "/normas" },
         { label: t("news"), href: "/novedades" },
       ],

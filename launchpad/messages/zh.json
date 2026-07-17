@@ -6,7 +6,8 @@
   "nav": {
     "launches": "发布广场",
     "collections": "合集",
-    "collaborations": "协作",
+    "achievements": "成就",
+    "collaborations": "服务",
     "leaderboard": "排行榜",
     "extension": "浏览器插件",
     "resources": "资源",
@@ -36,6 +37,7 @@
     "submit": "发布产品",
     "howItWorks": "运作方式",
     "makers": "创作者",
+    "achievements": "成就",
     "rules": "社区规范",
     "news": "动态",
     "guides": "指南",
@@ -658,9 +660,9 @@
     "emptyDescription": "这个合集目前还是空的。"
   },
   "collaborations": {
-    "metaTitle": "协作",
+    "metaTitle": "服务",
     "metaDescription": "联系需要服务的人，或能够提供服务的人。",
-    "heading": "协作",
+    "heading": "服务",
     "subheading": "联系需要服务的人，或能够提供服务的人。",
     "tabAll": "全部",
     "tabNeeds": "需求",
@@ -702,11 +704,11 @@
     "deleting": "删除中…",
     "notFoundTitle": "该协作信息已不存在",
     "notFoundDescription": "作者可能已将其删除，或者它已过期。",
-    "backToList": "返回协作页面",
-    "myCollaborations": "我的协作",
+    "backToList": "返回服务页面",
+    "myCollaborations": "我的服务",
     "noneYet": "你还没有发布任何协作信息。",
-    "contactRequestsReceived": "收到的联系请求（协作）",
-    "contactRequestsSent": "我发送的请求（协作）",
+    "contactRequestsReceived": "收到的联系请求（服务）",
+    "contactRequestsSent": "我发送的请求（服务）",
     "shareEmail": "分享我的邮箱",
     "dismiss": "忽略",
     "pending": "待处理",
@@ -800,5 +802,23 @@
       "errorAdd": "添加失败。",
       "errorRemove": "移除失败。"
     }
+  },
+  "achievements": {
+    "metaTitle": "成就",
+    "metaDescription": "社区从 Skool 等平台分享的真实成就 — 经 Denveler 核实。",
+    "heading": "社区成就",
+    "subheading": "真实的胜利，经过分享与核实。从签下新客户到完成挑战，应有尽有。",
+    "loadError": "无法加载成就。",
+    "emptyTitle": "暂无成就",
+    "emptyDescription": "当社区通过插件分享的成就通过核实后，会显示在这里。",
+    "footerLink": "成就",
+    "typeLogro": "成就",
+    "typeMilestone": "里程碑",
+    "typeAnnouncement": "公告",
+    "typeOther": "成就",
+    "viewPost": "查看帖子",
+    "saveLabel": "收藏该成就",
+    "unsaveLabel": "取消收藏",
+    "savedSectionTitle": "已收藏的成就"
   }
 }

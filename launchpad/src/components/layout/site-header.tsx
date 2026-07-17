@@ -28,7 +28,7 @@ export function SiteHeader() {
 
   const NAV_LINKS = [
     { href: "/launches", label: t("launches") },
-    { href: "/colecciones", label: t("collections") },
+    { href: "/logros", label: t("achievements") },
     { href: "/colaboraciones", label: t("collaborations") },
     { href: "/leaderboard", label: t("leaderboard") },
     { href: "/extension", label: t("extension") },

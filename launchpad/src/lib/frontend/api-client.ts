@@ -494,6 +494,25 @@ export function fetchCommunityLinksByStatus(status: "PENDING" | "VERIFIED" | "RE
   return request<CommunityLink[]>(`/api/community-links?status=${status}`);
 }
 
+/** POST /api/community-links/:id/save (auth) — save an achievement. */
+export function saveCommunityLink(id: string) {
+  return request<{ saved: boolean }>(`/api/community-links/${encodeURIComponent(id)}/save`, {
+    method: "POST",
+  });
+}
+
+/** DELETE /api/community-links/:id/save (auth) — unsave an achievement. */
+export function unsaveCommunityLink(id: string) {
+  return request<{ saved: boolean }>(`/api/community-links/${encodeURIComponent(id)}/save`, {
+    method: "DELETE",
+  });
+}
+
+/** GET /api/me/saved-links (auth) — my saved achievements. */
+export function fetchSavedCommunityLinks() {
+  return request<CommunityLink[]>(`/api/me/saved-links`);
+}
+
 /** GET /api/users/:id — public maker profile. */
 export function fetchUser(id: string) {
   return request<PublicUser>(`/api/users/${encodeURIComponent(id)}`);

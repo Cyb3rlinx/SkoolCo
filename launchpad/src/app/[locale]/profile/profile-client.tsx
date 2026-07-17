@@ -26,6 +26,7 @@ import { EmptyState, ErrorState } from "@/components/ui/states";
 import { ProductCard } from "@/components/product/product-card";
 import { ContactRequestsSection } from "@/components/profile/contact-requests-section";
 import { SavedProductsSection } from "@/components/profile/saved-products-section";
+import { SavedAchievementsSection } from "@/components/profile/saved-achievements-section";
 import { SentContactRequestsSection } from "@/components/profile/sent-contact-requests-section";
 import { CollaborationsSection } from "@/components/profile/collaborations-section";
 import { CollaborationContactRequestsSection } from "@/components/profile/collaboration-contact-requests-section";
@@ -218,6 +219,9 @@ export function ProfileClient() {
 
       {/* Productos guardados */}
       <SavedProductsSection />
+
+      {/* Logros de la extensión guardados */}
+      <SavedAchievementsSection />
 
       {/* Solicitudes de contacto (puente de compraventa) */}
       <ContactRequestsSection />
