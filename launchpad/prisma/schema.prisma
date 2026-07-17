@@ -46,8 +46,26 @@ model User {
   notificationsActed      Notification[] @relation("NotificationsActed")
   uploadedImages          UploadedImage[]
   contactRequestsSent     ContactRequest[]
+  savedProducts           SavedProduct[]
+  /// Un admin confirmó la identidad/legitimidad de esta cuenta como maker de confianza.
+  verifiedAt              DateTime?        @map("verified_at")
 
   @@map("users")
+}
+
+/// Producto que un usuario guardó para ver después (sin votar ni pedir contacto).
+model SavedProduct {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  productId String   @map("product_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@index([userId])
+  @@map("saved_products")
 }
 
 // User-uploaded images (product logos, avatars). Stored as bytea for MVP —
@@ -119,6 +137,7 @@ model Product {
   notifications Notification[]
   images        ProductImage[]
   contactRequests ContactRequest[]
+  savedBy         SavedProduct[]
 
   @@index([status, launchDate])
   @@index([makerId])
@@ -190,6 +209,8 @@ model Comment {
   id        String    @id @default(cuid())
   userId    String    @map("user_id")
   productId String    @map("product_id")
+  /// NULL = comentario raíz. No-NULL = respuesta a otro comentario (un solo nivel de anidamiento).
+  parentId  String?   @map("parent_id")
   body      String
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
@@ -197,10 +218,13 @@ model Comment {
 
   user          User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   product       Product            @relation(fields: [productId], references: [id], onDelete: Cascade)
+  parent        Comment?           @relation("Replies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies       Comment[]          @relation("Replies")
   reports       ModerationReport[]
   notifications Notification[]
 
   @@index([productId, createdAt])
+  @@index([parentId])
   @@map("comments")
 }
 
@@ -215,12 +239,20 @@ enum ReportStatus {
   DISMISSED
 }
 
+enum ReportCategory {
+  SPAM
+  SCAM
+  INAPPROPRIATE
+  OTHER
+}
+
 model ModerationReport {
   id         String       @id @default(cuid())
   reporterId String       @map("reporter_id")
   productId  String?      @map("product_id")
   commentId  String?      @map("comment_id")
   reason     String
+  category   ReportCategory @default(OTHER)
   status     ReportStatus @default(OPEN)
   resolvedById String?    @map("resolved_by_id")
   resolvedAt DateTime?    @map("resolved_at") // audit: when it was resolved/dismissed
