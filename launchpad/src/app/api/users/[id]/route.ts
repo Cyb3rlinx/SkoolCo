@@ -19,6 +19,7 @@ export const GET = withErrorHandling(async (_req: Request, { params }: Params) =
       name: true,
       avatarUrl: true,
       bio: true,
+      verifiedAt: true,
       createdAt: true,
       _count: {
         select: {

@@ -12,6 +12,7 @@ import type {
   CommentItem,
   CommunityLink,
   LeaderboardEntry,
+  MakerRef,
   MeProfile,
   ModerationReportItem,
   NotificationItem,
@@ -30,12 +31,12 @@ const hoursAgo = (h: number) => new Date(now - h * 3_600_000).toISOString();
 // --- Users -----------------------------------------------------------------
 
 const users = {
-  ana: { id: "mock_u_ana", name: "Ana Maker", avatarUrl: null },
-  luis: { id: "mock_u_luis", name: "Luis Builder", avatarUrl: null },
-  sofia: { id: "mock_u_sofia", name: "Sofía Design", avatarUrl: null },
-  marco: { id: "mock_u_marco", name: "Marco Data", avatarUrl: null },
-  mod: { id: "mock_u_mod", name: "Morgan Mod", avatarUrl: null },
-} satisfies Record<string, UserRef>;
+  ana: { id: "mock_u_ana", name: "Ana Maker", avatarUrl: null, verifiedAt: daysAgo(30) },
+  luis: { id: "mock_u_luis", name: "Luis Builder", avatarUrl: null, verifiedAt: null },
+  sofia: { id: "mock_u_sofia", name: "Sofía Design", avatarUrl: null, verifiedAt: null },
+  marco: { id: "mock_u_marco", name: "Marco Data", avatarUrl: null, verifiedAt: null },
+  mod: { id: "mock_u_mod", name: "Morgan Mod", avatarUrl: null, verifiedAt: null },
+} satisfies Record<string, MakerRef>;
 
 // --- Categories --------------------------------------------------------------
 
@@ -60,7 +61,7 @@ interface MockProductInput {
   name: string;
   tagline: string;
   description: string;
-  maker: UserRef;
+  maker: MakerRef;
   category: ReturnType<typeof cat>;
   launchDate: string;
   upvotes: number;

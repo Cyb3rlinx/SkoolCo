@@ -106,8 +106,19 @@ export function UsersSection() {
                     </div>
                     <Badge variant={ROLE_VARIANT[u.role]}>{u.role}</Badge>
                     {u.suspendedAt && <Badge variant="destructive">Suspendido</Badge>}
+                    {u.verifiedAt && <Badge variant="secondary">Verificado</Badge>}
                     {!isSelf && (
                       <div className="flex flex-wrap items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={busy}
+                          onClick={() =>
+                            act(u.id, () => updateAdminUser(u.id, { verified: !u.verifiedAt }))
+                          }
+                        >
+                          {u.verifiedAt ? "Quitar verificación" : "Verificar"}
+                        </Button>
                         <select
                           className="h-9 rounded-lg border bg-background px-2 text-sm"
                           value={u.role}

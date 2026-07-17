@@ -29,7 +29,7 @@ export const productListSelect = {
   status: true,
   createdAt: true,
   category: { select: { id: true, name: true, slug: true } },
-  maker: { select: { id: true, name: true, avatarUrl: true } },
+  maker: { select: { id: true, name: true, avatarUrl: true, verifiedAt: true } },
   _count: { select: { upvotes: true, comments: true } },
 } as const;
 

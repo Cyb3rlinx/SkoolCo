@@ -167,6 +167,7 @@ export function SubmitLaunchForm() {
         id: session?.user?.id ?? "preview",
         name: session?.user?.name ?? "Tú",
         avatarUrl: session?.user?.image ?? null,
+        verifiedAt: null,
       },
       _count: { upvotes: 1, comments: 0 },
     }),

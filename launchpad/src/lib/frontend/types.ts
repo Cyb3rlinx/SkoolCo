@@ -35,12 +35,18 @@ export interface UserRef {
   avatarUrl: string | null;
 }
 
+/** UserRef plus maker-verification status (product maker, public profile). */
+export interface MakerRef extends UserRef {
+  verifiedAt: string | null;
+}
+
 /** GET /api/users/:id — public maker profile. */
 export interface PublicUser {
   id: string;
   name: string;
   avatarUrl: string | null;
   bio: string | null;
+  verifiedAt: string | null;
   createdAt: string;
   _count: { products: number; upvotes: number; comments: number };
 }
@@ -83,7 +89,7 @@ export interface ProductListItem {
   status: ProductStatus;
   createdAt: string;
   category: { id: string; name: string; slug: string };
-  maker: UserRef;
+  maker: MakerRef;
   _count: { upvotes: number; comments: number };
 }
 
@@ -264,6 +270,7 @@ export interface AdminUserItem {
   role: "USER" | "MODERATOR" | "ADMIN";
   createdAt: string;
   suspendedAt: string | null;
+  verifiedAt: string | null;
   _count?: { products: number };
 }
 

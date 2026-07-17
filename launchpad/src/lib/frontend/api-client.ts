@@ -413,7 +413,7 @@ export function fetchAdminUsers(q: string, page: number) {
 /** PATCH /api/admin/users/:id */
 export function updateAdminUser(
   id: string,
-  input: { role?: "USER" | "MODERATOR" | "ADMIN"; suspended?: boolean }
+  input: { role?: "USER" | "MODERATOR" | "ADMIN"; suspended?: boolean; verified?: boolean }
 ) {
   return request<AdminUserItem>(`/api/admin/users/${id}`, {
     method: "PATCH",

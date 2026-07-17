@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, CalendarDays, MessageCircle, Rocket, ThumbsUp } from "lucide-react";
+import { ArrowLeft, BadgeCheck, CalendarDays, MessageCircle, Rocket, ThumbsUp } from "lucide-react";
 import { fetchProducts, fetchUser } from "@/lib/frontend/api-client";
 import { useApi } from "@/lib/frontend/hooks";
 import { formatDate } from "@/lib/frontend/format";
@@ -76,7 +76,12 @@ export function MakerProfileClient({ id }: { id: string }) {
         <CardContent className="flex flex-col gap-6 p-6 sm:flex-row sm:items-start">
           <Avatar name={profile.name} src={profile.avatarUrl} size="xl" />
           <div className="min-w-0 flex-1 space-y-2">
-            <h1 className="text-2xl font-extrabold tracking-tight">{profile.name}</h1>
+            <h1 className="flex items-center gap-2 text-2xl font-extrabold tracking-tight">
+              {profile.name}
+              {profile.verifiedAt && (
+                <BadgeCheck className="h-5 w-5 shrink-0 text-primary" aria-label="Maker verificado" />
+              )}
+            </h1>
             {profile.bio && <p className="max-w-xl text-sm">{profile.bio}</p>}
             <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <CalendarDays className="h-3.5 w-3.5" aria-hidden />

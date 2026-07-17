@@ -176,9 +176,10 @@ export const adminUpdateUserSchema = z
   .object({
     role: z.enum(["USER", "MODERATOR", "ADMIN"]).optional(),
     suspended: z.boolean().optional(),
+    verified: z.boolean().optional(),
   })
-  .refine((v) => v.role !== undefined || v.suspended !== undefined, {
-    message: "Debes enviar al menos un cambio (role o suspended).",
+  .refine((v) => v.role !== undefined || v.suspended !== undefined || v.verified !== undefined, {
+    message: "Debes enviar al menos un cambio (role, suspended o verified).",
   });
 
 /** POST /api/contact — formulario público de contacto. */
