@@ -21,31 +21,39 @@ enum UserRole {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  name         String
-  email        String   @unique
-  passwordHash String   @map("password_hash")
-  avatarUrl    String?  @map("avatar_url")
-  bio          String?
-  role          UserRole  @default(USER)
-  emailVerified DateTime? @map("email_verified")
-  createdAt     DateTime  @default(now()) @map("created_at")
+  id                String    @id @default(cuid())
+  name              String
+  email             String    @unique
+  passwordHash      String    @map("password_hash")
+  avatarUrl         String?   @map("avatar_url")
+  bio               String?
+  role              UserRole  @default(USER)
+  emailVerified     DateTime? @map("email_verified")
+  createdAt         DateTime  @default(now()) @map("created_at")
   /// Cuenta suspendida por un admin: no puede iniciar sesión ni ejecutar acciones.
-  suspendedAt   DateTime? @map("suspended_at")
+  suspendedAt       DateTime? @map("suspended_at")
+  /// @handle único. Nullable a nivel de BD (Postgres permite múltiples NULL
+  /// bajo UNIQUE) — la app siempre asigna uno al registrarse; el backfill
+  /// llena a los usuarios existentes (ver prisma/backfill-usernames.ts).
+  username          String?   @unique
+  /// Se puede editar una sola vez: NULL = todavía no lo cambió manualmente.
+  usernameChangedAt DateTime? @map("username_changed_at")
 
-  products          Product[]
-  upvotes           Upvote[]
-  comments          Comment[]
-  reportsFiled      ModerationReport[] @relation("ReportsFiled")
-  reportsResolved   ModerationReport[] @relation("ReportsResolved")
-  communityLinks    CommunityLink[]
-  extensionEvents   ExtensionEvent[]
+  products                Product[]
+  upvotes                 Upvote[]
+  comments                Comment[]
+  reportsFiled            ModerationReport[]       @relation("ReportsFiled")
+  reportsResolved         ModerationReport[]       @relation("ReportsResolved")
+  communityLinks          CommunityLink[]
+  extensionEvents         ExtensionEvent[]
   passwordResetTokens     PasswordResetToken[]
   emailVerificationTokens EmailVerificationToken[]
-  notificationsReceived   Notification[] @relation("NotificationsReceived")
-  notificationsActed      Notification[] @relation("NotificationsActed")
+  notificationsReceived   Notification[]           @relation("NotificationsReceived")
+  notificationsActed      Notification[]           @relation("NotificationsActed")
   uploadedImages          UploadedImage[]
   contactRequestsSent     ContactRequest[]
+  badges                  UserBadge[]
+  badgesGranted           UserBadge[]              @relation("BadgesGranted")
 
   @@map("users")
 }
@@ -101,23 +109,23 @@ model Product {
   status      ProductStatus @default(DRAFT)
 
   // --- Puente de compraventa (Fase 2): métricas declaradas + interés ---
-  openToOffers     Boolean @default(false) @map("open_to_offers")
-  declaredMrrUsd   Int?    @map("declared_mrr_usd") // USD/mes, declarado por el maker, NO verificado
-  monetizationNote String? @map("monetization_note")
+  openToOffers     Boolean   @default(false) @map("open_to_offers")
+  declaredMrrUsd   Int?      @map("declared_mrr_usd") // USD/mes, declarado por el maker, NO verificado
+  monetizationNote String?   @map("monetization_note")
   // Señal del puente: vistas de la oferta (sin deduplicar) y candado del email de tracción.
   offerViewCount   Int       @default(0) @map("offer_view_count")
   offerNudgeSentAt DateTime? @map("offer_nudge_sent_at")
 
-  createdAt   DateTime      @default(now()) @map("created_at")
-  updatedAt   DateTime      @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
-  maker         User               @relation(fields: [makerId], references: [id], onDelete: Cascade)
-  category      Category           @relation(fields: [categoryId], references: [id])
-  upvotes       Upvote[]
-  comments      Comment[]
-  reports       ModerationReport[]
-  notifications Notification[]
-  images        ProductImage[]
+  maker           User               @relation(fields: [makerId], references: [id], onDelete: Cascade)
+  category        Category           @relation(fields: [categoryId], references: [id])
+  upvotes         Upvote[]
+  comments        Comment[]
+  reports         ModerationReport[]
+  notifications   Notification[]
+  images          ProductImage[]
   contactRequests ContactRequest[]
   updates         ProductUpdate[]
 
@@ -231,16 +239,16 @@ enum ReportStatus {
 }
 
 model ModerationReport {
-  id         String       @id @default(cuid())
+  id           String       @id @default(cuid())
   /// NULL = reporte auto-generado por el sistema (detección de contenido sospechoso), no por un usuario.
-  reporterId String?      @map("reporter_id")
-  productId  String?      @map("product_id")
-  commentId  String?      @map("comment_id")
-  reason     String
-  status     ReportStatus @default(OPEN)
-  resolvedById String?    @map("resolved_by_id")
-  resolvedAt DateTime?    @map("resolved_at") // audit: when it was resolved/dismissed
-  createdAt  DateTime     @default(now()) @map("created_at")
+  reporterId   String?      @map("reporter_id")
+  productId    String?      @map("product_id")
+  commentId    String?      @map("comment_id")
+  reason       String
+  status       ReportStatus @default(OPEN)
+  resolvedById String?      @map("resolved_by_id")
+  resolvedAt   DateTime?    @map("resolved_at") // audit: when it was resolved/dismissed
+  createdAt    DateTime     @default(now()) @map("created_at")
 
   reporter   User?    @relation("ReportsFiled", fields: [reporterId], references: [id], onDelete: Cascade)
   resolvedBy User?    @relation("ReportsResolved", fields: [resolvedById], references: [id])
@@ -270,7 +278,7 @@ model CommunityLink {
   title          String
   url            String
   sourcePlatform String     @map("source_platform") // e.g. "skool"
-  type           String     // e.g. "logro", "milestone", "announcement"
+  type           String // e.g. "logro", "milestone", "announcement"
   status         LinkStatus @default(PENDING)
   createdAt      DateTime   @default(now()) @map("created_at")
 
@@ -324,6 +332,7 @@ model PasswordResetToken {
 enum NotificationType {
   UPVOTE
   COMMENT
+  MENTION
 }
 
 model Notification {
@@ -357,4 +366,40 @@ model EmailVerificationToken {
 
   @@index([userId])
   @@map("email_verification_tokens")
+}
+
+// ---------------------------------------------------------------------------
+// Insignias
+// ---------------------------------------------------------------------------
+
+/// Catálogo fijo de insignias. Agregar una nueva es una fila (seed), no
+/// requiere código nuevo salvo que también necesite un trigger automático.
+model Badge {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String
+  icon        String
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  users UserBadge[]
+
+  @@map("badges")
+}
+
+model UserBadge {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  badgeId     String   @map("badge_id")
+  /// NULL = otorgada automáticamente por el sistema. No-NULL = admin que la otorgó a mano.
+  grantedById String?  @map("granted_by_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user      User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge     Badge @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+  grantedBy User? @relation("BadgesGranted", fields: [grantedById], references: [id], onDelete: SetNull)
+
+  @@unique([userId, badgeId])
+  @@index([userId])
+  @@map("user_badges")
 }

@@ -7,6 +7,7 @@ import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 import { findProduct } from "@/lib/products";
 import { notify } from "@/lib/notifications";
 import { detectSuspiciousContent } from "@/lib/auto-flag";
+import { extractMentions } from "@/lib/mentions";
 
 type Params = { params: { slug: string } };
 
@@ -15,8 +16,42 @@ const commentSelect = {
   body: true,
   createdAt: true,
   updatedAt: true,
-  user: { select: { id: true, name: true, avatarUrl: true } },
+  user: {
+    select: {
+      id: true,
+      name: true,
+      avatarUrl: true,
+      badges: {
+        select: { badge: { select: { slug: true, icon: true, name: true } } },
+        orderBy: { createdAt: "asc" as const },
+      },
+    },
+  },
 } as const;
+
+const BADGE_PRIORITY = ["fundador", "vendido", "top-10-mes", "primer-lanzamiento"];
+
+interface RawComment {
+  id: string;
+  body: string;
+  createdAt: Date;
+  updatedAt: Date;
+  user: {
+    id: string;
+    name: string;
+    avatarUrl: string | null;
+    badges: { badge: { slug: string; icon: string; name: string } }[];
+  };
+}
+
+/** Insignias del autor, ordenadas por prioridad y recortadas a 2 para no saturar el hilo. */
+function toCommentDto(c: RawComment) {
+  const badges = c.user.badges
+    .map((ub) => ub.badge)
+    .sort((a, b) => BADGE_PRIORITY.indexOf(a.slug) - BADGE_PRIORITY.indexOf(b.slug))
+    .slice(0, 2);
+  return { ...c, user: { id: c.user.id, name: c.user.name, avatarUrl: c.user.avatarUrl, badges } };
+}
 
 /** GET /api/products/:idOrSlug/comments — newest first, soft-deleted hidden. */
 export const GET = withErrorHandling(async (req: Request, { params }: Params) => {
@@ -36,7 +71,13 @@ export const GET = withErrorHandling(async (req: Request, { params }: Params) =>
     prisma.comment.count({ where: { productId: product.id, deletedAt: null } }),
   ]);
 
-  return ok({ items, page, pageSize, total, totalPages: Math.ceil(total / pageSize) });
+  return ok({
+    items: items.map(toCommentDto),
+    page,
+    pageSize,
+    total,
+    totalPages: Math.ceil(total / pageSize),
+  });
 });
 
 /** POST /api/products/:idOrSlug/comments — add a comment (auth required). */
@@ -84,5 +125,24 @@ export const POST = withErrorHandling(async (req: Request, { params }: Params) =
     }
   }
 
-  return created(comment);
+  const mentionedUsernames = extractMentions(input.body);
+  if (mentionedUsernames.length > 0) {
+    const mentionedUsers = await prisma.user.findMany({
+      where: { username: { in: mentionedUsernames }, suspendedAt: null, id: { not: user.id } },
+      select: { id: true },
+    });
+    await Promise.all(
+      mentionedUsers.map((mentioned) =>
+        notify({
+          userId: mentioned.id,
+          actorId: user.id,
+          type: "MENTION",
+          productId: product.id,
+          commentId: comment.id,
+        })
+      )
+    );
+  }
+
+  return created(toCommentDto(comment));
 });

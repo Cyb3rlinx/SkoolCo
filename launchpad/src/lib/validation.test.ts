@@ -8,6 +8,7 @@ import {
   createContactRequestSchema,
   adminUpdateUserSchema,
   createProductUpdateSchema,
+  usernameSchema,
 } from "@/lib/validation";
 
 describe("createProductUpdateSchema", () => {
@@ -26,6 +27,30 @@ describe("createProductUpdateSchema", () => {
   it("recorta espacios", () => {
     const result = createProductUpdateSchema.safeParse({ body: "  novedad importante  " });
     expect(result.success && result.data.body).toBe("novedad importante");
+  });
+});
+
+describe("usernameSchema", () => {
+  it("acepta un username válido", () => {
+    expect(usernameSchema.parse("willy-dev")).toBe("willy-dev");
+  });
+
+  it("normaliza a minúsculas", () => {
+    expect(usernameSchema.parse("Willy-Dev")).toBe("willy-dev");
+  });
+
+  it("rechaza menos de 3 caracteres", () => {
+    expect(usernameSchema.safeParse("ab").success).toBe(false);
+  });
+
+  it("rechaza caracteres fuera de [a-z0-9-]", () => {
+    expect(usernameSchema.safeParse("willy_dev").success).toBe(false);
+    expect(usernameSchema.safeParse("willy dev").success).toBe(false);
+  });
+
+  it("rechaza nombres reservados", () => {
+    expect(usernameSchema.safeParse("admin").success).toBe(false);
+    expect(usernameSchema.safeParse("DENVELER").success).toBe(false);
   });
 });
 

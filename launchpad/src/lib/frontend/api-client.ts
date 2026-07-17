@@ -29,6 +29,7 @@ import type {
   ProductListQuery,
   ReportStatus,
   UpvoteResult,
+  UserBadgeItem,
 } from "./types";
 
 export class ApiClientError extends Error {
@@ -456,4 +457,25 @@ export function fetchAdminProducts(q: string, status: string, page: number) {
   if (status) params.set("status", status);
   params.set("page", String(page));
   return request<Paginated<AdminProductItem>>(`/api/admin/products?${params}`);
+}
+
+/** GET /api/admin/users/:id/badges */
+export function fetchUserBadges(userId: string) {
+  return request<UserBadgeItem[]>(`/api/admin/users/${userId}/badges`);
+}
+
+/** POST /api/admin/users/:id/badges */
+export function grantBadge(userId: string, badgeSlug: string) {
+  return request<{ userId: string; badgeSlug: string }>(`/api/admin/users/${userId}/badges`, {
+    method: "POST",
+    body: JSON.stringify({ badgeSlug }),
+  });
+}
+
+/** DELETE /api/admin/users/:id/badges?slug= */
+export function revokeBadge(userId: string, badgeSlug: string) {
+  return request<void>(
+    `/api/admin/users/${userId}/badges?slug=${encodeURIComponent(badgeSlug)}`,
+    { method: "DELETE" }
+  );
 }

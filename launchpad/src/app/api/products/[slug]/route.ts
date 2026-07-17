@@ -4,6 +4,7 @@ import { getSessionUser, requireUser, ApiError } from "@/lib/auth";
 import { updateProductSchema } from "@/lib/validation";
 import { productListSelect, findProduct } from "@/lib/products";
 import { withErrorHandling, parseBody, ok, noContent } from "@/lib/api";
+import { shouldGrantFundador, shouldGrantPrimerLanzamiento, grantBadgeIfMissing } from "@/lib/badges";
 
 type Params = { params: { slug: string } };
 
@@ -89,6 +90,20 @@ export const PATCH = withErrorHandling(async (req: Request, { params }: Params) 
     data: input,
     select: detailSelect,
   });
+
+  // Insignias automáticas: solo al pasar A "LIVE" desde otro estado.
+  if (input.status === "LIVE" && base.status !== "LIVE") {
+    const [liveMakerCount, makerLiveProductCount] = await Promise.all([
+      prisma.user.count({ where: { products: { some: { status: "LIVE" } } } }),
+      prisma.product.count({ where: { makerId: base.makerId, status: "LIVE" } }),
+    ]);
+    if (shouldGrantFundador(liveMakerCount)) {
+      await grantBadgeIfMissing(base.makerId, "fundador", null);
+    }
+    if (shouldGrantPrimerLanzamiento(makerLiveProductCount)) {
+      await grantBadgeIfMissing(base.makerId, "primer-lanzamiento", null);
+    }
+  }
 
   return ok(product);
 });

@@ -1,0 +1,161 @@
+"use client";
+
+import { useState } from "react";
+import {
+  ApiClientError,
+  fetchAdminUsers,
+  fetchUserBadges,
+  grantBadge,
+  revokeBadge,
+} from "@/lib/frontend/api-client";
+import { useApi } from "@/lib/frontend/hooks";
+import type { BadgeInfo } from "@/lib/frontend/types";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Alert } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState, ErrorState } from "@/components/ui/states";
+
+/** Catálogo fijo — sin UI de administración de catálogo en esta iteración. */
+const BADGE_CATALOG: BadgeInfo[] = [
+  { slug: "fundador", name: "Fundador", description: "Uno de los primeros 10 makers en lanzar en Denveler", icon: "🏛️" },
+  { slug: "primer-lanzamiento", name: "Primer lanzamiento", description: "Publicó su primer producto en Denveler", icon: "🚀" },
+  { slug: "top-10-mes", name: "Top 10 del mes", description: "Producto entre los 10 más votados del mes", icon: "🏆" },
+  { slug: "vendido", name: "Vendido", description: "Concretó la venta de su producto a través de Denveler", icon: "🤝" },
+];
+
+/** Pestaña Insignias — buscar usuario, otorgar/revocar insignias del catálogo (solo ADMIN). */
+export function BadgesSection() {
+  const [q, setQ] = useState("");
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [selectedUserName, setSelectedUserName] = useState<string>("");
+  const [busySlug, setBusySlug] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+
+  const { data: searchResults, loading: searchLoading } = useApi(
+    () => fetchAdminUsers(q, 1),
+    { deps: [q], enabled: q.trim().length > 0 }
+  );
+
+  const {
+    data: userBadges,
+    loading: badgesLoading,
+    error: badgesError,
+    refetch: refetchBadges,
+  } = useApi(() => fetchUserBadges(selectedUserId as string), {
+    deps: [selectedUserId],
+    enabled: selectedUserId !== null,
+  });
+
+  async function act(slug: string, fn: () => Promise<unknown>) {
+    setActionError(null);
+    setBusySlug(slug);
+    try {
+      await fn();
+      refetchBadges();
+    } catch (err) {
+      setActionError(err instanceof ApiClientError ? err.message : "No se pudo completar la acción.");
+    } finally {
+      setBusySlug(null);
+    }
+  }
+
+  const heldSlugs = new Set((userBadges ?? []).map((b) => b.slug));
+
+  return (
+    <div className="space-y-4">
+      <Input
+        value={q}
+        onChange={(e) => {
+          setQ(e.target.value);
+          setSelectedUserId(null);
+        }}
+        placeholder="Buscar usuario por nombre o email…"
+        aria-label="Buscar usuario"
+      />
+
+      {q.trim().length > 0 && !selectedUserId && (
+        <div className="space-y-2">
+          {searchLoading && <Skeleton className="h-12 rounded-xl" />}
+          {!searchLoading && searchResults && searchResults.items.length === 0 && (
+            <EmptyState title="Sin resultados" description="Ningún usuario coincide con la búsqueda." />
+          )}
+          {!searchLoading &&
+            searchResults?.items.map((u) => (
+              <button
+                key={u.id}
+                type="button"
+                className="w-full rounded-xl border p-3 text-left text-sm hover:bg-muted/50"
+                onClick={() => {
+                  setSelectedUserId(u.id);
+                  setSelectedUserName(u.name);
+                }}
+              >
+                <span className="font-semibold">{u.name}</span>{" "}
+                <span className="text-muted-foreground">{u.email}</span>
+              </button>
+            ))}
+        </div>
+      )}
+
+      {selectedUserId && (
+        <Card>
+          <CardContent className="space-y-4 p-4">
+            <div className="flex items-center justify-between">
+              <p className="font-semibold">Insignias de {selectedUserName}</p>
+              <Button variant="outline" size="sm" onClick={() => setSelectedUserId(null)}>
+                Cambiar usuario
+              </Button>
+            </div>
+
+            {actionError && <Alert variant="destructive">{actionError}</Alert>}
+            {badgesLoading && <Skeleton className="h-16 rounded-xl" />}
+            {!badgesLoading && badgesError && <ErrorState message={badgesError} onRetry={refetchBadges} />}
+
+            {!badgesLoading && !badgesError && (
+              <div className="space-y-2">
+                {BADGE_CATALOG.map((b) => {
+                  const held = heldSlugs.has(b.slug);
+                  const busy = busySlug === b.slug;
+                  return (
+                    <div
+                      key={b.slug}
+                      className="flex items-center justify-between gap-3 rounded-xl border p-3"
+                    >
+                      <div className="flex min-w-0 items-center gap-2">
+                        <span className="text-lg" aria-hidden>
+                          {b.icon}
+                        </span>
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-semibold">{b.name}</p>
+                          <p className="truncate text-xs text-muted-foreground">{b.description}</p>
+                        </div>
+                        {held && <Badge variant="secondary">Otorgada</Badge>}
+                      </div>
+                      <Button
+                        variant={held ? "destructive" : "outline"}
+                        size="sm"
+                        disabled={busy}
+                        onClick={() =>
+                          act(b.slug, () =>
+                            held
+                              ? revokeBadge(selectedUserId, b.slug)
+                              : grantBadge(selectedUserId, b.slug)
+                          )
+                        }
+                      >
+                        {held ? "Revocar" : "Otorgar"}
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}

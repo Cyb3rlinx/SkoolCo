@@ -39,9 +39,11 @@ export interface UserRef {
 export interface PublicUser {
   id: string;
   name: string;
+  username: string | null;
   avatarUrl: string | null;
   bio: string | null;
   createdAt: string;
+  badges: UserBadgeItem[];
   _count: { products: number; upvotes: number; comments: number };
 }
 
@@ -49,6 +51,7 @@ export interface PublicUser {
 export interface MeProfile {
   id: string;
   name: string;
+  username: string | null;
   email: string;
   avatarUrl: string | null;
   bio: string | null;
@@ -153,7 +156,7 @@ export interface CommentItem {
   body: string;
   createdAt: string;
   updatedAt: string;
-  user: UserRef;
+  user: UserRef & { badges: { slug: string; icon: string; name: string }[] };
 }
 
 /** GET/POST /api/products/:slug/updates — bitácora de progreso del maker. */
@@ -188,7 +191,7 @@ export interface LeaderboardEntry {
 // Notifications
 // ---------------------------------------------------------------------------
 
-export type NotificationType = "UPVOTE" | "COMMENT";
+export type NotificationType = "UPVOTE" | "COMMENT" | "MENTION";
 
 export interface NotificationItem {
   id: string;
@@ -271,6 +274,18 @@ export interface AdminUserItem {
   createdAt: string;
   suspendedAt: string | null;
   _count?: { products: number };
+}
+
+export interface BadgeInfo {
+  slug: string;
+  name: string;
+  description: string;
+  icon: string;
+}
+
+export interface UserBadgeItem extends BadgeInfo {
+  grantedByAdmin: boolean;
+  createdAt: string;
 }
 
 export interface AdminProductItem {
