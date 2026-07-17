@@ -12,10 +12,15 @@ import { sendOfferNudgeEmail } from "@/lib/offer-emails";
  * ofertas" ni recibieron este aviso, y les envía UN email (offerNudgeSentAt
  * como candado). Protegido con CRON_SECRET (Vercel lo manda como Bearer);
  * sin CRON_SECRET configurado (dev local) no exige auth, igual que el modo
- * solo-log de sendEmail sin RESEND_API_KEY.
+ * solo-log de sendEmail sin RESEND_API_KEY. En producción, en cambio, un
+ * CRON_SECRET ausente es un error de configuración, no una excepción: sin
+ * eso el endpoint quedaría público y cualquiera podría spamear a los makers.
  */
 export const GET = withErrorHandling(async (req: Request) => {
   const secret = process.env.CRON_SECRET;
+  if (!secret && process.env.NODE_ENV === "production") {
+    throw new ApiError(500, "CRON_SECRET no configurado en producción");
+  }
   if (secret && req.headers.get("authorization") !== `Bearer ${secret}`) {
     throw new ApiError(401, "Unauthorized");
   }

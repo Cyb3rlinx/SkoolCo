@@ -4,7 +4,8 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { requireUser, ApiError } from "@/lib/auth";
 import { sendContactSharedNotification } from "@/lib/offer-emails";
-import { withErrorHandling, parseBody, ok } from "@/lib/api";
+import { withErrorHandling, parseBody, ok, errorResponse } from "@/lib/api";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 const resolveSchema = z.object({ status: z.enum(["SHARED", "DISMISSED"]) });
 
@@ -15,6 +16,11 @@ const resolveSchema = z.object({ status: z.enum(["SHARED", "DISMISSED"]) });
 export const PATCH = withErrorHandling(
   async (req: Request, { params }: { params: { id: string } }) => {
     const user = await requireUser();
+
+    if (!(await checkRateLimit(`contact-resolve:${user.id}`, RATE_LIMITS.selfAction))) {
+      return errorResponse(429, "Estás resolviendo demasiado rápido. Intenta de nuevo en un minuto.");
+    }
+
     const { status } = await parseBody(req, resolveSchema);
 
     const request = await prisma.contactRequest.findUnique({
