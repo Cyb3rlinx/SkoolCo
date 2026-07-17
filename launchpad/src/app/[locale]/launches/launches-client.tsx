@@ -91,7 +91,7 @@ export function LaunchesClient() {
             onChange={(e) => setParam("openToOffers", e.target.checked ? "1" : "")}
             className="h-4 w-4 rounded border-input"
           />
-          Solo abiertos a ofertas
+          {t("openToOffersOnly")}
         </label>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:w-auto lg:min-w-[540px]">

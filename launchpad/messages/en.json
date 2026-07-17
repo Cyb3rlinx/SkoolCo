@@ -264,7 +264,8 @@
     "emptyOtherTitle": "No launches in this period",
     "emptyDescription": "Big days start empty. Check past launches or publish yours.",
     "viewAllLaunches": "View all launches",
-    "publishMyProduct": "Publish my product"
+    "publishMyProduct": "Publish my product",
+    "openToOffersOnly": "Only open to offers"
   },
   "productFeed": {
     "loading": "Loading launches",

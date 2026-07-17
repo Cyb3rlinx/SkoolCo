@@ -264,7 +264,8 @@
     "emptyOtherTitle": "此时间段内没有发布",
     "emptyDescription": "伟大的一天总是从空白开始。看看以往的发布，或者发布你自己的产品。",
     "viewAllLaunches": "查看全部发布",
-    "publishMyProduct": "发布我的产品"
+    "publishMyProduct": "发布我的产品",
+    "openToOffersOnly": "仅显示接受报价的产品"
   },
   "productFeed": {
     "loading": "正在加载发布内容",
