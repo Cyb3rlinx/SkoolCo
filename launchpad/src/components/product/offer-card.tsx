@@ -23,12 +23,14 @@ export function OfferCard({
   openToOffers,
   declaredMrrUsd,
   monetizationNote,
+  mrrVerifiedAt,
 }: {
   slug: string;
   makerId: string;
   openToOffers?: boolean;
   declaredMrrUsd?: number | null;
   monetizationNote?: string | null;
+  mrrVerifiedAt?: string | null;
 }) {
   const { data: session, status } = useSession();
   const [open, setOpen] = useState(false);
@@ -72,10 +74,16 @@ export function OfferCard({
               <span className="font-semibold">
                 MRR declarado: ${declaredMrrUsd.toLocaleString("en-US")}/mes
               </span>
+              {mrrVerifiedAt && (
+                <span className="rounded-full bg-success/15 px-2 py-0.5 text-[10px] font-bold text-success">
+                  Verificado ✓
+                </span>
+              )}
             </p>
             <p className="mt-1 text-[11px] leading-snug text-muted-foreground">
-              Métrica declarada por el maker. Denveler no la verifica ni participa en
-              la negociación.
+              {mrrVerifiedAt
+                ? "Un admin de Denveler confirmó este dato con evidencia."
+                : "Métrica declarada por el maker. Denveler no la verifica ni participa en la negociación."}
             </p>
           </div>
         )}

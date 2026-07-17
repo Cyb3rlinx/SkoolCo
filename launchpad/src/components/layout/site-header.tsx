@@ -14,6 +14,7 @@ import { UserMenu } from "./user-menu";
 
 const NAV_LINKS = [
   { href: "/launches", label: "Lanzamientos" },
+  { href: "/colecciones", label: "Colecciones" },
   { href: "/leaderboard", label: "Ranking" },
   { href: "/extension", label: "Extensión" },
   { href: "/#como-funciona", label: "Recursos" },

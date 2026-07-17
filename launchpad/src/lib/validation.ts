@@ -75,6 +75,7 @@ export const listProductsQuerySchema = z.object({
   category: z.string().optional(), // category slug
   q: z.string().trim().min(1).max(100).optional(), // free-text search
   maker: z.string().trim().min(1).max(40).optional(), // "me" or a user id
+  openToOffers: z.coerce.boolean().optional(), // ?openToOffers=true — solo productos abiertos a ofertas
   sort: z.enum(["newest", "top", "launching"]).default("newest"),
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(50).default(20),
@@ -206,6 +207,19 @@ export const contactMessageSchema = z.object({
   name: z.string().trim().min(2).max(80),
   email: z.string().trim().toLowerCase().email().max(254),
   message: z.string().trim().min(10).max(2000),
+});
+
+// ---------------------------------------------------------------------------
+// Colecciones curadas
+// ---------------------------------------------------------------------------
+
+export const createCollectionSchema = z.object({
+  title: z.string().trim().min(3).max(100),
+  description: z.string().trim().min(10).max(500),
+});
+
+export const addCollectionProductSchema = z.object({
+  productId: z.string().min(1),
 });
 
 // ---------------------------------------------------------------------------

@@ -1,15 +1,18 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, CalendarDays, MessageCircle, Rocket, ThumbsUp } from "lucide-react";
-import { fetchProducts, fetchUser } from "@/lib/frontend/api-client";
+import { useSession } from "next-auth/react";
+import { ArrowLeft, CalendarDays, MessageCircle, Rocket, ThumbsUp, UserPlus, UserCheck } from "lucide-react";
+import { ApiClientError, fetchProducts, fetchUser, followUser, unfollowUser } from "@/lib/frontend/api-client";
 import { useApi } from "@/lib/frontend/hooks";
 import { formatDate } from "@/lib/frontend/format";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Alert } from "@/components/ui/alert";
 import { EmptyState, ErrorState } from "@/components/ui/states";
 import { ProductCard } from "@/components/product/product-card";
 
@@ -18,8 +21,25 @@ import { ProductCard } from "@/components/product/product-card";
  * Shows only community-facing info (no email) and LIVE launches.
  */
 export function MakerProfileClient({ id }: { id: string }) {
+  const { data: session } = useSession();
   const user = useApi(() => fetchUser(id), { deps: [id] });
   const launches = useApi(() => fetchProducts({ maker: id, pageSize: 50 }), { deps: [id] });
+  const [followBusy, setFollowBusy] = useState(false);
+  const [followError, setFollowError] = useState<string | null>(null);
+
+  async function onToggleFollow(currentlyFollowing: boolean) {
+    setFollowError(null);
+    setFollowBusy(true);
+    try {
+      if (currentlyFollowing) await unfollowUser(id);
+      else await followUser(id);
+      user.refetch();
+    } catch (err) {
+      setFollowError(err instanceof ApiClientError ? err.message : "No se pudo actualizar.");
+    } finally {
+      setFollowBusy(false);
+    }
+  }
 
   if (user.loading) {
     return (
@@ -76,7 +96,28 @@ export function MakerProfileClient({ id }: { id: string }) {
         <CardContent className="flex flex-col gap-6 p-6 sm:flex-row sm:items-start">
           <Avatar name={profile.name} src={profile.avatarUrl} size="xl" />
           <div className="min-w-0 flex-1 space-y-2">
-            <h1 className="text-2xl font-extrabold tracking-tight">{profile.name}</h1>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h1 className="text-2xl font-extrabold tracking-tight">{profile.name}</h1>
+              {session?.user?.id && session.user.id !== id && (
+                <Button
+                  variant={profile.isFollowedByMe ? "outline" : "default"}
+                  size="sm"
+                  disabled={followBusy}
+                  onClick={() => onToggleFollow(profile.isFollowedByMe)}
+                >
+                  {profile.isFollowedByMe ? (
+                    <>
+                      <UserCheck className="h-3.5 w-3.5" aria-hidden /> Siguiendo
+                    </>
+                  ) : (
+                    <>
+                      <UserPlus className="h-3.5 w-3.5" aria-hidden /> Seguir
+                    </>
+                  )}
+                </Button>
+              )}
+            </div>
+            {followError && <Alert variant="destructive">{followError}</Alert>}
             {profile.bio && <p className="max-w-xl text-sm">{profile.bio}</p>}
             <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <CalendarDays className="h-3.5 w-3.5" aria-hidden />
@@ -91,6 +132,9 @@ export function MakerProfileClient({ id }: { id: string }) {
               </Badge>
               <Badge variant="secondary">
                 <MessageCircle className="h-3 w-3" aria-hidden /> {profile._count.comments} comentarios
+              </Badge>
+              <Badge variant="secondary">
+                <UserCheck className="h-3 w-3" aria-hidden /> {profile._count.followers} seguidores
               </Badge>
             </div>
             {profile.badges.length > 0 && (

@@ -17,6 +17,7 @@ import type { CommunityLink, ModerationReportItem, ReportStatus } from "@/lib/fr
 import { StatsSection } from "@/components/admin/stats-section";
 import { UsersSection } from "@/components/admin/users-section";
 import { ProductsSection } from "@/components/admin/products-section";
+import { CollectionsSection } from "@/components/admin/collections-section";
 import { BadgesSection } from "@/components/admin/badges-section";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -33,7 +34,7 @@ const REPORT_STATUS_META: Record<ReportStatus, { label: string; variant: "warnin
   DISMISSED: { label: "Descartado", variant: "outline" },
 };
 
-type Section = "stats" | "users" | "products" | "badges" | "reports" | "links";
+type Section = "stats" | "users" | "products" | "collections" | "badges" | "reports" | "links";
 
 export function AdminClient() {
   const { data: session } = useSession();
@@ -53,6 +54,7 @@ export function AdminClient() {
           { value: "stats" as const, label: "Resumen" },
           { value: "users" as const, label: "Usuarios" },
           { value: "products" as const, label: "Productos" },
+          { value: "collections" as const, label: "Colecciones" },
           { value: "badges" as const, label: "Insignias" },
         ]
       : []),
@@ -66,6 +68,7 @@ export function AdminClient() {
       {section === "stats" && <StatsSection onGoToTab={setSection} />}
       {section === "users" && <UsersSection />}
       {section === "products" && <ProductsSection />}
+      {section === "collections" && <CollectionsSection />}
       {section === "badges" && <BadgesSection />}
       {section === "reports" && <ReportsQueue />}
       {section === "links" && <CommunityLinksQueue />}

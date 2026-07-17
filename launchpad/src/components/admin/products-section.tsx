@@ -7,6 +7,7 @@ import {
   ApiClientError,
   archiveProduct,
   fetchAdminProducts,
+  toggleMrrVerified,
 } from "@/lib/frontend/api-client";
 import { useApi } from "@/lib/frontend/hooks";
 import { formatDate } from "@/lib/frontend/format";
@@ -57,6 +58,19 @@ export function ProductsSection() {
       refetch();
     } catch (err) {
       setActionError(err instanceof ApiClientError ? err.message : "No se pudo archivar.");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function onToggleMrr(id: string) {
+    setActionError(null);
+    setBusyId(id);
+    try {
+      await toggleMrrVerified(id);
+      refetch();
+    } catch (err) {
+      setActionError(err instanceof ApiClientError ? err.message : "No se pudo actualizar.");
     } finally {
       setBusyId(null);
     }
@@ -130,6 +144,11 @@ export function ProductsSection() {
                       </p>
                     </div>
                     <Badge variant={meta.variant}>{meta.label}</Badge>
+                    {p.declaredMrrUsd !== null && (
+                      <Badge variant={p.mrrVerifiedAt ? "success" : "outline"}>
+                        {p.mrrVerifiedAt ? "MRR verificado ✓" : "MRR sin verificar"}
+                      </Badge>
+                    )}
                     <div className="flex items-center gap-2">
                       <Link
                         href={`/products/${p.slug}`}
@@ -137,6 +156,16 @@ export function ProductsSection() {
                       >
                         Ver <ExternalLink className="h-3.5 w-3.5" aria-hidden />
                       </Link>
+                      {p.declaredMrrUsd !== null && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={busy}
+                          onClick={() => onToggleMrr(p.id)}
+                        >
+                          {p.mrrVerifiedAt ? "Quitar verificación" : "Verificar MRR"}
+                        </Button>
+                      )}
                       {p.status !== "ARCHIVED" && (
                         <Button
                           variant="outline"

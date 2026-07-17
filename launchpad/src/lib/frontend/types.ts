@@ -44,7 +44,8 @@ export interface PublicUser {
   bio: string | null;
   createdAt: string;
   badges: UserBadgeItem[];
-  _count: { products: number; upvotes: number; comments: number };
+  _count: { products: number; upvotes: number; comments: number; followers: number };
+  isFollowedByMe: boolean;
 }
 
 /** GET /api/me */
@@ -85,6 +86,8 @@ export interface ProductListItem {
   launchDate: string;
   status: ProductStatus;
   createdAt: string;
+  openToOffers: boolean;
+  soldAt: string | null;
   category: { id: string; name: string; slug: string };
   maker: UserRef;
   _count: { upvotes: number; comments: number };
@@ -104,11 +107,12 @@ export interface ProductDetail extends ProductListItem {
   /** Gallery screenshots (empty for older mocks). */
   images?: ProductImage[];
   /** Puente de compraventa — declarado por el maker, NO verificado. */
-  openToOffers?: boolean;
   declaredMrrUsd?: number | null;
   monetizationNote?: string | null;
   /** Vistas de la oferta (sin deduplicar); solo tiene sentido para el maker. */
   offerViewCount?: number;
+  /** Confirmado por un admin/moderador con evidencia. */
+  mrrVerifiedAt?: string | null;
 }
 
 export interface ProductListQuery {
@@ -116,6 +120,7 @@ export interface ProductListQuery {
   category?: string; // category slug
   q?: string;
   maker?: string; // "me" or a user id
+  openToOffers?: boolean;
   sort?: "newest" | "top" | "launching";
   page?: number;
   pageSize?: number;
@@ -191,7 +196,7 @@ export interface LeaderboardEntry {
 // Notifications
 // ---------------------------------------------------------------------------
 
-export type NotificationType = "UPVOTE" | "COMMENT" | "MENTION";
+export type NotificationType = "UPVOTE" | "COMMENT" | "MENTION" | "FOLLOWED_LAUNCH";
 
 export interface NotificationItem {
   id: string;
@@ -276,6 +281,24 @@ export interface AdminUserItem {
   _count?: { products: number };
 }
 
+export interface CollectionSummary {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  createdAt: string;
+  productCount: number;
+}
+
+export interface CollectionDetail {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  createdAt: string;
+  products: ProductListItem[];
+}
+
 export interface BadgeInfo {
   slug: string;
   name: string;
@@ -296,6 +319,8 @@ export interface AdminProductItem {
   launchDate: string;
   createdAt: string;
   logoUrl: string | null;
+  declaredMrrUsd: number | null;
+  mrrVerifiedAt: string | null;
   maker: { name: string; email: string };
   _count: { upvotes: number; comments: number };
 }

@@ -63,6 +63,15 @@ export function ProductCard({ product, rank, className }: ProductCardProps) {
             <MessageCircle className="h-3.5 w-3.5" aria-hidden />
             {product._count.comments}
           </span>
+          {product.soldAt ? (
+            <span className="rounded-full bg-muted px-2 py-0.5 font-semibold">Vendido</span>
+          ) : (
+            product.openToOffers && (
+              <span className="rounded-full bg-primary/10 px-2 py-0.5 font-semibold text-primary">
+                Abierto a ofertas
+              </span>
+            )
+          )}
         </div>
       </div>
 
