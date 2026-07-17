@@ -267,5 +267,96 @@
     "noResultsHint": "试试其他关键词，或清除筛选条件。",
     "defaultEmptyTitle": "暂时还没有发布",
     "defaultEmptyDescription": "成为第一个发布产品、开启这个动态流的人吧。"
+  },
+  "product": {
+    "makerCard": {
+      "viewProfileOf": "查看 {name} 的主页",
+      "maker": "创作者",
+      "communityMember": "社区成员",
+      "viewProfile": "查看主页与发布 →"
+    },
+    "offerCard": {
+      "openToOffers": "愿意接受合作",
+      "declaredMrr": "申报 MRR：每月 ${amount}",
+      "mrrDisclaimer": "该指标由创作者自行申报。Denveler 不对其进行核实，也不参与后续协商。",
+      "monetization": "变现方式：",
+      "requestSent": "请求已发送。创作者将决定是否分享联系方式。",
+      "requestContact": "申请联系",
+      "loginToRequest": "登录后申请联系",
+      "dialogTitle": "申请联系",
+      "dialogDescription": "告诉创作者你是谁、为何感兴趣。如果对方同意，你将收到对方的邮箱。",
+      "messagePlaceholder": "例如：我是一名微型 SaaS 运营者，希望进一步了解这个产品，探讨收购的可能性…",
+      "minChars": "至少 20 个字符。{count}/1000",
+      "cancel": "取消",
+      "sending": "发送中…",
+      "sendRequest": "发送请求",
+      "errorGeneric": "无法发送你的请求。"
+    },
+    "report": {
+      "report": "举报",
+      "dialogTitle": "举报该产品",
+      "dialogDescription": "告诉我们出了什么问题，管理团队会进行审核。",
+      "thanks": "感谢反馈，你的举报已进入审核队列。",
+      "close": "关闭",
+      "reasonPlaceholder": "例如：内容误导、垃圾信息、链接失效…",
+      "reasonLabel": "举报原因",
+      "cancel": "取消",
+      "sending": "发送中…",
+      "sendReport": "发送举报"
+    },
+    "related": {
+      "title": "相关发布"
+    },
+    "gallery": {
+      "errorFileType": "请使用 PNG、JPG 或 WebP 格式。",
+      "errorFileSize": "每张图片最大 2MB。",
+      "errorUpload": "图片上传失败。",
+      "errorDelete": "图片删除失败。",
+      "previewOf": "{name} 的预览图",
+      "screenshotOf": "{name} 的截图",
+      "deleteScreenshot": "删除该截图",
+      "thumbnails": "图库缩略图",
+      "previewNumber": "预览图 {number}",
+      "addScreenshot": "添加截图",
+      "uploading": "上传中…",
+      "addPhoto": "添加图片"
+    },
+    "status": {
+      "launchedToday": "今日发布 🚀",
+      "published": "已发布",
+      "scheduled": "已排期",
+      "draft": "草稿",
+      "archived": "已归档"
+    },
+    "detail": {
+      "notFoundTitle": "未找到该产品",
+      "notFoundDescription": "链接可能已失效，或该产品已不再公开。",
+      "backToLaunches": "返回发布广场",
+      "loadError": "无法加载该产品。",
+      "launches": "发布广场",
+      "visitWebsite": "访问网站",
+      "about": "关于 {name}",
+      "launchesOn": "发布日期：",
+      "launchedOn": "发布于",
+      "votesAndComments": "{votes} 票 · {comments} 条评论"
+    },
+    "comments": {
+      "title": "评论",
+      "placeholder": "留下建设性的反馈、提出问题，或送上祝贺…",
+      "writeComment": "写评论",
+      "posting": "发布中…",
+      "comment": "发表评论",
+      "notLive": "只有已发布（LIVE）的产品才能接收评论。",
+      "joinConversation": "加入讨论：社区反馈是每一次发布的核心。",
+      "loginToComment": "登录后发表评论",
+      "empty": "还没有人评论。来打破沉默吧！💬"
+    }
+  },
+  "og": {
+    "siteTitle": "与社区一起发布你的产品",
+    "siteSubtitle": "发布你的项目，获得真实的投票和反馈，赢得关注度。",
+    "defaultTagline": "由社区驱动的产品发布平台",
+    "votes": "{count} 票",
+    "by": "由 {name} 发布"
   }
 }

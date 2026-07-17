@@ -2,6 +2,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
 import { ImagePlus, Trash2 } from "lucide-react";
 import {
@@ -41,6 +42,7 @@ export function ProductGallery({
   images?: ProductImage[];
   onChanged?: () => void;
 }) {
+  const t = useTranslations("product.gallery");
   const [active, setActive] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -61,11 +63,11 @@ export function ProductGallery({
     setError(null);
 
     if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
-      setError("Usa PNG, JPG o WebP.");
+      setError(t("errorFileType"));
       return;
     }
     if (file.size > 2 * 1024 * 1024) {
-      setError("Máximo 2MB por imagen.");
+      setError(t("errorFileSize"));
       return;
     }
 
@@ -76,7 +78,7 @@ export function ProductGallery({
       setActive(images.length); // focus the newly added frame after refetch
       onChanged?.();
     } catch (err) {
-      setError(err instanceof ApiClientError ? err.message : "No pudimos subir la imagen.");
+      setError(err instanceof ApiClientError ? err.message : t("errorUpload"));
     } finally {
       setBusy(false);
       e.target.value = "";
@@ -91,7 +93,7 @@ export function ProductGallery({
       setActive(0);
       onChanged?.();
     } catch (err) {
-      setError(err instanceof ApiClientError ? err.message : "No pudimos borrar la imagen.");
+      setError(err instanceof ApiClientError ? err.message : t("errorDelete"));
     } finally {
       setBusy(false);
     }
@@ -104,10 +106,10 @@ export function ProductGallery({
         className="relative flex aspect-[16/8] items-center justify-center overflow-hidden rounded-2xl border bg-muted"
         style={current ? undefined : { backgroundImage: gradient }}
         role="img"
-        aria-label={`Vista previa de ${name}`}
+        aria-label={t("previewOf", { name })}
       >
         {current ? (
-          <img src={current.url} alt={`Captura de ${name}`} className="h-full w-full object-contain" />
+          <img src={current.url} alt={t("screenshotOf", { name })} className="h-full w-full object-contain" />
         ) : (
           <>
             <div className="absolute inset-0 opacity-25 [background-image:radial-gradient(circle_at_25%_20%,white_0,transparent_45%),radial-gradient(circle_at_80%_75%,white_0,transparent_40%)]" />
@@ -134,7 +136,7 @@ export function ProductGallery({
             onClick={() => onDelete(current.id)}
             disabled={busy}
             className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur transition-colors hover:bg-destructive disabled:opacity-50"
-            aria-label="Borrar esta captura"
+            aria-label={t("deleteScreenshot")}
           >
             <Trash2 className="h-4 w-4" aria-hidden />
           </button>
@@ -143,14 +145,14 @@ export function ProductGallery({
 
       {/* Thumbnails + add button */}
       {(hasImages || canEdit) && (
-        <div className="grid grid-cols-3 gap-3 sm:grid-cols-5" role="tablist" aria-label="Miniaturas de la galería">
+        <div className="grid grid-cols-3 gap-3 sm:grid-cols-5" role="tablist" aria-label={t("thumbnails")}>
           {images.map((img, i) => (
             <button
               key={img.id}
               type="button"
               role="tab"
               aria-selected={active === i}
-              aria-label={`Vista previa ${i + 1}`}
+              aria-label={t("previewNumber", { number: i + 1 })}
               onClick={() => setActive(i)}
               className={cn(
                 "relative aspect-[16/9] overflow-hidden rounded-xl border bg-muted transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
@@ -167,15 +169,15 @@ export function ProductGallery({
               onClick={() => fileInputRef.current?.click()}
               disabled={busy}
               className="flex aspect-[16/9] flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary disabled:opacity-60"
-              aria-label="Agregar captura"
+              aria-label={t("addScreenshot")}
               aria-busy={busy}
             >
               {busy ? (
-                <span className="text-[10px] font-semibold">Subiendo…</span>
+                <span className="text-[10px] font-semibold">{t("uploading")}</span>
               ) : (
                 <>
                   <ImagePlus className="h-5 w-5" aria-hidden />
-                  <span className="text-[10px] font-semibold">Agregar foto</span>
+                  <span className="text-[10px] font-semibold">{t("addPhoto")}</span>
                 </>
               )}
             </button>

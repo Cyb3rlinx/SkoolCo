@@ -267,5 +267,96 @@
     "noResultsHint": "Prueba con otras palabras o quita los filtros.",
     "defaultEmptyTitle": "Todavía no hay lanzamientos",
     "defaultEmptyDescription": "Sé la primera persona en publicar su producto y estrenar el feed."
+  },
+  "product": {
+    "makerCard": {
+      "viewProfileOf": "Ver perfil de {name}",
+      "maker": "Maker",
+      "communityMember": "Miembro de la comunidad",
+      "viewProfile": "Ver perfil y lanzamientos →"
+    },
+    "offerCard": {
+      "openToOffers": "Abierto a ofertas",
+      "declaredMrr": "MRR declarado: ${amount}/mes",
+      "mrrDisclaimer": "Métrica declarada por el maker. Denveler no la verifica ni participa en la negociación.",
+      "monetization": "Monetización:",
+      "requestSent": "Solicitud enviada. El maker decidirá si comparte su contacto.",
+      "requestContact": "Solicitar contacto",
+      "loginToRequest": "Inicia sesión para solicitar contacto",
+      "dialogTitle": "Solicitar contacto",
+      "dialogDescription": "Cuéntale al maker quién eres y por qué te interesa. Si acepta, recibirás su email.",
+      "messagePlaceholder": "Ej.: Soy operador de micro-SaaS, me interesa conocer más del producto y conversar una posible compra…",
+      "minChars": "Mínimo 20 caracteres. {count}/1000",
+      "cancel": "Cancelar",
+      "sending": "Enviando…",
+      "sendRequest": "Enviar solicitud",
+      "errorGeneric": "No pudimos enviar tu solicitud."
+    },
+    "report": {
+      "report": "Reportar",
+      "dialogTitle": "Reportar este producto",
+      "dialogDescription": "Cuéntanos qué está mal. El equipo de moderación lo revisará.",
+      "thanks": "Gracias por avisar. Tu reporte quedó en la cola de moderación.",
+      "close": "Cerrar",
+      "reasonPlaceholder": "Ej.: contenido engañoso, spam, enlace roto…",
+      "reasonLabel": "Motivo del reporte",
+      "cancel": "Cancelar",
+      "sending": "Enviando…",
+      "sendReport": "Enviar reporte"
+    },
+    "related": {
+      "title": "Lanzamientos relacionados"
+    },
+    "gallery": {
+      "errorFileType": "Usa PNG, JPG o WebP.",
+      "errorFileSize": "Máximo 2MB por imagen.",
+      "errorUpload": "No pudimos subir la imagen.",
+      "errorDelete": "No pudimos borrar la imagen.",
+      "previewOf": "Vista previa de {name}",
+      "screenshotOf": "Captura de {name}",
+      "deleteScreenshot": "Borrar esta captura",
+      "thumbnails": "Miniaturas de la galería",
+      "previewNumber": "Vista previa {number}",
+      "addScreenshot": "Agregar captura",
+      "uploading": "Subiendo…",
+      "addPhoto": "Agregar foto"
+    },
+    "status": {
+      "launchedToday": "Lanzado hoy 🚀",
+      "published": "Publicado",
+      "scheduled": "Programado",
+      "draft": "Borrador",
+      "archived": "Archivado"
+    },
+    "detail": {
+      "notFoundTitle": "Producto no encontrado",
+      "notFoundDescription": "Puede que el enlace esté roto o que el producto ya no sea público.",
+      "backToLaunches": "Volver a lanzamientos",
+      "loadError": "No pudimos cargar el producto.",
+      "launches": "Lanzamientos",
+      "visitWebsite": "Visitar sitio",
+      "about": "Sobre {name}",
+      "launchesOn": "Se lanza el",
+      "launchedOn": "Lanzado el",
+      "votesAndComments": "{votes} votos · {comments} comentarios"
+    },
+    "comments": {
+      "title": "Comentarios",
+      "placeholder": "Deja feedback constructivo, una pregunta o unas felicitaciones…",
+      "writeComment": "Escribe un comentario",
+      "posting": "Publicando…",
+      "comment": "Comentar",
+      "notLive": "Solo los productos publicados (LIVE) aceptan comentarios.",
+      "joinConversation": "Únete a la conversación: el feedback de la comunidad es el corazón de cada lanzamiento.",
+      "loginToComment": "Inicia sesión para comentar",
+      "empty": "Nadie comentó todavía. ¡Rompe el hielo! 💬"
+    }
+  },
+  "og": {
+    "siteTitle": "Lanza tu producto con la comunidad",
+    "siteSubtitle": "Publica tu proyecto, recibe votos y feedback real, y gana visibilidad.",
+    "defaultTagline": "La plataforma de lanzamientos impulsada por la comunidad",
+    "votes": "{count} votos",
+    "by": "por {name}"
   }
 }

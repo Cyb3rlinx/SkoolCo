@@ -1,11 +1,12 @@
 import { ImageResponse } from "next/og";
+import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/db";
 
 // Prisma needs Node (not edge), and the image must reflect current votes.
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export const alt = "Lanzamiento en Denveler";
+export const alt = "Denveler launch";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -15,24 +16,25 @@ export const contentType = "image/png";
  * Brand-gradient canvas with name, tagline, category and votes — no remote
  * assets, so it renders fast and never breaks on missing logos.
  */
-export default async function OgImage({ params }: { params: { slug: string } }) {
-  const product = await prisma.product.findUnique({
-    where: { slug: params.slug },
-    select: {
-      name: true,
-      tagline: true,
-      status: true,
-      category: { select: { name: true } },
-      maker: { select: { name: true } },
-      _count: { select: { upvotes: true } },
-    },
-  });
+export default async function OgImage({ params }: { params: { slug: string; locale: string } }) {
+  const [product, t] = await Promise.all([
+    prisma.product.findUnique({
+      where: { slug: params.slug },
+      select: {
+        name: true,
+        tagline: true,
+        status: true,
+        category: { select: { name: true } },
+        maker: { select: { name: true } },
+        _count: { select: { upvotes: true } },
+      },
+    }),
+    getTranslations({ locale: params.locale, namespace: "og" }),
+  ]);
 
   const live = product && product.status === "LIVE";
   const name = live ? product.name : "Denveler";
-  const tagline = live
-    ? product.tagline
-    : "La plataforma de lanzamientos impulsada por la comunidad";
+  const tagline = live ? product.tagline : t("defaultTagline");
 
   return new ImageResponse(
     (
@@ -87,10 +89,12 @@ export default async function OgImage({ params }: { params: { slug: string } }) 
           )}
           {live && (
             <div style={{ display: "flex", fontWeight: 700 }}>
-              {product._count.upvotes} votos
+              {t("votes", { count: product._count.upvotes })}
             </div>
           )}
-          {live && <div style={{ display: "flex", opacity: 0.8 }}>por {product.maker.name}</div>}
+          {live && (
+            <div style={{ display: "flex", opacity: 0.8 }}>{t("by", { name: product.maker.name })}</div>
+          )}
         </div>
       </div>
     ),

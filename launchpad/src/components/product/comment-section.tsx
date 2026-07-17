@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
 import { fetchComments, postComment } from "@/lib/frontend/api-client";
 import { mockCommentsByProduct, paginate } from "@/lib/frontend/mock-data";
@@ -14,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Alert } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DemoBanner, ErrorState } from "@/components/ui/states";
+import { Link, usePathname } from "@/i18n/navigation";
 
 /**
  * Comments block for the product detail page.
@@ -21,6 +21,8 @@ import { DemoBanner, ErrorState } from "@/components/ui/states";
  * locally after a successful POST (the API returns the created comment).
  */
 export function CommentSection({ slug, live }: { slug: string; live: boolean }) {
+  const t = useTranslations("product.comments");
+  const locale = useLocale();
   const { status } = useSession();
   const pathname = usePathname();
   const [body, setBody] = useState("");
@@ -56,7 +58,7 @@ export function CommentSection({ slug, live }: { slug: string; live: boolean }) 
     <section aria-labelledby="comments-title" className="space-y-5">
       <div className="flex items-center justify-between">
         <h2 id="comments-title" className="text-xl font-extrabold">
-          Comentarios {total > 0 && <span className="text-muted-foreground">({total})</span>}
+          {t("title")} {total > 0 && <span className="text-muted-foreground">({total})</span>}
         </h2>
         {demo && <DemoBanner />}
       </div>
@@ -71,32 +73,29 @@ export function CommentSection({ slug, live }: { slug: string; live: boolean }) 
                 setBody(e.target.value);
                 if (submitError) clearError();
               }}
-              placeholder="Deja feedback constructivo, una pregunta o unas felicitaciones…"
-              aria-label="Escribe un comentario"
+              placeholder={t("placeholder")}
+              aria-label={t("writeComment")}
               maxLength={2000}
               required
             />
             {submitError && <Alert variant="destructive">{submitError}</Alert>}
             <div className="flex justify-end">
               <Button type="submit" disabled={submitting || body.trim().length === 0}>
-                {submitting ? "Publicando…" : "Comentar"}
+                {submitting ? t("posting") : t("comment")}
               </Button>
             </div>
           </form>
         ) : (
-          <Alert>Solo los productos publicados (LIVE) aceptan comentarios.</Alert>
+          <Alert>{t("notLive")}</Alert>
         )
       ) : (
         <div className="flex flex-col items-start gap-3 rounded-2xl border border-dashed bg-muted/40 p-5 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-muted-foreground">
-            Únete a la conversación: el feedback de la comunidad es el corazón de cada
-            lanzamiento.
-          </p>
+          <p className="text-sm text-muted-foreground">{t("joinConversation")}</p>
           <Link
             href={`/login?next=${encodeURIComponent(pathname)}`}
             className={buttonVariants({ variant: "outline", size: "sm" })}
           >
-            Inicia sesión para comentar
+            {t("loginToComment")}
           </Link>
         </div>
       )}
@@ -120,7 +119,7 @@ export function CommentSection({ slug, live }: { slug: string; live: boolean }) 
 
       {!loading && !error && data && data.items.length === 0 && (
         <p className="rounded-2xl border border-dashed bg-muted/40 p-6 text-center text-sm text-muted-foreground">
-          Nadie comentó todavía. ¡Rompe el hielo! 💬
+          {t("empty")}
         </p>
       )}
 
@@ -132,7 +131,7 @@ export function CommentSection({ slug, live }: { slug: string; live: boolean }) 
               <div className="min-w-0 flex-1">
                 <p className="text-sm">
                   <span className="font-bold">{c.user.name}</span>{" "}
-                  <span className="text-xs text-muted-foreground">· {timeAgo(c.createdAt)}</span>
+                  <span className="text-xs text-muted-foreground">· {timeAgo(c.createdAt, locale)}</span>
                 </p>
                 <p className="mt-1 whitespace-pre-line text-sm text-foreground/90">{c.body}</p>
               </div>

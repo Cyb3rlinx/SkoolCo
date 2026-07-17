@@ -1,10 +1,11 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { fetchProducts } from "@/lib/frontend/api-client";
 import { filterMockProducts } from "@/lib/frontend/mock-data";
 import { useApi } from "@/lib/frontend/hooks";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Link } from "@/i18n/navigation";
 import { ProductLogo } from "./product-logo";
 
 /**
@@ -18,6 +19,7 @@ export function RelatedLaunches({
   categorySlug: string;
   excludeSlug: string;
 }) {
+  const t = useTranslations("product.related");
   const { data, loading } = useApi(
     () => fetchProducts({ category: categorySlug, sort: "top", pageSize: 5 }),
     {
@@ -33,7 +35,7 @@ export function RelatedLaunches({
   return (
     <section aria-labelledby="related-title" className="space-y-3">
       <h2 id="related-title" className="text-sm font-bold uppercase tracking-wide text-muted-foreground">
-        Lanzamientos relacionados
+        {t("title")}
       </h2>
 
       {loading ? (

@@ -267,5 +267,96 @@
     "noResultsHint": "Try different words or clear the filters.",
     "defaultEmptyTitle": "No launches yet",
     "defaultEmptyDescription": "Be the first to publish your product and kick off the feed."
+  },
+  "product": {
+    "makerCard": {
+      "viewProfileOf": "View {name}'s profile",
+      "maker": "Maker",
+      "communityMember": "Community member",
+      "viewProfile": "View profile and launches →"
+    },
+    "offerCard": {
+      "openToOffers": "Open to offers",
+      "declaredMrr": "Declared MRR: ${amount}/mo",
+      "mrrDisclaimer": "Metric declared by the maker. Denveler doesn't verify it or take part in the negotiation.",
+      "monetization": "Monetization:",
+      "requestSent": "Request sent. The maker will decide whether to share their contact info.",
+      "requestContact": "Request contact",
+      "loginToRequest": "Log in to request contact",
+      "dialogTitle": "Request contact",
+      "dialogDescription": "Tell the maker who you are and why you're interested. If they accept, you'll receive their email.",
+      "messagePlaceholder": "E.g.: I run a micro-SaaS, I'd like to learn more about the product and discuss a possible acquisition…",
+      "minChars": "Minimum 20 characters. {count}/1000",
+      "cancel": "Cancel",
+      "sending": "Sending…",
+      "sendRequest": "Send request",
+      "errorGeneric": "We couldn't send your request."
+    },
+    "report": {
+      "report": "Report",
+      "dialogTitle": "Report this product",
+      "dialogDescription": "Tell us what's wrong. The moderation team will review it.",
+      "thanks": "Thanks for letting us know. Your report is in the moderation queue.",
+      "close": "Close",
+      "reasonPlaceholder": "E.g.: misleading content, spam, broken link…",
+      "reasonLabel": "Reason for the report",
+      "cancel": "Cancel",
+      "sending": "Sending…",
+      "sendReport": "Send report"
+    },
+    "related": {
+      "title": "Related launches"
+    },
+    "gallery": {
+      "errorFileType": "Use PNG, JPG, or WebP.",
+      "errorFileSize": "Maximum 2MB per image.",
+      "errorUpload": "We couldn't upload the image.",
+      "errorDelete": "We couldn't delete the image.",
+      "previewOf": "Preview of {name}",
+      "screenshotOf": "Screenshot of {name}",
+      "deleteScreenshot": "Delete this screenshot",
+      "thumbnails": "Gallery thumbnails",
+      "previewNumber": "Preview {number}",
+      "addScreenshot": "Add screenshot",
+      "uploading": "Uploading…",
+      "addPhoto": "Add photo"
+    },
+    "status": {
+      "launchedToday": "Launched today 🚀",
+      "published": "Published",
+      "scheduled": "Scheduled",
+      "draft": "Draft",
+      "archived": "Archived"
+    },
+    "detail": {
+      "notFoundTitle": "Product not found",
+      "notFoundDescription": "The link may be broken, or the product may no longer be public.",
+      "backToLaunches": "Back to launches",
+      "loadError": "We couldn't load the product.",
+      "launches": "Launches",
+      "visitWebsite": "Visit website",
+      "about": "About {name}",
+      "launchesOn": "Launching on",
+      "launchedOn": "Launched on",
+      "votesAndComments": "{votes} votes · {comments} comments"
+    },
+    "comments": {
+      "title": "Comments",
+      "placeholder": "Leave constructive feedback, a question, or congratulations…",
+      "writeComment": "Write a comment",
+      "posting": "Posting…",
+      "comment": "Comment",
+      "notLive": "Only published (LIVE) products accept comments.",
+      "joinConversation": "Join the conversation: community feedback is the heart of every launch.",
+      "loginToComment": "Log in to comment",
+      "empty": "No one has commented yet. Break the ice! 💬"
+    }
+  },
+  "og": {
+    "siteTitle": "Launch your product with the community",
+    "siteSubtitle": "Post your project, get real votes and feedback, and gain visibility.",
+    "defaultTagline": "The community-powered launch platform",
+    "votes": "{count} votes",
+    "by": "by {name}"
   }
 }
