@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { detectPlatform } from "@/lib/platforms";
+import { RESERVED_USERNAMES } from "@/lib/username";
 
 // ---------------------------------------------------------------------------
 // Auth
@@ -10,6 +11,15 @@ export const registerSchema = z.object({
   email: z.string().trim().toLowerCase().email().max(254),
   password: z.string().min(8).max(128),
 });
+
+export const usernameSchema = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .min(3)
+  .max(30)
+  .regex(/^[a-z0-9-]+$/, "Solo minúsculas, números y guiones")
+  .refine((v) => !RESERVED_USERNAMES.has(v), "Ese nombre de usuario no está disponible");
 
 /** Absolute http(s) URL or an internal uploaded-image path (/api/uploads/:id). */
 export const imageUrlSchema = z
@@ -25,6 +35,7 @@ export const updateProfileSchema = z.object({
   name: z.string().trim().min(2).max(80).optional(),
   bio: z.string().trim().max(500).optional(),
   avatarUrl: imageUrlSchema.optional().nullable(),
+  username: usernameSchema.optional(),
 });
 
 // ---------------------------------------------------------------------------
@@ -64,7 +75,8 @@ export const listProductsQuerySchema = z.object({
   category: z.string().optional(), // category slug
   q: z.string().trim().min(1).max(100).optional(), // free-text search
   maker: z.string().trim().min(1).max(40).optional(), // "me" or a user id
-  sort: z.enum(["newest", "top", "launching"]).default("newest"),
+  openToOffers: z.coerce.boolean().optional(), // ?openToOffers=true — solo productos abiertos a ofertas
+  sort: z.enum(["newest", "top", "launching", "trending"]).default("newest"),
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(50).default(20),
 });
@@ -75,6 +87,14 @@ export const listProductsQuerySchema = z.object({
 
 export const createCommentSchema = z.object({
   body: z.string().trim().min(1).max(2000),
+  parentId: z.string().min(1).optional(),
+});
+
+export const REPORT_CATEGORIES = ["SPAM", "SCAM", "INAPPROPRIATE", "OTHER"] as const;
+
+/** POST /api/products/:slug/updates — bitácora de progreso del maker. */
+export const createProductUpdateSchema = z.object({
+  body: z.string().trim().min(5).max(1000),
 });
 
 export const createReportSchema = z
@@ -82,6 +102,7 @@ export const createReportSchema = z
     productId: z.string().optional(),
     commentId: z.string().optional(),
     reason: z.string().trim().min(5).max(1000),
+    category: z.enum(REPORT_CATEGORIES).optional(),
   })
   .refine((v) => Boolean(v.productId) !== Boolean(v.commentId), {
     message: "Provide exactly one of productId or commentId",
@@ -175,16 +196,35 @@ export const adminUpdateUserSchema = z
   .object({
     role: z.enum(["USER", "MODERATOR", "ADMIN"]).optional(),
     suspended: z.boolean().optional(),
+    verified: z.boolean().optional(),
   })
-  .refine((v) => v.role !== undefined || v.suspended !== undefined, {
-    message: "Debes enviar al menos un cambio (role o suspended).",
+  .refine((v) => v.role !== undefined || v.suspended !== undefined || v.verified !== undefined, {
+    message: "Debes enviar al menos un cambio (role, suspended o verified).",
   });
+
+/** POST /api/admin/users/:id/badges — otorga una insignia del catálogo. */
+export const grantBadgeSchema = z.object({
+  badgeSlug: z.string().min(1).max(60),
+});
 
 /** POST /api/contact — formulario público de contacto. */
 export const contactMessageSchema = z.object({
   name: z.string().trim().min(2).max(80),
   email: z.string().trim().toLowerCase().email().max(254),
   message: z.string().trim().min(10).max(2000),
+});
+
+// ---------------------------------------------------------------------------
+// Colecciones curadas
+// ---------------------------------------------------------------------------
+
+export const createCollectionSchema = z.object({
+  title: z.string().trim().min(3).max(100),
+  description: z.string().trim().min(10).max(500),
+});
+
+export const addCollectionProductSchema = z.object({
+  productId: z.string().min(1),
 });
 
 // ---------------------------------------------------------------------------

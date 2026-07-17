@@ -13,6 +13,7 @@ import { Logo } from "./logo";
 import { NotificationsBell } from "./notifications-bell";
 import { UserMenu } from "./user-menu";
 import { LanguageSwitcher } from "./language-switcher";
+import { SearchAutocomplete } from "./search-autocomplete";
 
 export function SiteHeader() {
   const t = useTranslations("nav");
@@ -26,6 +27,7 @@ export function SiteHeader() {
 
   const NAV_LINKS = [
     { href: "/launches", label: t("launches") },
+    { href: "/colecciones", label: t("collections") },
     { href: "/leaderboard", label: t("leaderboard") },
     { href: "/extension", label: t("extension") },
     { href: "/#como-funciona", label: t("resources") },
@@ -68,19 +70,7 @@ export function SiteHeader() {
         </nav>
 
         {/* Search (desktop) */}
-        <form onSubmit={onSearch} role="search" className="relative ml-auto hidden w-56 lg:block">
-          <Search
-            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
-            aria-hidden
-          />
-          <Input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder={t("searchPlaceholder")}
-            aria-label={t("searchLabel")}
-            className="h-9 pl-9"
-          />
-        </form>
+        <SearchAutocomplete className="ml-auto hidden w-56 lg:block" />
 
         <div className="ml-auto flex items-center gap-1.5 lg:ml-0">
           {!isAdmin && <LanguageSwitcher className="hidden sm:flex" />}

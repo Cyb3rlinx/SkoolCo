@@ -35,20 +35,30 @@ export interface UserRef {
   avatarUrl: string | null;
 }
 
+/** UserRef plus maker-verification status (product maker, public profile). */
+export interface MakerRef extends UserRef {
+  verifiedAt: string | null;
+}
+
 /** GET /api/users/:id — public maker profile. */
 export interface PublicUser {
   id: string;
   name: string;
+  username: string | null;
   avatarUrl: string | null;
   bio: string | null;
+  verifiedAt: string | null;
   createdAt: string;
-  _count: { products: number; upvotes: number; comments: number };
+  badges: UserBadgeItem[];
+  _count: { products: number; upvotes: number; comments: number; followers: number };
+  isFollowedByMe: boolean;
 }
 
 /** GET /api/me */
 export interface MeProfile {
   id: string;
   name: string;
+  username: string | null;
   email: string;
   avatarUrl: string | null;
   bio: string | null;
@@ -82,8 +92,10 @@ export interface ProductListItem {
   launchDate: string;
   status: ProductStatus;
   createdAt: string;
+  openToOffers: boolean;
+  soldAt: string | null;
   category: { id: string; name: string; slug: string };
-  maker: UserRef;
+  maker: MakerRef;
   _count: { upvotes: number; comments: number };
 }
 
@@ -98,14 +110,16 @@ export interface ProductDetail extends ProductListItem {
   description: string;
   updatedAt: string;
   upvotedByMe: boolean;
+  savedByMe?: boolean;
   /** Gallery screenshots (empty for older mocks). */
   images?: ProductImage[];
   /** Puente de compraventa — declarado por el maker, NO verificado. */
-  openToOffers?: boolean;
   declaredMrrUsd?: number | null;
   monetizationNote?: string | null;
   /** Vistas de la oferta (sin deduplicar); solo tiene sentido para el maker. */
   offerViewCount?: number;
+  /** Confirmado por un admin/moderador con evidencia. */
+  mrrVerifiedAt?: string | null;
 }
 
 export interface ProductListQuery {
@@ -113,7 +127,8 @@ export interface ProductListQuery {
   category?: string; // category slug
   q?: string;
   maker?: string; // "me" or a user id
-  sort?: "newest" | "top" | "launching";
+  openToOffers?: boolean;
+  sort?: "newest" | "top" | "launching" | "trending";
   page?: number;
   pageSize?: number;
 }
@@ -153,13 +168,38 @@ export interface CommentItem {
   body: string;
   createdAt: string;
   updatedAt: string;
-  user: UserRef;
+  parentId: string | null;
+  user: UserRef & { badges: { slug: string; icon: string; name: string }[] };
+  replies?: CommentItem[];
+}
+
+/** GET/POST /api/products/:slug/updates — bitácora de progreso del maker. */
+export interface ProductUpdateItem {
+  id: string;
+  body: string;
+  createdAt: string;
 }
 
 /** POST/DELETE /api/products/:slug/upvote */
 export interface UpvoteResult {
   upvoted: boolean;
   upvoteCount: number;
+}
+
+/** POST/DELETE /api/products/:slug/save */
+export interface SaveResult {
+  saved: boolean;
+}
+
+export interface InsightsBucket {
+  date: string;
+  count: number;
+}
+
+/** GET /api/products/:slug/insights — maker/staff only. */
+export interface ProductInsights {
+  upvotes: InsightsBucket[];
+  comments: InsightsBucket[];
 }
 
 // ---------------------------------------------------------------------------
@@ -181,7 +221,7 @@ export interface LeaderboardEntry {
 // Notifications
 // ---------------------------------------------------------------------------
 
-export type NotificationType = "UPVOTE" | "COMMENT";
+export type NotificationType = "UPVOTE" | "COMMENT" | "MENTION" | "FOLLOWED_LAUNCH";
 
 export interface NotificationItem {
   id: string;
@@ -202,16 +242,19 @@ export interface NotificationsPage extends Paginated<NotificationItem> {
 // ---------------------------------------------------------------------------
 
 export type ReportStatus = "OPEN" | "REVIEWING" | "RESOLVED" | "DISMISSED";
+export type ReportCategory = "SPAM" | "SCAM" | "INAPPROPRIATE" | "OTHER";
 
 /** Item shape of GET /api/reports (moderator/admin only). */
 export interface ModerationReportItem {
   id: string;
   reason: string;
+  category: ReportCategory;
   status: ReportStatus;
   createdAt: string;
   resolvedAt: string | null;
   resolvedBy: { id: string; name: string } | null;
-  reporter: { id: string; name: string };
+  /** null = reporte auto-generado por el sistema (detección de contenido sospechoso). */
+  reporter: { id: string; name: string } | null;
   product: { id: string; name: string; slug: string } | null;
   comment: { id: string; body: string } | null;
 }
@@ -262,7 +305,38 @@ export interface AdminUserItem {
   role: "USER" | "MODERATOR" | "ADMIN";
   createdAt: string;
   suspendedAt: string | null;
+  verifiedAt: string | null;
   _count?: { products: number };
+}
+
+export interface CollectionSummary {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  createdAt: string;
+  productCount: number;
+}
+
+export interface CollectionDetail {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  createdAt: string;
+  products: ProductListItem[];
+}
+
+export interface BadgeInfo {
+  slug: string;
+  name: string;
+  description: string;
+  icon: string;
+}
+
+export interface UserBadgeItem extends BadgeInfo {
+  grantedByAdmin: boolean;
+  createdAt: string;
 }
 
 export interface AdminProductItem {
@@ -273,6 +347,8 @@ export interface AdminProductItem {
   launchDate: string;
   createdAt: string;
   logoUrl: string | null;
+  declaredMrrUsd: number | null;
+  mrrVerifiedAt: string | null;
   maker: { name: string; email: string };
   _count: { upvotes: number; comments: number };
 }

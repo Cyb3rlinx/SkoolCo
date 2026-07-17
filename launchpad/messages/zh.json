@@ -5,6 +5,7 @@
   },
   "nav": {
     "launches": "发布广场",
+    "collections": "合集",
     "leaderboard": "排行榜",
     "extension": "浏览器插件",
     "resources": "资源",
@@ -85,7 +86,9 @@
     "upvoted": "投票支持了你的产品",
     "commentedOn": "评论了",
     "bellLabel": "通知",
-    "bellLabelUnread": "通知（{count} 条未读）"
+    "bellLabelUnread": "通知（{count} 条未读）",
+    "mentioned": "在评论中提到了你",
+    "followedLaunch": "发布了新产品："
   },
   "home": {
     "hero": {
@@ -256,6 +259,7 @@
     "sortBy": "排序方式",
     "sortNewest": "最新",
     "sortTop": "最多投票",
+    "sortTrending": "🔥 热门（近24小时）",
     "emptyTodayTitle": "今天还没有发布",
     "emptyOtherTitle": "此时间段内没有发布",
     "emptyDescription": "伟大的一天总是从空白开始。看看以往的发布，或者发布你自己的产品。",
@@ -273,8 +277,8 @@
     "makerCard": {
       "viewProfileOf": "查看 {name} 的主页",
       "maker": "创作者",
-      "communityMember": "社区成员",
-      "viewProfile": "查看主页与发布 →"
+      "viewProfile": "查看主页与发布 →",
+      "verified": "认证创作者"
     },
     "offerCard": {
       "openToOffers": "愿意接受合作",
@@ -291,7 +295,9 @@
       "cancel": "取消",
       "sending": "发送中…",
       "sendRequest": "发送请求",
-      "errorGeneric": "无法发送你的请求。"
+      "errorGeneric": "无法发送你的请求。",
+      "mrrDisclaimerVerified": "Denveler 管理员已凭证据确认此数据。",
+      "verifiedBadge": "已验证 ✓"
     },
     "report": {
       "report": "举报",
@@ -303,7 +309,12 @@
       "reasonLabel": "举报原因",
       "cancel": "取消",
       "sending": "发送中…",
-      "sendReport": "发送举报"
+      "sendReport": "发送举报",
+      "categoryLabel": "类别",
+      "categorySpam": "垃圾信息",
+      "categoryScam": "诈骗",
+      "categoryInappropriate": "不当内容",
+      "categoryOther": "其他"
     },
     "related": {
       "title": "相关发布"
@@ -350,7 +361,10 @@
       "notLive": "只有已发布（LIVE）的产品才能接收评论。",
       "joinConversation": "加入讨论：社区反馈是每一次发布的核心。",
       "loginToComment": "登录后发表评论",
-      "empty": "还没有人评论。来打破沉默吧！💬"
+      "empty": "还没有人评论。来打破沉默吧！💬",
+      "reply": "回复",
+      "replyTo": "回复 {name}…",
+      "cancel": "取消"
     }
   },
   "og": {
@@ -412,7 +426,12 @@
     "commentsCount": "{count} 条评论",
     "launchesBy": "{name} 的发布",
     "noPublicLaunchesTitle": "暂无公开发布",
-    "noPublicLaunchesDescription": "当他们发布内容后，会显示在这里。"
+    "noPublicLaunchesDescription": "当他们发布内容后，会显示在这里。",
+    "followersCount": "{count} 位关注者",
+    "following": "已关注",
+    "follow": "关注",
+    "verifiedMaker": "认证创作者",
+    "followUpdateError": "更新失败。"
   },
   "extension": {
     "popupMock": {
@@ -486,5 +505,10 @@
       "wallTitle": "已验证的成就",
       "wallSubtitle": "社区提交并经管理员核实的成就。点击即可在原动态上为其支持。"
     }
+  },
+  "collections": {
+    "metaTitle": "合集",
+    "metaDescription": "社区产品的精选合集。",
+    "detailMetaTitle": "合集"
   }
 }

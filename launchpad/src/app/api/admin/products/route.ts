@@ -54,6 +54,8 @@ export const GET = withErrorHandling(async (req: Request) => {
         launchDate: true,
         createdAt: true,
         logoUrl: true,
+        declaredMrrUsd: true,
+        mrrVerifiedAt: true,
         maker: { select: { name: true, email: true } },
         _count: { select: { upvotes: true, comments: true } },
       },

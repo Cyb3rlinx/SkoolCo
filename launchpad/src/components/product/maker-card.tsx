@@ -1,12 +1,12 @@
 import { BadgeCheck } from "lucide-react";
 import { useTranslations } from "next-intl";
-import type { UserRef } from "@/lib/frontend/types";
+import type { MakerRef } from "@/lib/frontend/types";
 import { Avatar } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 
 /** Maker block for the detail sidebar — links to the public maker profile. */
-export function MakerCard({ maker }: { maker: UserRef }) {
+export function MakerCard({ maker }: { maker: MakerRef }) {
   const t = useTranslations("product.makerCard");
   return (
     <Card className="transition-shadow hover:shadow-lift">
@@ -19,7 +19,9 @@ export function MakerCard({ maker }: { maker: UserRef }) {
             </p>
             <p className="flex items-center gap-1.5 truncate font-bold">
               {maker.name}
-              <BadgeCheck className="h-4 w-4 shrink-0 text-primary" aria-label={t("communityMember")} />
+              {maker.verifiedAt && (
+                <BadgeCheck className="h-4 w-4 shrink-0 text-primary" aria-label={t("verified")} />
+              )}
             </p>
             <p className="text-xs text-muted-foreground">{t("viewProfile")}</p>
           </div>

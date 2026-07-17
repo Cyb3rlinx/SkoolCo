@@ -1,15 +1,27 @@
 "use client";
 
+import { useState } from "react";
+import { useSession } from "next-auth/react";
 import { useLocale, useTranslations } from "next-intl";
-import { ArrowLeft, CalendarDays, MessageCircle, Rocket, ThumbsUp } from "lucide-react";
-import { fetchProducts, fetchUser } from "@/lib/frontend/api-client";
+import {
+  ArrowLeft,
+  BadgeCheck,
+  CalendarDays,
+  MessageCircle,
+  Rocket,
+  ThumbsUp,
+  UserPlus,
+  UserCheck,
+} from "lucide-react";
+import { ApiClientError, fetchProducts, fetchUser, followUser, unfollowUser } from "@/lib/frontend/api-client";
 import { useApi } from "@/lib/frontend/hooks";
 import { formatDate } from "@/lib/frontend/format";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Alert } from "@/components/ui/alert";
 import { EmptyState, ErrorState } from "@/components/ui/states";
 import { ProductCard } from "@/components/product/product-card";
 import { Link } from "@/i18n/navigation";
@@ -21,8 +33,25 @@ import { Link } from "@/i18n/navigation";
 export function MakerProfileClient({ id }: { id: string }) {
   const t = useTranslations("makerProfile");
   const locale = useLocale();
+  const { data: session } = useSession();
   const user = useApi(() => fetchUser(id), { deps: [id] });
   const launches = useApi(() => fetchProducts({ maker: id, pageSize: 50 }), { deps: [id] });
+  const [followBusy, setFollowBusy] = useState(false);
+  const [followError, setFollowError] = useState<string | null>(null);
+
+  async function onToggleFollow(currentlyFollowing: boolean) {
+    setFollowError(null);
+    setFollowBusy(true);
+    try {
+      if (currentlyFollowing) await unfollowUser(id);
+      else await followUser(id);
+      user.refetch();
+    } catch (err) {
+      setFollowError(err instanceof ApiClientError ? err.message : t("followUpdateError"));
+    } finally {
+      setFollowBusy(false);
+    }
+  }
 
   if (user.loading) {
     return (
@@ -79,7 +108,33 @@ export function MakerProfileClient({ id }: { id: string }) {
         <CardContent className="flex flex-col gap-6 p-6 sm:flex-row sm:items-start">
           <Avatar name={profile.name} src={profile.avatarUrl} size="xl" />
           <div className="min-w-0 flex-1 space-y-2">
-            <h1 className="text-2xl font-extrabold tracking-tight">{profile.name}</h1>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h1 className="flex items-center gap-2 text-2xl font-extrabold tracking-tight">
+                {profile.name}
+                {profile.verifiedAt && (
+                  <BadgeCheck className="h-5 w-5 shrink-0 text-primary" aria-label={t("verifiedMaker")} />
+                )}
+              </h1>
+              {session?.user?.id && session.user.id !== id && (
+                <Button
+                  variant={profile.isFollowedByMe ? "outline" : "default"}
+                  size="sm"
+                  disabled={followBusy}
+                  onClick={() => onToggleFollow(profile.isFollowedByMe)}
+                >
+                  {profile.isFollowedByMe ? (
+                    <>
+                      <UserCheck className="h-3.5 w-3.5" aria-hidden /> {t("following")}
+                    </>
+                  ) : (
+                    <>
+                      <UserPlus className="h-3.5 w-3.5" aria-hidden /> {t("follow")}
+                    </>
+                  )}
+                </Button>
+              )}
+            </div>
+            {followError && <Alert variant="destructive">{followError}</Alert>}
             {profile.bio && <p className="max-w-xl text-sm">{profile.bio}</p>}
             <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <CalendarDays className="h-3.5 w-3.5" aria-hidden />
@@ -95,7 +150,24 @@ export function MakerProfileClient({ id }: { id: string }) {
               <Badge variant="secondary">
                 <MessageCircle className="h-3 w-3" aria-hidden /> {t("commentsCount", { count: profile._count.comments })}
               </Badge>
+              <Badge variant="secondary">
+                <UserCheck className="h-3 w-3" aria-hidden /> {t("followersCount", { count: profile._count.followers })}
+              </Badge>
             </div>
+            {profile.badges.length > 0 && (
+              <div className="flex flex-wrap gap-2 pt-1">
+                {profile.badges.map((b) => (
+                  <span
+                    key={b.slug}
+                    title={b.description}
+                    className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary"
+                  >
+                    <span aria-hidden>{b.icon}</span>
+                    {b.name}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

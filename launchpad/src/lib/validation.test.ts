@@ -7,7 +7,87 @@ import {
   createProductSchema,
   createContactRequestSchema,
   adminUpdateUserSchema,
+  listProductsQuerySchema,
+  createCollectionSchema,
+  createProductUpdateSchema,
+  usernameSchema,
 } from "@/lib/validation";
+
+describe("createCollectionSchema", () => {
+  it("acepta título y descripción válidos", () => {
+    expect(
+      createCollectionSchema.safeParse({
+        title: "Mejores herramientas de IA",
+        description: "Una selección curada de productos de IA lanzados esta semana.",
+      }).success
+    ).toBe(true);
+  });
+
+  it("rechaza título muy corto", () => {
+    expect(createCollectionSchema.safeParse({ title: "ai", description: "x".repeat(20) }).success).toBe(false);
+  });
+
+  it("rechaza descripción muy corta", () => {
+    expect(
+      createCollectionSchema.safeParse({ title: "Título válido", description: "corta" }).success
+    ).toBe(false);
+  });
+});
+
+describe("listProductsQuerySchema", () => {
+  it("openToOffers es opcional", () => {
+    const result = listProductsQuerySchema.safeParse({});
+    expect(result.success && result.data.openToOffers).toBeUndefined();
+  });
+
+  it("coacciona ?openToOffers=true a booleano", () => {
+    const result = listProductsQuerySchema.safeParse({ openToOffers: "true" });
+    expect(result.success && result.data.openToOffers).toBe(true);
+  });
+});
+
+describe("createProductUpdateSchema", () => {
+  it("acepta un body válido", () => {
+    expect(createProductUpdateSchema.safeParse({ body: "Lanzamos soporte para modo oscuro." }).success).toBe(true);
+  });
+
+  it("rechaza menos de 5 caracteres", () => {
+    expect(createProductUpdateSchema.safeParse({ body: "hola" }).success).toBe(false);
+  });
+
+  it("rechaza más de 1000 caracteres", () => {
+    expect(createProductUpdateSchema.safeParse({ body: "a".repeat(1001) }).success).toBe(false);
+  });
+
+  it("recorta espacios", () => {
+    const result = createProductUpdateSchema.safeParse({ body: "  novedad importante  " });
+    expect(result.success && result.data.body).toBe("novedad importante");
+  });
+});
+
+describe("usernameSchema", () => {
+  it("acepta un username válido", () => {
+    expect(usernameSchema.parse("willy-dev")).toBe("willy-dev");
+  });
+
+  it("normaliza a minúsculas", () => {
+    expect(usernameSchema.parse("Willy-Dev")).toBe("willy-dev");
+  });
+
+  it("rechaza menos de 3 caracteres", () => {
+    expect(usernameSchema.safeParse("ab").success).toBe(false);
+  });
+
+  it("rechaza caracteres fuera de [a-z0-9-]", () => {
+    expect(usernameSchema.safeParse("willy_dev").success).toBe(false);
+    expect(usernameSchema.safeParse("willy dev").success).toBe(false);
+  });
+
+  it("rechaza nombres reservados", () => {
+    expect(usernameSchema.safeParse("admin").success).toBe(false);
+    expect(usernameSchema.safeParse("DENVELER").success).toBe(false);
+  });
+});
 
 describe("password schemas", () => {
   it("forgot requires a valid email", () => {

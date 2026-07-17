@@ -5,6 +5,7 @@
   },
   "nav": {
     "launches": "Lanzamientos",
+    "collections": "Colecciones",
     "leaderboard": "Ranking",
     "extension": "Extensión",
     "resources": "Recursos",
@@ -85,7 +86,9 @@
     "upvoted": "votó tu producto",
     "commentedOn": "comentó en",
     "bellLabel": "Notificaciones",
-    "bellLabelUnread": "Notificaciones ({count} sin leer)"
+    "bellLabelUnread": "Notificaciones ({count} sin leer)",
+    "mentioned": "te mencionó en un comentario en",
+    "followedLaunch": "publicó un nuevo lanzamiento:"
   },
   "home": {
     "hero": {
@@ -256,6 +259,7 @@
     "sortBy": "Ordenar por",
     "sortNewest": "Más recientes",
     "sortTop": "Más votados",
+    "sortTrending": "🔥 Tendencia (últimas 24h)",
     "emptyTodayTitle": "Hoy todavía no hay lanzamientos",
     "emptyOtherTitle": "No hay lanzamientos en este periodo",
     "emptyDescription": "Los grandes días empiezan vacíos. Mira lanzamientos anteriores o publica el tuyo.",
@@ -273,8 +277,8 @@
     "makerCard": {
       "viewProfileOf": "Ver perfil de {name}",
       "maker": "Maker",
-      "communityMember": "Miembro de la comunidad",
-      "viewProfile": "Ver perfil y lanzamientos →"
+      "viewProfile": "Ver perfil y lanzamientos →",
+      "verified": "Maker verificado"
     },
     "offerCard": {
       "openToOffers": "Abierto a ofertas",
@@ -291,7 +295,9 @@
       "cancel": "Cancelar",
       "sending": "Enviando…",
       "sendRequest": "Enviar solicitud",
-      "errorGeneric": "No pudimos enviar tu solicitud."
+      "errorGeneric": "No pudimos enviar tu solicitud.",
+      "mrrDisclaimerVerified": "Un admin de Denveler confirmó este dato con evidencia.",
+      "verifiedBadge": "Verificado ✓"
     },
     "report": {
       "report": "Reportar",
@@ -303,7 +309,12 @@
       "reasonLabel": "Motivo del reporte",
       "cancel": "Cancelar",
       "sending": "Enviando…",
-      "sendReport": "Enviar reporte"
+      "sendReport": "Enviar reporte",
+      "categoryLabel": "Categoría",
+      "categorySpam": "Spam",
+      "categoryScam": "Estafa o fraude",
+      "categoryInappropriate": "Contenido inapropiado",
+      "categoryOther": "Otro"
     },
     "related": {
       "title": "Lanzamientos relacionados"
@@ -350,7 +361,10 @@
       "notLive": "Solo los productos publicados (LIVE) aceptan comentarios.",
       "joinConversation": "Únete a la conversación: el feedback de la comunidad es el corazón de cada lanzamiento.",
       "loginToComment": "Inicia sesión para comentar",
-      "empty": "Nadie comentó todavía. ¡Rompe el hielo! 💬"
+      "empty": "Nadie comentó todavía. ¡Rompe el hielo! 💬",
+      "reply": "Responder",
+      "replyTo": "Responder a {name}…",
+      "cancel": "Cancelar"
     }
   },
   "og": {
@@ -412,7 +426,12 @@
     "commentsCount": "{count} comentarios",
     "launchesBy": "Lanzamientos de {name}",
     "noPublicLaunchesTitle": "Todavía sin lanzamientos públicos",
-    "noPublicLaunchesDescription": "Cuando publique algo, lo verás aquí."
+    "noPublicLaunchesDescription": "Cuando publique algo, lo verás aquí.",
+    "followersCount": "{count} seguidores",
+    "following": "Siguiendo",
+    "follow": "Seguir",
+    "verifiedMaker": "Maker verificado",
+    "followUpdateError": "No se pudo actualizar."
   },
   "extension": {
     "popupMock": {
@@ -486,5 +505,10 @@
       "wallTitle": "Logros verificados",
       "wallSubtitle": "Los logros que la comunidad envió y un moderador verificó. Haz clic para apoyarlos en el post original."
     }
+  },
+  "collections": {
+    "metaTitle": "Colecciones",
+    "metaDescription": "Selecciones curadas de productos de la comunidad.",
+    "detailMetaTitle": "Colección"
   }
 }

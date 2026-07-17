@@ -38,7 +38,10 @@ export function NotificationsBell() {
   const unread = data?.unreadCount ?? 0;
 
   function notificationText(n: NotificationItem): string {
-    return n.type === "UPVOTE" ? t("upvoted") : t("commentedOn");
+    if (n.type === "UPVOTE") return t("upvoted");
+    if (n.type === "MENTION") return t("mentioned");
+    if (n.type === "FOLLOWED_LAUNCH") return t("followedLaunch");
+    return t("commentedOn");
   }
 
   async function markAllRead() {

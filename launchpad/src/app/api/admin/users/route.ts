@@ -44,6 +44,7 @@ export const GET = withErrorHandling(async (req: Request) => {
         role: true,
         createdAt: true,
         suspendedAt: true,
+        verifiedAt: true,
         _count: { select: { products: true } },
       },
     }),

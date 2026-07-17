@@ -1,13 +1,14 @@
 export const dynamic = "force-dynamic";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
-import { requireUser } from "@/lib/auth";
+import { requireUser, ApiError } from "@/lib/auth";
 import { updateProfileSchema, deleteAccountSchema } from "@/lib/validation";
 import { withErrorHandling, parseBody, ok, noContent, errorResponse } from "@/lib/api";
 
 const profileSelect = {
   id: true,
   name: true,
+  username: true,
   email: true,
   avatarUrl: true,
   bio: true,
@@ -26,14 +27,30 @@ export const GET = withErrorHandling(async () => {
   return ok(user);
 });
 
-/** PATCH /api/me — update name, bio, avatarUrl. */
+/** PATCH /api/me — update name, bio, avatarUrl, username (una sola vez). */
 export const PATCH = withErrorHandling(async (req: Request) => {
   const sessionUser = await requireUser();
-  const input = await parseBody(req, updateProfileSchema);
+  const { username, ...rest } = await parseBody(req, updateProfileSchema);
+
+  let usernameUpdate: { username: string; usernameChangedAt: Date } | Record<string, never> = {};
+  if (username !== undefined) {
+    const current = await prisma.user.findUnique({
+      where: { id: sessionUser.id },
+      select: { username: true, usernameChangedAt: true },
+    });
+    if (current?.usernameChangedAt) {
+      throw new ApiError(400, "Ya usaste tu único cambio de nombre de usuario.");
+    }
+    if (username !== current?.username) {
+      const taken = await prisma.user.findUnique({ where: { username }, select: { id: true } });
+      if (taken) throw new ApiError(400, "Ese nombre de usuario ya está en uso.");
+    }
+    usernameUpdate = { username, usernameChangedAt: new Date() };
+  }
 
   const user = await prisma.user.update({
     where: { id: sessionUser.id },
-    data: input,
+    data: { ...rest, ...usernameUpdate },
     select: profileSelect,
   });
   return ok(user);

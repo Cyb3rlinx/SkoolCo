@@ -28,8 +28,10 @@ export const productListSelect = {
   launchDate: true,
   status: true,
   createdAt: true,
+  openToOffers: true,
+  soldAt: true,
   category: { select: { id: true, name: true, slug: true } },
-  maker: { select: { id: true, name: true, avatarUrl: true } },
+  maker: { select: { id: true, name: true, avatarUrl: true, verifiedAt: true } },
   _count: { select: { upvotes: true, comments: true } },
 } as const;
 

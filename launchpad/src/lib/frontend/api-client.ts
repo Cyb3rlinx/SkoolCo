@@ -13,6 +13,8 @@ import type {
   AdminStats,
   AdminUserItem,
   Category,
+  CollectionDetail,
+  CollectionSummary,
   CommentItem,
   CommunityLink,
   ContactRequestItem,
@@ -24,10 +26,15 @@ import type {
   Paginated,
   ProductDetail,
   ProductListItem,
+  ProductUpdateItem,
   PublicUser,
+  ProductInsights,
   ProductListQuery,
+  ReportCategory,
   ReportStatus,
+  SaveResult,
   UpvoteResult,
+  UserBadgeItem,
 } from "./types";
 
 export class ApiClientError extends Error {
@@ -191,6 +198,11 @@ export function fetchMyContactRequests() {
   return request<ContactRequestItem[]>(`/api/me/contact-requests`);
 }
 
+/** GET /api/me/sent-contact-requests (auth) — solicitudes que YO envié como comprador. */
+export function fetchSentContactRequests() {
+  return request<ContactRequestItem[]>(`/api/me/sent-contact-requests`);
+}
+
 /** PATCH /api/contact-requests/:id (auth) — compartir email o descartar. */
 export function resolveContactRequest(id: string, status: "SHARED" | "DISMISSED") {
   return request<{ id: string; status: string }>(
@@ -213,6 +225,37 @@ export function removeUpvote(slug: string) {
   });
 }
 
+/** POST /api/products/:slug/save (auth, idempotent). */
+export function saveProduct(slug: string) {
+  return request<SaveResult>(`/api/products/${encodeURIComponent(slug)}/save`, {
+    method: "POST",
+  });
+}
+
+/** DELETE /api/products/:slug/save (auth, idempotent). */
+export function unsaveProduct(slug: string) {
+  return request<SaveResult>(`/api/products/${encodeURIComponent(slug)}/save`, {
+    method: "DELETE",
+  });
+}
+
+/** GET /api/me/saved (auth) */
+export function fetchSavedProducts() {
+  return request<ProductListItem[]>(`/api/me/saved`);
+}
+
+/** GET /api/products/:slug/insights (auth, maker/staff only). */
+export function fetchProductInsights(slug: string) {
+  return request<ProductInsights>(`/api/products/${encodeURIComponent(slug)}/insights`);
+}
+
+/** POST /api/products/:slug/relaunch (auth, maker/staff, source must be ARCHIVED). */
+export function relaunchProduct(slug: string) {
+  return request<ProductDetail>(`/api/products/${encodeURIComponent(slug)}/relaunch`, {
+    method: "POST",
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Comments
 // ---------------------------------------------------------------------------
@@ -224,9 +267,26 @@ export function fetchComments(slug: string, page = 1, pageSize = 20) {
   );
 }
 
-/** POST /api/products/:slug/comments (auth). */
-export function postComment(slug: string, body: string) {
+/** POST /api/products/:slug/comments (auth). Pass parentId to reply (one level deep). */
+export function postComment(slug: string, body: string, parentId?: string) {
   return request<CommentItem>(`/api/products/${encodeURIComponent(slug)}/comments`, {
+    method: "POST",
+    body: JSON.stringify(parentId ? { body, parentId } : { body }),
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Bitácora de progreso del maker
+// ---------------------------------------------------------------------------
+
+/** GET /api/products/:slug/updates — pública. */
+export function fetchProductUpdates(slug: string) {
+  return request<ProductUpdateItem[]>(`/api/products/${encodeURIComponent(slug)}/updates`);
+}
+
+/** POST /api/products/:slug/updates (auth) — solo el maker dueño o staff. */
+export function postProductUpdate(slug: string, body: string) {
+  return request<ProductUpdateItem>(`/api/products/${encodeURIComponent(slug)}/updates`, {
     method: "POST",
     body: JSON.stringify({ body }),
   });
@@ -340,11 +400,16 @@ export function resolveReport(id: string, status: Exclude<ReportStatus, "OPEN">)
 }
 
 /** POST /api/reports (auth) — report a product or a comment. */
-export function createReport(input: { productId?: string; commentId?: string; reason: string }) {
-  return request<{ id: string; status: ReportStatus; createdAt: string }>(`/api/reports`, {
-    method: "POST",
-    body: JSON.stringify(input),
-  });
+export function createReport(input: {
+  productId?: string;
+  commentId?: string;
+  reason: string;
+  category?: ReportCategory;
+}) {
+  return request<{ id: string; status: ReportStatus; category: ReportCategory; createdAt: string }>(
+    `/api/reports`,
+    { method: "POST", body: JSON.stringify(input) }
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -364,6 +429,18 @@ export function fetchCommunityLinksByStatus(status: "PENDING" | "VERIFIED" | "RE
 /** GET /api/users/:id — public maker profile. */
 export function fetchUser(id: string) {
   return request<PublicUser>(`/api/users/${encodeURIComponent(id)}`);
+}
+
+/** POST /api/users/:id/follow (auth). */
+export function followUser(id: string) {
+  return request<{ following: boolean }>(`/api/users/${encodeURIComponent(id)}/follow`, {
+    method: "POST",
+  });
+}
+
+/** DELETE /api/users/:id/follow (auth). */
+export function unfollowUser(id: string) {
+  return request<void>(`/api/users/${encodeURIComponent(id)}/follow`, { method: "DELETE" });
 }
 
 /** POST /api/community-links (auth) — submit a public skool.com achievement link. */
@@ -413,7 +490,7 @@ export function fetchAdminUsers(q: string, page: number) {
 /** PATCH /api/admin/users/:id */
 export function updateAdminUser(
   id: string,
-  input: { role?: "USER" | "MODERATOR" | "ADMIN"; suspended?: boolean }
+  input: { role?: "USER" | "MODERATOR" | "ADMIN"; suspended?: boolean; verified?: boolean }
 ) {
   return request<AdminUserItem>(`/api/admin/users/${id}`, {
     method: "PATCH",
@@ -433,4 +510,84 @@ export function fetchAdminProducts(q: string, status: string, page: number) {
   if (status) params.set("status", status);
   params.set("page", String(page));
   return request<Paginated<AdminProductItem>>(`/api/admin/products?${params}`);
+}
+
+/** POST /api/admin/products/:id/verify-mrr — alterna el estado de verificación. */
+export function toggleMrrVerified(id: string) {
+  return request<{ id: string; mrrVerifiedAt: string | null }>(
+    `/api/admin/products/${id}/verify-mrr`,
+    { method: "POST" }
+  );
+}
+
+/** POST /api/products/:slug/mark-sold (auth) — el maker confirma la venta. */
+export function markProductSold(slug: string) {
+  return request<{ id: string; soldAt: string; openToOffers: boolean }>(
+    `/api/products/${encodeURIComponent(slug)}/mark-sold`,
+    { method: "POST" }
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Colecciones curadas
+// ---------------------------------------------------------------------------
+
+/** GET /api/collections — público. */
+export function fetchCollections() {
+  return request<CollectionSummary[]>(`/api/collections`);
+}
+
+/** GET /api/collections/:slug — público. */
+export function fetchCollection(slug: string) {
+  return request<CollectionDetail>(`/api/collections/${encodeURIComponent(slug)}`);
+}
+
+/** POST /api/admin/collections (solo ADMIN). */
+export function createCollection(input: { title: string; description: string }) {
+  return request<{ id: string; title: string; slug: string; description: string; createdAt: string }>(
+    `/api/admin/collections`,
+    { method: "POST", body: JSON.stringify(input) }
+  );
+}
+
+/** DELETE /api/admin/collections/:id (solo ADMIN). */
+export function deleteCollection(id: string) {
+  return request<void>(`/api/admin/collections/${id}`, { method: "DELETE" });
+}
+
+/** POST /api/admin/collections/:id/products (solo ADMIN). */
+export function addToCollection(collectionId: string, productId: string) {
+  return request<{ id: string; productId: string }>(
+    `/api/admin/collections/${collectionId}/products`,
+    { method: "POST", body: JSON.stringify({ productId }) }
+  );
+}
+
+/** DELETE /api/admin/collections/:id/products?productId= (solo ADMIN). */
+export function removeFromCollection(collectionId: string, productId: string) {
+  return request<void>(
+    `/api/admin/collections/${collectionId}/products?productId=${encodeURIComponent(productId)}`,
+    { method: "DELETE" }
+  );
+}
+
+/** GET /api/admin/users/:id/badges */
+export function fetchUserBadges(userId: string) {
+  return request<UserBadgeItem[]>(`/api/admin/users/${userId}/badges`);
+}
+
+/** POST /api/admin/users/:id/badges */
+export function grantBadge(userId: string, badgeSlug: string) {
+  return request<{ userId: string; badgeSlug: string }>(`/api/admin/users/${userId}/badges`, {
+    method: "POST",
+    body: JSON.stringify({ badgeSlug }),
+  });
+}
+
+/** DELETE /api/admin/users/:id/badges?slug= */
+export function revokeBadge(userId: string, badgeSlug: string) {
+  return request<void>(
+    `/api/admin/users/${userId}/badges?slug=${encodeURIComponent(badgeSlug)}`,
+    { method: "DELETE" }
+  );
 }

@@ -5,6 +5,7 @@
   },
   "nav": {
     "launches": "Launches",
+    "collections": "Collections",
     "leaderboard": "Leaderboard",
     "extension": "Extension",
     "resources": "Resources",
@@ -85,7 +86,9 @@
     "upvoted": "upvoted your product",
     "commentedOn": "commented on",
     "bellLabel": "Notifications",
-    "bellLabelUnread": "Notifications ({count} unread)"
+    "bellLabelUnread": "Notifications ({count} unread)",
+    "mentioned": "mentioned you in a comment on",
+    "followedLaunch": "published a new launch:"
   },
   "home": {
     "hero": {
@@ -256,6 +259,7 @@
     "sortBy": "Sort by",
     "sortNewest": "Newest",
     "sortTop": "Top voted",
+    "sortTrending": "🔥 Trending (last 24h)",
     "emptyTodayTitle": "No launches yet today",
     "emptyOtherTitle": "No launches in this period",
     "emptyDescription": "Big days start empty. Check past launches or publish yours.",
@@ -273,8 +277,8 @@
     "makerCard": {
       "viewProfileOf": "View {name}'s profile",
       "maker": "Maker",
-      "communityMember": "Community member",
-      "viewProfile": "View profile and launches →"
+      "viewProfile": "View profile and launches →",
+      "verified": "Verified maker"
     },
     "offerCard": {
       "openToOffers": "Open to offers",
@@ -291,7 +295,9 @@
       "cancel": "Cancel",
       "sending": "Sending…",
       "sendRequest": "Send request",
-      "errorGeneric": "We couldn't send your request."
+      "errorGeneric": "We couldn't send your request.",
+      "mrrDisclaimerVerified": "A Denveler admin confirmed this figure with evidence.",
+      "verifiedBadge": "Verified ✓"
     },
     "report": {
       "report": "Report",
@@ -303,7 +309,12 @@
       "reasonLabel": "Reason for the report",
       "cancel": "Cancel",
       "sending": "Sending…",
-      "sendReport": "Send report"
+      "sendReport": "Send report",
+      "categoryLabel": "Category",
+      "categorySpam": "Spam",
+      "categoryScam": "Scam or fraud",
+      "categoryInappropriate": "Inappropriate content",
+      "categoryOther": "Other"
     },
     "related": {
       "title": "Related launches"
@@ -350,7 +361,10 @@
       "notLive": "Only published (LIVE) products accept comments.",
       "joinConversation": "Join the conversation: community feedback is the heart of every launch.",
       "loginToComment": "Log in to comment",
-      "empty": "No one has commented yet. Break the ice! 💬"
+      "empty": "No one has commented yet. Break the ice! 💬",
+      "reply": "Reply",
+      "replyTo": "Reply to {name}…",
+      "cancel": "Cancel"
     }
   },
   "og": {
@@ -412,7 +426,12 @@
     "commentsCount": "{count} comments",
     "launchesBy": "Launches by {name}",
     "noPublicLaunchesTitle": "No public launches yet",
-    "noPublicLaunchesDescription": "When they publish something, you'll see it here."
+    "noPublicLaunchesDescription": "When they publish something, you'll see it here.",
+    "followersCount": "{count} followers",
+    "following": "Following",
+    "follow": "Follow",
+    "verifiedMaker": "Verified maker",
+    "followUpdateError": "Could not update."
   },
   "extension": {
     "popupMock": {
@@ -486,5 +505,10 @@
       "wallTitle": "Verified achievements",
       "wallSubtitle": "Achievements the community submitted and a moderator verified. Click to support them on the original post."
     }
+  },
+  "collections": {
+    "metaTitle": "Collections",
+    "metaDescription": "Curated selections of community products.",
+    "detailMetaTitle": "Collection"
   }
 }

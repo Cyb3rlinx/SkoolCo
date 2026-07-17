@@ -6,6 +6,7 @@ import { withErrorHandling, parseBody, created, errorResponse, clientIp } from "
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 import { isPasswordPwned } from "@/lib/password";
 import { createEmailVerification, sendVerificationEmail } from "@/lib/tokens";
+import { baseUsername, resolveUsername } from "@/lib/username";
 
 /**
  * POST /api/auth/register
@@ -34,9 +35,19 @@ export const POST = withErrorHandling(async (req: Request) => {
 
   const passwordHash = await bcrypt.hash(input.password, 12);
 
+  const base = baseUsername(input.name);
+  const existingUsernames = await prisma.user.findMany({
+    where: { username: { startsWith: base } },
+    select: { username: true },
+  });
+  const taken = new Set(
+    existingUsernames.map((u) => u.username).filter((u): u is string => u !== null)
+  );
+  const username = resolveUsername(base, taken);
+
   const user = await prisma.user.create({
-    data: { name: input.name, email: input.email, passwordHash },
-    select: { id: true, name: true, email: true, role: true, createdAt: true },
+    data: { name: input.name, email: input.email, passwordHash, username },
+    select: { id: true, name: true, username: true, email: true, role: true, createdAt: true },
   });
 
   // Fire off email verification (non-fatal if the mailer is unconfigured — it logs).

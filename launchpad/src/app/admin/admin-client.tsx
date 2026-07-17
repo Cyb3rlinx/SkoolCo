@@ -13,10 +13,12 @@ import {
 import { mockCommunityLinks, mockReports } from "@/lib/frontend/mock-data";
 import { useApi } from "@/lib/frontend/hooks";
 import { timeAgo } from "@/lib/frontend/format";
-import type { CommunityLink, ModerationReportItem, ReportStatus } from "@/lib/frontend/types";
+import type { CommunityLink, ModerationReportItem, ReportCategory, ReportStatus } from "@/lib/frontend/types";
 import { StatsSection } from "@/components/admin/stats-section";
 import { UsersSection } from "@/components/admin/users-section";
 import { ProductsSection } from "@/components/admin/products-section";
+import { CollectionsSection } from "@/components/admin/collections-section";
+import { BadgesSection } from "@/components/admin/badges-section";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -32,7 +34,14 @@ const REPORT_STATUS_META: Record<ReportStatus, { label: string; variant: "warnin
   DISMISSED: { label: "Descartado", variant: "outline" },
 };
 
-type Section = "stats" | "users" | "products" | "reports" | "links";
+const REPORT_CATEGORY_LABEL: Record<ReportCategory, string> = {
+  SPAM: "Spam",
+  SCAM: "Estafa o fraude",
+  INAPPROPRIATE: "Contenido inapropiado",
+  OTHER: "Otro",
+};
+
+type Section = "stats" | "users" | "products" | "collections" | "badges" | "reports" | "links";
 
 export function AdminClient() {
   const { data: session } = useSession();
@@ -52,6 +61,8 @@ export function AdminClient() {
           { value: "stats" as const, label: "Resumen" },
           { value: "users" as const, label: "Usuarios" },
           { value: "products" as const, label: "Productos" },
+          { value: "collections" as const, label: "Colecciones" },
+          { value: "badges" as const, label: "Insignias" },
         ]
       : []),
     { value: "reports", label: "Reportes" },
@@ -64,6 +75,8 @@ export function AdminClient() {
       {section === "stats" && <StatsSection onGoToTab={setSection} />}
       {section === "users" && <UsersSection />}
       {section === "products" && <ProductsSection />}
+      {section === "collections" && <CollectionsSection />}
+      {section === "badges" && <BadgesSection />}
       {section === "reports" && <ReportsQueue />}
       {section === "links" && <CommunityLinksQueue />}
     </div>
@@ -154,6 +167,7 @@ function ReportRow({
         <div className="min-w-0 flex-1 space-y-2">
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant={meta.variant}>{meta.label}</Badge>
+            <Badge variant="outline">{REPORT_CATEGORY_LABEL[report.category]}</Badge>
             <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
               <Flag className="h-3 w-3" aria-hidden />
               {report.product ? "Producto" : "Comentario"} · {timeAgo(report.createdAt)}
@@ -176,7 +190,7 @@ function ReportRow({
           </p>
 
           <p className="text-xs text-muted-foreground">
-            Reportado por {report.reporter.name}
+            {report.reporter ? `Reportado por ${report.reporter.name}` : "🤖 Auto-detectado por el sistema"}
             {report.resolvedBy && ` · resuelto por ${report.resolvedBy.name}`}
           </p>
         </div>

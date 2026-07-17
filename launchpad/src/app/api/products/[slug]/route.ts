@@ -4,6 +4,8 @@ import { getSessionUser, requireUser, ApiError } from "@/lib/auth";
 import { updateProductSchema } from "@/lib/validation";
 import { productListSelect, findProduct } from "@/lib/products";
 import { withErrorHandling, parseBody, ok, noContent } from "@/lib/api";
+import { notify } from "@/lib/notifications";
+import { shouldGrantFundador, shouldGrantPrimerLanzamiento, grantBadgeIfMissing } from "@/lib/badges";
 
 type Params = { params: { slug: string } };
 
@@ -15,6 +17,7 @@ const detailSelect = {
   declaredMrrUsd: true,
   monetizationNote: true,
   offerViewCount: true,
+  mrrVerifiedAt: true,
   images: {
     select: { id: true, url: true, sort: true },
     orderBy: { sort: "asc" as const },
@@ -48,6 +51,15 @@ export const GET = withErrorHandling(async (_req: Request, { params }: Params) =
       )
     : false;
 
+  const savedByMe = user
+    ? Boolean(
+        await prisma.savedProduct.findUnique({
+          where: { userId_productId: { userId: user.id, productId: base.id } },
+          select: { id: true },
+        })
+      )
+    : false;
+
   // Señal del puente: una vista de la oferta por cada carga de un no-maker.
   // Efecto secundario: si falla, no tumba la respuesta.
   if (product.openToOffers && user?.id !== base.makerId) {
@@ -61,7 +73,7 @@ export const GET = withErrorHandling(async (_req: Request, { params }: Params) =
     }
   }
 
-  return ok({ ...product, upvotedByMe });
+  return ok({ ...product, upvotedByMe, savedByMe });
 });
 
 /** PATCH /api/products/:slug — update (maker or staff only). */
@@ -89,6 +101,35 @@ export const PATCH = withErrorHandling(async (req: Request, { params }: Params) 
     data: input,
     select: detailSelect,
   });
+
+  // Al pasar A "LIVE" desde otro estado: avisar seguidores + insignias automáticas.
+  if (input.status === "LIVE" && base.status !== "LIVE") {
+    const followers = await prisma.follow.findMany({
+      where: { followingId: base.makerId },
+      select: { followerId: true },
+    });
+    await Promise.all(
+      followers.map((f) =>
+        notify({
+          userId: f.followerId,
+          actorId: base.makerId,
+          type: "FOLLOWED_LAUNCH",
+          productId: base.id,
+        })
+      )
+    );
+
+    const [liveMakerCount, makerLiveProductCount] = await Promise.all([
+      prisma.user.count({ where: { products: { some: { status: "LIVE" } } } }),
+      prisma.product.count({ where: { makerId: base.makerId, status: "LIVE" } }),
+    ]);
+    if (shouldGrantFundador(liveMakerCount)) {
+      await grantBadgeIfMissing(base.makerId, "fundador", null);
+    }
+    if (shouldGrantPrimerLanzamiento(makerLiveProductCount)) {
+      await grantBadgeIfMissing(base.makerId, "primer-lanzamiento", null);
+    }
+  }
 
   return ok(product);
 });

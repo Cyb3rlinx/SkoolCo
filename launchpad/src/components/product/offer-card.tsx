@@ -24,12 +24,14 @@ export function OfferCard({
   openToOffers,
   declaredMrrUsd,
   monetizationNote,
+  mrrVerifiedAt,
 }: {
   slug: string;
   makerId: string;
   openToOffers?: boolean;
   declaredMrrUsd?: number | null;
   monetizationNote?: string | null;
+  mrrVerifiedAt?: string | null;
 }) {
   const t = useTranslations("product.offerCard");
   const { data: session, status } = useSession();
@@ -72,8 +74,15 @@ export function OfferCard({
               <span className="font-semibold">
                 {t("declaredMrr", { amount: declaredMrrUsd.toLocaleString("en-US") })}
               </span>
+              {mrrVerifiedAt && (
+                <span className="rounded-full bg-success/15 px-2 py-0.5 text-[10px] font-bold text-success">
+                  {t("verifiedBadge")}
+                </span>
+              )}
             </p>
-            <p className="mt-1 text-[11px] leading-snug text-muted-foreground">{t("mrrDisclaimer")}</p>
+            <p className="mt-1 text-[11px] leading-snug text-muted-foreground">
+              {mrrVerifiedAt ? t("mrrDisclaimerVerified") : t("mrrDisclaimer")}
+            </p>
           </div>
         )}
 
