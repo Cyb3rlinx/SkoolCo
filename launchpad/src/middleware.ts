@@ -1,6 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 import createMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
+import { isAllowedOrigin } from "./lib/cors";
+
+export { isAllowedOrigin };
 
 const intlMiddleware = createMiddleware(routing);
 
@@ -11,16 +14,6 @@ const SECURITY_HEADERS: Record<string, string> = {
   "Strict-Transport-Security": "max-age=63072000; includeSubDomains",
   "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
 };
-
-/** True only if `origin` is explicitly listed in the comma-separated env value. */
-export function isAllowedOrigin(origin: string | null, envValue: string | undefined): boolean {
-  if (!origin || !envValue) return false;
-  return envValue
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean)
-    .includes(origin);
-}
 
 // Routes the browser extension calls cross-origin.
 const CORS_PATHS = ["/api/extension", "/api/community-links"];

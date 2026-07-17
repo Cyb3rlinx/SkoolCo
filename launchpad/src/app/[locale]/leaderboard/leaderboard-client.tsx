@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Crown, MessageCircle, Rocket, ThumbsUp, Trophy } from "lucide-react";
 import { fetchLeaderboard } from "@/lib/frontend/api-client";
 import { mockLeaderboard } from "@/lib/frontend/mock-data";
@@ -13,6 +13,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { buttonVariants } from "@/components/ui/button";
 import { DemoBanner, EmptyState, ErrorState } from "@/components/ui/states";
+import { Link } from "@/i18n/navigation";
 
 const PODIUM_STYLES = [
   "border-warning/50 bg-warning/5", // 1st gold
@@ -21,6 +22,7 @@ const PODIUM_STYLES = [
 ];
 
 function PodiumCard({ entry, place }: { entry: LeaderboardEntry; place: number }) {
+  const t = useTranslations("leaderboard");
   return (
     <Card className={cn("relative overflow-hidden text-center", PODIUM_STYLES[place - 1])}>
       <CardContent className="flex flex-col items-center gap-2 p-6">
@@ -32,16 +34,19 @@ function PodiumCard({ entry, place }: { entry: LeaderboardEntry; place: number }
             "flex h-8 w-8 items-center justify-center rounded-full text-sm font-extrabold text-white",
             place === 1 ? "bg-warning" : place === 2 ? "bg-muted-foreground" : "bg-[#b4713f]"
           )}
-          aria-label={`Puesto ${place}`}
+          aria-label={t("place", { place })}
         >
           {place}
         </span>
         <Avatar name={entry.name} src={entry.avatarUrl} size="xl" />
         <p className="text-lg font-extrabold">{entry.name}</p>
-        <p className="brand-text-gradient text-2xl font-extrabold">{entry.score} pts</p>
+        <p className="brand-text-gradient text-2xl font-extrabold">{t("pts", { score: entry.score })}</p>
         <p className="text-xs text-muted-foreground">
-          {entry.launchesCount} lanzamientos · {entry.upvotesReceived} votos ·{" "}
-          {entry.commentsCount} comentarios
+          {t("statsLine", {
+            launches: entry.launchesCount,
+            votes: entry.upvotesReceived,
+            comments: entry.commentsCount,
+          })}
         </p>
       </CardContent>
     </Card>
@@ -50,6 +55,7 @@ function PodiumCard({ entry, place }: { entry: LeaderboardEntry; place: number }
 
 /** Community leaderboard — GET /api/leaderboard (live SQL view). */
 export function LeaderboardClient() {
+  const t = useTranslations("leaderboard");
   const { data, loading, error, demo, refetch } = useApi(fetchLeaderboard, {
     fallback: () => mockLeaderboard,
   });
@@ -60,8 +66,8 @@ export function LeaderboardClient() {
   return (
     <div className="container-page space-y-8 py-10">
       <PageHeader
-        title="Ranking de la comunidad"
-        description="Reconocemos a quienes construyen y apoyan: lanzar suma 10, cada voto recibido suma 2 y cada comentario hecho suma 1."
+        title={t("title")}
+        description={t("description")}
         actions={demo ? <DemoBanner /> : undefined}
       />
 
@@ -80,11 +86,11 @@ export function LeaderboardClient() {
 
       {!loading && !error && data && data.length === 0 && (
         <EmptyState
-          title="El ranking está esperando su primera estrella"
-          description="Publica un lanzamiento o apoya a otros makers para aparecer aquí."
+          title={t("emptyTitle")}
+          description={t("emptyDescription")}
           action={
             <Link href="/submit" className={buttonVariants({ variant: "gradient" })}>
-              Publicar mi producto
+              {t("publishMyProduct")}
             </Link>
           }
         />
@@ -114,22 +120,22 @@ export function LeaderboardClient() {
             <Card>
               <CardContent className="p-0">
                 <table className="w-full text-sm">
-                  <caption className="sr-only">Ranking completo de la comunidad</caption>
+                  <caption className="sr-only">{t("fullRankingCaption")}</caption>
                   <thead>
                     <tr className="border-b text-left text-xs uppercase tracking-wide text-muted-foreground">
                       <th scope="col" className="px-5 py-3 font-semibold">#</th>
-                      <th scope="col" className="px-2 py-3 font-semibold">Miembro</th>
+                      <th scope="col" className="px-2 py-3 font-semibold">{t("member")}</th>
                       <th scope="col" className="hidden px-2 py-3 font-semibold sm:table-cell">
-                        <span className="inline-flex items-center gap-1"><Rocket className="h-3.5 w-3.5" aria-hidden />Lanzamientos</span>
+                        <span className="inline-flex items-center gap-1"><Rocket className="h-3.5 w-3.5" aria-hidden />{t("launches")}</span>
                       </th>
                       <th scope="col" className="hidden px-2 py-3 font-semibold sm:table-cell">
-                        <span className="inline-flex items-center gap-1"><ThumbsUp className="h-3.5 w-3.5" aria-hidden />Votos</span>
+                        <span className="inline-flex items-center gap-1"><ThumbsUp className="h-3.5 w-3.5" aria-hidden />{t("votes")}</span>
                       </th>
                       <th scope="col" className="hidden px-2 py-3 font-semibold md:table-cell">
-                        <span className="inline-flex items-center gap-1"><MessageCircle className="h-3.5 w-3.5" aria-hidden />Comentarios</span>
+                        <span className="inline-flex items-center gap-1"><MessageCircle className="h-3.5 w-3.5" aria-hidden />{t("comments")}</span>
                       </th>
                       <th scope="col" className="px-5 py-3 text-right font-semibold">
-                        <span className="inline-flex items-center gap-1"><Trophy className="h-3.5 w-3.5" aria-hidden />Puntos</span>
+                        <span className="inline-flex items-center gap-1"><Trophy className="h-3.5 w-3.5" aria-hidden />{t("points")}</span>
                       </th>
                     </tr>
                   </thead>
@@ -158,16 +164,14 @@ export function LeaderboardClient() {
           {/* CTA */}
           <div className="brand-gradient flex flex-col items-center gap-3 rounded-2xl p-8 text-center text-white sm:flex-row sm:justify-between sm:text-left">
             <div>
-              <p className="text-lg font-extrabold">¿Quieres subir en el ranking?</p>
-              <p className="text-sm text-white/85">
-                Lanza tu próximo proyecto o deja feedback a otros makers — la comunidad lo nota.
-              </p>
+              <p className="text-lg font-extrabold">{t("ctaTitle")}</p>
+              <p className="text-sm text-white/85">{t("ctaBody")}</p>
             </div>
             <Link
               href="/submit"
               className={cn(buttonVariants({ variant: "outline", size: "lg" }), "border-white/40 bg-white/10 text-white hover:bg-white/20")}
             >
-              Publicar producto
+              {t("publishProduct")}
             </Link>
           </div>
         </>

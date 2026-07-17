@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 import { ArrowLeft, CalendarDays, MessageCircle, Rocket, ThumbsUp } from "lucide-react";
 import { fetchProducts, fetchUser } from "@/lib/frontend/api-client";
 import { useApi } from "@/lib/frontend/hooks";
@@ -12,12 +12,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState, ErrorState } from "@/components/ui/states";
 import { ProductCard } from "@/components/product/product-card";
+import { Link } from "@/i18n/navigation";
 
 /**
  * Public maker profile — GET /api/users/:id + GET /api/products?maker=:id.
  * Shows only community-facing info (no email) and LIVE launches.
  */
 export function MakerProfileClient({ id }: { id: string }) {
+  const t = useTranslations("makerProfile");
+  const locale = useLocale();
   const user = useApi(() => fetchUser(id), { deps: [id] });
   const launches = useApi(() => fetchProducts({ maker: id, pageSize: 50 }), { deps: [id] });
 
@@ -43,17 +46,17 @@ export function MakerProfileClient({ id }: { id: string }) {
         {user.errorStatus === 404 ? (
           <EmptyState
             icon="search"
-            title="Maker no encontrado"
-            description="Puede que el enlace esté roto o que la cuenta ya no exista."
+            title={t("notFoundTitle")}
+            description={t("notFoundDescription")}
             action={
               <Link href="/launches" className={buttonVariants({ variant: "outline" })}>
                 <ArrowLeft className="h-4 w-4" aria-hidden />
-                Volver a lanzamientos
+                {t("backToLaunches")}
               </Link>
             }
           />
         ) : (
-          <ErrorState message={user.error ?? "No pudimos cargar el perfil."} onRetry={user.refetch} />
+          <ErrorState message={user.error ?? t("loadError")} onRetry={user.refetch} />
         )}
       </div>
     );
@@ -68,7 +71,7 @@ export function MakerProfileClient({ id }: { id: string }) {
         className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4" aria-hidden />
-        Lanzamientos
+        {t("launches")}
       </Link>
 
       {/* Header */}
@@ -80,17 +83,17 @@ export function MakerProfileClient({ id }: { id: string }) {
             {profile.bio && <p className="max-w-xl text-sm">{profile.bio}</p>}
             <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <CalendarDays className="h-3.5 w-3.5" aria-hidden />
-              En la comunidad desde {formatDate(profile.createdAt)}
+              {t("memberSince", { date: formatDate(profile.createdAt, locale) })}
             </p>
             <div className="flex flex-wrap gap-2 pt-1">
               <Badge variant="secondary">
-                <Rocket className="h-3 w-3" aria-hidden /> {profile._count.products} lanzamientos
+                <Rocket className="h-3 w-3" aria-hidden /> {t("launchesCount", { count: profile._count.products })}
               </Badge>
               <Badge variant="secondary">
-                <ThumbsUp className="h-3 w-3" aria-hidden /> {profile._count.upvotes} votos dados
+                <ThumbsUp className="h-3 w-3" aria-hidden /> {t("votesGiven", { count: profile._count.upvotes })}
               </Badge>
               <Badge variant="secondary">
-                <MessageCircle className="h-3 w-3" aria-hidden /> {profile._count.comments} comentarios
+                <MessageCircle className="h-3 w-3" aria-hidden /> {t("commentsCount", { count: profile._count.comments })}
               </Badge>
             </div>
           </div>
@@ -100,7 +103,7 @@ export function MakerProfileClient({ id }: { id: string }) {
       {/* Launches */}
       <section className="space-y-4" aria-labelledby="maker-launches-title">
         <h2 id="maker-launches-title" className="text-xl font-extrabold">
-          Lanzamientos de {profile.name}
+          {t("launchesBy", { name: profile.name })}
         </h2>
 
         {launches.loading && (
@@ -115,10 +118,7 @@ export function MakerProfileClient({ id }: { id: string }) {
         )}
 
         {!launches.loading && !launches.error && launches.data?.items.length === 0 && (
-          <EmptyState
-            title="Todavía sin lanzamientos públicos"
-            description="Cuando publique algo, lo verás aquí."
-          />
+          <EmptyState title={t("noPublicLaunchesTitle")} description={t("noPublicLaunchesDescription")} />
         )}
 
         <div className="space-y-3">

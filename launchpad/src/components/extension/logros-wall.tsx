@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import { ExternalLink, Trophy } from "lucide-react";
 import { fetchCommunityLinks } from "@/lib/frontend/api-client";
 import { mockCommunityLinks } from "@/lib/frontend/mock-data";
@@ -17,6 +18,8 @@ import { DemoBanner, EmptyState, ErrorState } from "@/components/ui/states";
  * manual, human click on the real post. No engagement happens here.
  */
 export function LogrosWall() {
+  const t = useTranslations("extension.wall");
+  const locale = useLocale();
   const { data, loading, error, demo, refetch } = useApi(() => fetchCommunityLinks(false), {
     fallback: () => mockCommunityLinks,
   });
@@ -36,13 +39,7 @@ export function LogrosWall() {
   const links = data ?? [];
 
   if (links.length === 0) {
-    return (
-      <EmptyState
-        icon="inbox"
-        title="Aún no hay logros verificados"
-        description="Cuando la comunidad envíe sus logros y un moderador los verifique, aparecerán aquí."
-      />
-    );
+    return <EmptyState icon="inbox" title={t("emptyTitle")} description={t("emptyDescription")} />;
   }
 
   return (
@@ -65,7 +62,7 @@ export function LogrosWall() {
 
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <Avatar name={link.submittedBy.name} src={link.submittedBy.avatarUrl} size="xs" />
-                {link.submittedBy.name} · {timeAgo(link.createdAt)}
+                {link.submittedBy.name} · {timeAgo(link.createdAt, locale)}
               </div>
 
               <a
@@ -74,17 +71,14 @@ export function LogrosWall() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-1.5 rounded-lg border py-2 text-sm font-semibold transition-colors hover:border-primary/40 hover:text-primary"
               >
-                Abrir post en Skool
+                {t("openPost")}
                 <ExternalLink className="h-3.5 w-3.5" aria-hidden />
               </a>
             </CardContent>
           </Card>
         ))}
       </div>
-      <p className="text-center text-xs text-muted-foreground">
-        Apoyar un logro siempre es un clic tuyo en el post original. Denveler nunca interactúa
-        por ti.
-      </p>
+      <p className="text-center text-xs text-muted-foreground">{t("supportNote")}</p>
     </div>
   );
 }

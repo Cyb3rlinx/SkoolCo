@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { LeaderboardClient } from "./leaderboard-client";
 
-export const metadata: Metadata = {
-  title: "Ranking de la comunidad",
-  description:
-    "Quiénes más aportan a la comunidad: lanzamientos, votos recibidos y feedback dado.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("leaderboard");
+  return { title: t("metaTitle"), description: t("metaDescription") };
+}
 
 export default function LeaderboardPage() {
   return <LeaderboardClient />;

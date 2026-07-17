@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { CheckCircle2, ExternalLink, Send, Trophy } from "lucide-react";
 import { cn } from "@/lib/frontend/utils";
 import { mockMyLinks } from "@/lib/frontend/mock-data";
@@ -14,17 +15,18 @@ import { Badge } from "@/components/ui/badge";
  */
 type Tab = "send" | "mine";
 
-const STATUS_META = {
-  PENDING: { label: "Pendiente", variant: "warning" as const },
-  VERIFIED: { label: "Verificado", variant: "success" as const },
-  REJECTED: { label: "Rechazado", variant: "outline" as const },
-};
-
 export function ExtensionPopupMock() {
+  const t = useTranslations("extension.popupMock");
   const [tab, setTab] = useState<Tab>("send");
-  const [title, setTitle] = useState("¡Llegué a 100 usuarios! 🎉");
+  const [title, setTitle] = useState(t("defaultTitle"));
   const [type, setType] = useState("logro");
   const [sent, setSent] = useState(false);
+
+  const STATUS_META = {
+    PENDING: { label: t("statusPending"), variant: "warning" as const },
+    VERIFIED: { label: t("statusVerified"), variant: "success" as const },
+    REJECTED: { label: t("statusRejected"), variant: "outline" as const },
+  };
 
   return (
     <div className="mx-auto w-[340px] max-w-full overflow-hidden rounded-3xl border bg-card shadow-lift">
@@ -33,7 +35,7 @@ export function ExtensionPopupMock() {
         <span className="h-2.5 w-2.5 rounded-full bg-destructive/60" aria-hidden />
         <span className="h-2.5 w-2.5 rounded-full bg-warning/60" aria-hidden />
         <span className="h-2.5 w-2.5 rounded-full bg-success/60" aria-hidden />
-        <span className="ml-2 text-[10px] font-medium text-muted-foreground">Extensión · Logros</span>
+        <span className="ml-2 text-[10px] font-medium text-muted-foreground">{t("chromeLabel")}</span>
       </div>
 
       {/* Popup header */}
@@ -42,24 +44,24 @@ export function ExtensionPopupMock() {
           <Trophy className="h-4 w-4" aria-hidden />
         </span>
         <div>
-          <p className="text-sm font-extrabold leading-none">Logros</p>
-          <p className="text-[10px] text-muted-foreground">Apoya a tu comunidad, con tu permiso</p>
+          <p className="text-sm font-extrabold leading-none">{t("panelTitle")}</p>
+          <p className="text-[10px] text-muted-foreground">{t("panelSubtitle")}</p>
         </div>
       </div>
 
       {/* Tabs */}
       <div className="flex gap-1 px-4 pt-3">
-        {(["send", "mine"] as Tab[]).map((t) => (
+        {(["send", "mine"] as Tab[]).map((tb) => (
           <button
-            key={t}
+            key={tb}
             type="button"
-            onClick={() => setTab(t)}
+            onClick={() => setTab(tb)}
             className={cn(
               "flex-1 rounded-lg px-3 py-1.5 text-xs font-bold transition-colors",
-              tab === t ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-muted"
+              tab === tb ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-muted"
             )}
           >
-            {t === "send" ? "Enviar" : "Mis links"}
+            {tb === "send" ? t("tabSend") : t("tabMine")}
           </button>
         ))}
       </div>
@@ -69,22 +71,20 @@ export function ExtensionPopupMock() {
           sent ? (
             <div className="space-y-3 py-4 text-center">
               <CheckCircle2 className="mx-auto h-10 w-10 text-success" aria-hidden />
-              <p className="text-sm font-bold">¡Enviado como pendiente!</p>
-              <p className="text-xs text-muted-foreground">
-                Un moderador lo verificará antes de publicarlo.
-              </p>
+              <p className="text-sm font-bold">{t("sentTitle")}</p>
+              <p className="text-xs text-muted-foreground">{t("sentBody")}</p>
               <button
                 type="button"
                 onClick={() => setSent(false)}
                 className="text-xs font-semibold text-primary hover:underline"
               >
-                Enviar otro
+                {t("sendAnother")}
               </button>
             </div>
           ) : (
             <div className="space-y-3">
               <div className="rounded-lg border border-dashed bg-muted/40 p-2.5 text-[11px] text-muted-foreground">
-                Post detectado en la pestaña activa:
+                {t("detectedPost")}
                 <span className="mt-1 flex items-center gap-1 font-semibold text-foreground">
                   <ExternalLink className="h-3 w-3" aria-hidden />
                   skool.com/tu-comunidad/post
@@ -92,7 +92,7 @@ export function ExtensionPopupMock() {
               </div>
 
               <label className="block space-y-1">
-                <span className="text-[11px] font-bold">Título (editable)</span>
+                <span className="text-[11px] font-bold">{t("titleField")}</span>
                 <input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
@@ -101,15 +101,15 @@ export function ExtensionPopupMock() {
               </label>
 
               <label className="block space-y-1">
-                <span className="text-[11px] font-bold">Tipo</span>
+                <span className="text-[11px] font-bold">{t("typeField")}</span>
                 <select
                   value={type}
                   onChange={(e) => setType(e.target.value)}
                   className="w-full rounded-lg border border-input bg-card px-2.5 py-1.5 text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
-                  <option value="logro">Logro</option>
-                  <option value="milestone">Milestone</option>
-                  <option value="announcement">Anuncio</option>
+                  <option value="logro">{t("typeAchievement")}</option>
+                  <option value="milestone">{t("typeMilestone")}</option>
+                  <option value="announcement">{t("typeAnnouncement")}</option>
                 </select>
               </label>
 
@@ -119,11 +119,9 @@ export function ExtensionPopupMock() {
                 className="brand-gradient flex w-full items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-bold text-white transition-opacity hover:opacity-95"
               >
                 <Send className="h-3.5 w-3.5" aria-hidden />
-                Enviar como logro
+                {t("sendAsAchievement")}
               </button>
-              <p className="text-center text-[10px] text-muted-foreground">
-                Solo se envía cuando tú haces clic. Nada automático.
-              </p>
+              <p className="text-center text-[10px] text-muted-foreground">{t("onlyOnClick")}</p>
             </div>
           )
         ) : (
@@ -147,7 +145,7 @@ export function ExtensionPopupMock() {
       </div>
 
       <p className="border-t bg-muted/40 px-4 py-2 text-center text-[10px] text-muted-foreground">
-        Vista previa · la extensión real se instala desde el navegador
+        {t("previewNote")}
       </p>
     </div>
   );

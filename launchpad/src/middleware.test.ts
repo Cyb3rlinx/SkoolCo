@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { isAllowedOrigin } from "@/middleware";
+// Imported from lib/cors (not @/middleware) so this test doesn't have to
+// load next-intl/middleware, which isn't resolvable under Vitest's plain
+// Node environment (Next.js's bundler handles that resolution; Vitest
+// doesn't). See src/lib/cors.ts.
+import { isAllowedOrigin } from "@/lib/cors";
 
 describe("isAllowedOrigin", () => {
   it("allows origins listed in the env", () => {
