@@ -240,6 +240,13 @@ export function fetchProductInsights(slug: string) {
   return request<ProductInsights>(`/api/products/${encodeURIComponent(slug)}/insights`);
 }
 
+/** POST /api/products/:slug/relaunch (auth, maker/staff, source must be ARCHIVED). */
+export function relaunchProduct(slug: string) {
+  return request<ProductDetail>(`/api/products/${encodeURIComponent(slug)}/relaunch`, {
+    method: "POST",
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Comments
 // ---------------------------------------------------------------------------
