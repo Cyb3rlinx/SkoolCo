@@ -25,6 +25,7 @@ import type {
   ProductDetail,
   ProductListItem,
   PublicUser,
+  ProductInsights,
   ProductListQuery,
   ReportCategory,
   ReportStatus,
@@ -232,6 +233,11 @@ export function unsaveProduct(slug: string) {
 /** GET /api/me/saved (auth) */
 export function fetchSavedProducts() {
   return request<ProductListItem[]>(`/api/me/saved`);
+}
+
+/** GET /api/products/:slug/insights (auth, maker/staff only). */
+export function fetchProductInsights(slug: string) {
+  return request<ProductInsights>(`/api/products/${encodeURIComponent(slug)}/insights`);
 }
 
 // ---------------------------------------------------------------------------

@@ -19,6 +19,7 @@ import { CommentSection } from "@/components/product/comment-section";
 import { MakerCard } from "@/components/product/maker-card";
 import { OfferCard } from "@/components/product/offer-card";
 import { OfferSettings } from "@/components/product/offer-settings";
+import { InsightsSection } from "@/components/product/insights-section";
 import { ChangeLogoButton } from "@/components/product/change-logo-button";
 import { RelatedLaunches } from "@/components/product/related-launches";
 import { ReportButton } from "@/components/product/report-button";
@@ -187,6 +188,8 @@ export function ProductDetailClient({ slug }: { slug: string }) {
             offerViewCount={product.offerViewCount}
             onUpdated={refetch}
           />
+
+          <InsightsSection slug={product.slug} makerId={product.maker.id} />
 
           <Card>
             <CardContent className="space-y-3 p-5 text-sm">

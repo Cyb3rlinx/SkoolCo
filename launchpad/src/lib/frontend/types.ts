@@ -176,6 +176,17 @@ export interface SaveResult {
   saved: boolean;
 }
 
+export interface InsightsBucket {
+  date: string;
+  count: number;
+}
+
+/** GET /api/products/:slug/insights — maker/staff only. */
+export interface ProductInsights {
+  upvotes: InsightsBucket[];
+  comments: InsightsBucket[];
+}
+
 // ---------------------------------------------------------------------------
 // Leaderboard
 // ---------------------------------------------------------------------------
