@@ -22,6 +22,14 @@ export const GET = withErrorHandling(async (_req: Request, { params }: Params) =
       avatarUrl: true,
       bio: true,
       createdAt: true,
+      badges: {
+        select: {
+          badge: { select: { slug: true, name: true, description: true, icon: true } },
+          grantedById: true,
+          createdAt: true,
+        },
+        orderBy: { createdAt: "asc" },
+      },
       _count: {
         select: {
           products: { where: { status: "LIVE" } },
@@ -33,5 +41,12 @@ export const GET = withErrorHandling(async (_req: Request, { params }: Params) =
   });
   if (!user) throw new ApiError(404, "User not found");
 
-  return ok(user);
+  return ok({
+    ...user,
+    badges: user.badges.map((ub) => ({
+      ...ub.badge,
+      grantedByAdmin: ub.grantedById !== null,
+      createdAt: ub.createdAt.toISOString(),
+    })),
+  });
 });

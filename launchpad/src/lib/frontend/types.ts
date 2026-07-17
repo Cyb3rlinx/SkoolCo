@@ -43,6 +43,7 @@ export interface PublicUser {
   avatarUrl: string | null;
   bio: string | null;
   createdAt: string;
+  badges: UserBadgeItem[];
   _count: { products: number; upvotes: number; comments: number };
 }
 
@@ -155,7 +156,7 @@ export interface CommentItem {
   body: string;
   createdAt: string;
   updatedAt: string;
-  user: UserRef;
+  user: UserRef & { badges: { slug: string; icon: string; name: string }[] };
 }
 
 /** POST/DELETE /api/products/:slug/upvote */

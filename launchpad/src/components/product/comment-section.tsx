@@ -152,7 +152,12 @@ export function CommentSection({ slug, live }: { slug: string; live: boolean }) 
               <Avatar name={c.user.name} src={c.user.avatarUrl} size="sm" />
               <div className="min-w-0 flex-1">
                 <p className="text-sm">
-                  <span className="font-bold">{c.user.name}</span>{" "}
+                  <span className="font-bold">{c.user.name}</span>
+                  {c.user.badges.map((b) => (
+                    <span key={b.slug} title={b.name} className="ml-1" aria-hidden>
+                      {b.icon}
+                    </span>
+                  ))}{" "}
                   <span className="text-xs text-muted-foreground">· {timeAgo(c.createdAt)}</span>
                 </p>
                 <p className="mt-1 whitespace-pre-line text-sm text-foreground/90">
