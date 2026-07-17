@@ -20,6 +20,7 @@ import { OfferCard } from "@/components/product/offer-card";
 import { OfferSettings } from "@/components/product/offer-settings";
 import { ChangeLogoButton } from "@/components/product/change-logo-button";
 import { RelatedLaunches } from "@/components/product/related-launches";
+import { VoteWidgetCard } from "@/components/product/vote-widget-card";
 import { ReportButton } from "@/components/product/report-button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -201,6 +202,8 @@ export function ProductDetailClient({ slug }: { slug: string }) {
               </div>
             </CardContent>
           </Card>
+
+          <VoteWidgetCard slug={product.slug} makerId={product.maker.id} />
 
           <RelatedLaunches categorySlug={product.category.slug} excludeSlug={product.slug} />
         </aside>
