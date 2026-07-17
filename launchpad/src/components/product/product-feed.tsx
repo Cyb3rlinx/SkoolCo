@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { useTranslations } from "next-intl";
 import { fetchProducts } from "@/lib/frontend/api-client";
 import { filterMockProducts } from "@/lib/frontend/mock-data";
 import { useApi } from "@/lib/frontend/hooks";
@@ -36,11 +37,12 @@ export function ProductFeed({
   dateWindow = "all",
   ranked = false,
   limit,
-  emptyTitle = "Todavía no hay lanzamientos",
-  emptyDescription = "Sé la primera persona en publicar su producto y estrenar el feed.",
+  emptyTitle,
+  emptyDescription,
   emptyAction,
   showDemoBanner = true,
 }: ProductFeedProps) {
+  const t = useTranslations("productFeed");
   const key = JSON.stringify(query);
   const { data, loading, error, demo, refetch } = useApi(() => fetchProducts(query), {
     fallback: () => filterMockProducts(query),
@@ -49,7 +51,7 @@ export function ProductFeed({
 
   if (loading) {
     return (
-      <div className="space-y-3" aria-busy="true" aria-label="Cargando lanzamientos">
+      <div className="space-y-3" aria-busy="true" aria-label={t("loading")}>
         {Array.from({ length: 4 }).map((_, i) => (
           <ProductCardSkeleton key={i} />
         ))}
@@ -78,12 +80,8 @@ export function ProductFeed({
     return (
       <EmptyState
         icon={query.q ? "search" : "inbox"}
-        title={query.q ? `Sin resultados para “${query.q}”` : emptyTitle}
-        description={
-          query.q
-            ? "Prueba con otras palabras o quita los filtros."
-            : emptyDescription
-        }
+        title={query.q ? t("noResultsFor", { query: query.q }) : (emptyTitle ?? t("defaultEmptyTitle"))}
+        description={query.q ? t("noResultsHint") : (emptyDescription ?? t("defaultEmptyDescription"))}
         action={emptyAction}
       />
     );

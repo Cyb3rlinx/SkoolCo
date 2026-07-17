@@ -51,7 +51,13 @@
     "somethingWrong": "Algo salió mal",
     "loading": "Cargando…",
     "logoHome": "Denveler — inicio",
-    "optional": "Opcional"
+    "optional": "Opcional",
+    "commentsCount": "{count} comentarios",
+    "loadErrorDefault": "No pudimos cargar esta sección.",
+    "demoBanner": "Datos de demo — la API no está disponible (¿levantaste la base de datos?)",
+    "upvoteLabel": "Votar este producto ({count} votos)",
+    "removeUpvoteLabel": "Quitar voto de este producto ({count} votos)",
+    "upvoteFailed": "No se pudo guardar tu voto — ¿API disponible?"
   },
   "notFound": {
     "eyebrow": "Error 404",
@@ -230,5 +236,36 @@
       "errorTooShort": "Cuéntanos un poco más (mínimo 10 caracteres).",
       "errorGeneric": "No se pudo enviar el mensaje."
     }
+  },
+  "launches": {
+    "metaTitle": "Lanzamientos",
+    "metaDescription": "Descubre los productos que la comunidad está lanzando hoy: vota, comenta y apoya a sus makers.",
+    "tabToday": "Hoy",
+    "tabWeek": "Esta semana",
+    "tabAll": "Todos",
+    "headingToday": "Lanzamientos de hoy",
+    "headingWeek": "Lanzamientos de la semana",
+    "headingAll": "Todos los lanzamientos",
+    "subheading": "{date} — vota y comenta para dar visibilidad a los makers de la comunidad.",
+    "publishYours": "Publica el tuyo",
+    "search": "Buscar",
+    "searchPlaceholder": "Nombre, tagline…",
+    "category": "Categoría",
+    "allCategories": "Todas",
+    "sortBy": "Ordenar por",
+    "sortNewest": "Más recientes",
+    "sortTop": "Más votados",
+    "emptyTodayTitle": "Hoy todavía no hay lanzamientos",
+    "emptyOtherTitle": "No hay lanzamientos en este periodo",
+    "emptyDescription": "Los grandes días empiezan vacíos. Mira lanzamientos anteriores o publica el tuyo.",
+    "viewAllLaunches": "Ver todos los lanzamientos",
+    "publishMyProduct": "Publicar mi producto"
+  },
+  "productFeed": {
+    "loading": "Cargando lanzamientos",
+    "noResultsFor": "Sin resultados para “{query}”",
+    "noResultsHint": "Prueba con otras palabras o quita los filtros.",
+    "defaultEmptyTitle": "Todavía no hay lanzamientos",
+    "defaultEmptyDescription": "Sé la primera persona en publicar su producto y estrenar el feed."
   }
 }

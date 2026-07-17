@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { getTranslations } from "next-intl/server";
 import { LaunchesClient } from "./launches-client";
 import { ProductCardSkeleton } from "@/components/product/product-card";
 
-export const metadata: Metadata = {
-  title: "Lanzamientos",
-  description:
-    "Descubre los productos que la comunidad está lanzando hoy: vota, comenta y apoya a sus makers.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("launches");
+  return { title: t("metaTitle"), description: t("metaDescription") };
+}
 
 /**
  * Server shell — the interactive list lives in LaunchesClient

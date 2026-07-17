@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useMemo } from "react";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { Sparkles } from "lucide-react";
 import { fetchCategories } from "@/lib/frontend/api-client";
 import { mockCategories } from "@/lib/frontend/mock-data";
@@ -16,18 +16,21 @@ import { Select } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { Link, useRouter } from "@/i18n/navigation";
 
 type Window = "today" | "week" | "all";
 
-const TAB_ITEMS: { value: Window; label: string }[] = [
-  { value: "today", label: "Hoy" },
-  { value: "week", label: "Esta semana" },
-  { value: "all", label: "Todos" },
-];
-
 export function LaunchesClient() {
+  const t = useTranslations("launches");
+  const locale = useLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  const TAB_ITEMS: { value: Window; label: string }[] = [
+    { value: "today", label: t("tabToday") },
+    { value: "week", label: t("tabWeek") },
+    { value: "all", label: t("tabAll") },
+  ];
 
   const q = searchParams.get("q") ?? "";
   const category = searchParams.get("category") ?? "";
@@ -60,21 +63,17 @@ export function LaunchesClient() {
   );
 
   const heading =
-    windowParam === "today"
-      ? "Lanzamientos de hoy"
-      : windowParam === "week"
-        ? "Lanzamientos de la semana"
-        : "Todos los lanzamientos";
+    windowParam === "today" ? t("headingToday") : windowParam === "week" ? t("headingWeek") : t("headingAll");
 
   return (
     <div className="container-page space-y-8 py-10">
       <PageHeader
         title={heading}
-        description={`${formatDate(new Date())} — vota y comenta para dar visibilidad a los makers de la comunidad.`}
+        description={t("subheading", { date: formatDate(new Date(), locale) })}
         actions={
           <Link href="/submit" className={buttonVariants({ variant: "gradient" })}>
             <Sparkles className="h-4 w-4" aria-hidden />
-            Publica el tuyo
+            {t("publishYours")}
           </Link>
         }
       />
@@ -85,12 +84,12 @@ export function LaunchesClient() {
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:w-auto lg:min-w-[540px]">
           <div className="space-y-1.5">
-            <Label htmlFor="filter-q">Buscar</Label>
+            <Label htmlFor="filter-q">{t("search")}</Label>
             <Input
               id="filter-q"
               defaultValue={q}
               key={q} /* re-sync when header search navigates here */
-              placeholder="Nombre, tagline…"
+              placeholder={t("searchPlaceholder")}
               onKeyDown={(e) => {
                 if (e.key === "Enter") setParam("q", (e.target as HTMLInputElement).value.trim());
               }}
@@ -100,13 +99,13 @@ export function LaunchesClient() {
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="filter-category">Categoría</Label>
+            <Label htmlFor="filter-category">{t("category")}</Label>
             <Select
               id="filter-category"
               value={category}
               onChange={(e) => setParam("category", e.target.value)}
             >
-              <option value="">Todas</option>
+              <option value="">{t("allCategories")}</option>
               {(categories ?? []).map((c) => (
                 <option key={c.slug} value={c.slug}>
                   {c.name}
@@ -115,10 +114,10 @@ export function LaunchesClient() {
             </Select>
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="filter-sort">Ordenar por</Label>
+            <Label htmlFor="filter-sort">{t("sortBy")}</Label>
             <Select id="filter-sort" value={sort} onChange={(e) => setParam("sort", e.target.value === "newest" ? "" : e.target.value)}>
-              <option value="newest">Más recientes</option>
-              <option value="top">Más votados</option>
+              <option value="newest">{t("sortNewest")}</option>
+              <option value="top">{t("sortTop")}</option>
             </Select>
           </div>
         </div>
@@ -129,19 +128,15 @@ export function LaunchesClient() {
         query={query}
         dateWindow={windowParam}
         ranked={windowParam !== "all" || sort === "top"}
-        emptyTitle={
-          windowParam === "today"
-            ? "Hoy todavía no hay lanzamientos"
-            : "No hay lanzamientos en este periodo"
-        }
-        emptyDescription="Los grandes días empiezan vacíos. Mira lanzamientos anteriores o publica el tuyo."
+        emptyTitle={windowParam === "today" ? t("emptyTodayTitle") : t("emptyOtherTitle")}
+        emptyDescription={t("emptyDescription")}
         emptyAction={
           <div className="flex flex-wrap justify-center gap-2">
             <Button variant="outline" onClick={() => setParam("window", "all")}>
-              Ver todos los lanzamientos
+              {t("viewAllLaunches")}
             </Button>
             <Link href="/submit" className={buttonVariants({ variant: "gradient" })}>
-              Publicar mi producto
+              {t("publishMyProduct")}
             </Link>
           </div>
         }

@@ -51,7 +51,13 @@
     "somethingWrong": "出错了",
     "loading": "加载中…",
     "logoHome": "Denveler — 首页",
-    "optional": "选填"
+    "optional": "选填",
+    "commentsCount": "{count} 条评论",
+    "loadErrorDefault": "无法加载此部分内容。",
+    "demoBanner": "演示数据 — API 当前不可用（数据库启动了吗？）",
+    "upvoteLabel": "为该产品投票（{count} 票）",
+    "removeUpvoteLabel": "取消对该产品的投票（{count} 票）",
+    "upvoteFailed": "投票保存失败 — API 是否可用？"
   },
   "notFound": {
     "eyebrow": "错误 404",
@@ -230,5 +236,36 @@
       "errorTooShort": "请多告诉我们一些（至少 10 个字符）。",
       "errorGeneric": "消息发送失败。"
     }
+  },
+  "launches": {
+    "metaTitle": "发布广场",
+    "metaDescription": "发现社区今天正在发布的产品：投票、评论，支持这些创作者。",
+    "tabToday": "今天",
+    "tabWeek": "本周",
+    "tabAll": "全部",
+    "headingToday": "今日发布",
+    "headingWeek": "本周发布",
+    "headingAll": "全部发布",
+    "subheading": "{date} — 投票并评论，为社区创作者带来更多关注。",
+    "publishYours": "发布你的产品",
+    "search": "搜索",
+    "searchPlaceholder": "名称、标语…",
+    "category": "分类",
+    "allCategories": "全部",
+    "sortBy": "排序方式",
+    "sortNewest": "最新",
+    "sortTop": "最多投票",
+    "emptyTodayTitle": "今天还没有发布",
+    "emptyOtherTitle": "此时间段内没有发布",
+    "emptyDescription": "伟大的一天总是从空白开始。看看以往的发布，或者发布你自己的产品。",
+    "viewAllLaunches": "查看全部发布",
+    "publishMyProduct": "发布我的产品"
+  },
+  "productFeed": {
+    "loading": "正在加载发布内容",
+    "noResultsFor": "没有找到与 “{query}” 相关的结果",
+    "noResultsHint": "试试其他关键词，或清除筛选条件。",
+    "defaultEmptyTitle": "暂时还没有发布",
+    "defaultEmptyDescription": "成为第一个发布产品、开启这个动态流的人吧。"
   }
 }

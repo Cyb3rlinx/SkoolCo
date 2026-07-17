@@ -51,7 +51,13 @@
     "somethingWrong": "Something went wrong",
     "loading": "Loading…",
     "logoHome": "Denveler — home",
-    "optional": "Optional"
+    "optional": "Optional",
+    "commentsCount": "{count} comments",
+    "loadErrorDefault": "We couldn't load this section.",
+    "demoBanner": "Demo data — the API isn't available (did you start the database?)",
+    "upvoteLabel": "Upvote this product ({count} votes)",
+    "removeUpvoteLabel": "Remove your upvote from this product ({count} votes)",
+    "upvoteFailed": "We couldn't save your vote — is the API available?"
   },
   "notFound": {
     "eyebrow": "Error 404",
@@ -230,5 +236,36 @@
       "errorTooShort": "Tell us a bit more (minimum 10 characters).",
       "errorGeneric": "We couldn't send the message."
     }
+  },
+  "launches": {
+    "metaTitle": "Launches",
+    "metaDescription": "Discover the products the community is launching today: vote, comment, and support their makers.",
+    "tabToday": "Today",
+    "tabWeek": "This week",
+    "tabAll": "All",
+    "headingToday": "Today's launches",
+    "headingWeek": "This week's launches",
+    "headingAll": "All launches",
+    "subheading": "{date} — vote and comment to give the community's makers visibility.",
+    "publishYours": "Publish yours",
+    "search": "Search",
+    "searchPlaceholder": "Name, tagline…",
+    "category": "Category",
+    "allCategories": "All",
+    "sortBy": "Sort by",
+    "sortNewest": "Newest",
+    "sortTop": "Top voted",
+    "emptyTodayTitle": "No launches yet today",
+    "emptyOtherTitle": "No launches in this period",
+    "emptyDescription": "Big days start empty. Check past launches or publish yours.",
+    "viewAllLaunches": "View all launches",
+    "publishMyProduct": "Publish my product"
+  },
+  "productFeed": {
+    "loading": "Loading launches",
+    "noResultsFor": "No results for “{query}”",
+    "noResultsHint": "Try different words or clear the filters.",
+    "defaultEmptyTitle": "No launches yet",
+    "defaultEmptyDescription": "Be the first to publish your product and kick off the feed."
   }
 }

@@ -1,9 +1,10 @@
-import Link from "next/link";
 import { MessageCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { ProductListItem } from "@/lib/frontend/types";
 import { cn } from "@/lib/frontend/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar } from "@/components/ui/avatar";
+import { Link } from "@/i18n/navigation";
 import { ProductLogo } from "./product-logo";
 import { UpvoteButton } from "./upvote-button";
 
@@ -20,6 +21,7 @@ interface ProductCardProps {
  * interactive elements (upvote, category, maker) sit above the overlay.
  */
 export function ProductCard({ product, rank, className }: ProductCardProps) {
+  const t = useTranslations("common");
   return (
     <article
       className={cn(
@@ -59,7 +61,10 @@ export function ProductCard({ product, rank, className }: ProductCardProps) {
             <Avatar name={product.maker.name} src={product.maker.avatarUrl} size="xs" />
             {product.maker.name}
           </span>
-          <span className="flex items-center gap-1" aria-label={`${product._count.comments} comentarios`}>
+          <span
+            className="flex items-center gap-1"
+            aria-label={t("commentsCount", { count: product._count.comments })}
+          >
             <MessageCircle className="h-3.5 w-3.5" aria-hidden />
             {product._count.comments}
           </span>
