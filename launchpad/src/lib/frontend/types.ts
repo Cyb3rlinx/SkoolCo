@@ -159,6 +159,13 @@ export interface CommentItem {
   user: UserRef & { badges: { slug: string; icon: string; name: string }[] };
 }
 
+/** GET/POST /api/products/:slug/updates — bitácora de progreso del maker. */
+export interface ProductUpdateItem {
+  id: string;
+  body: string;
+  createdAt: string;
+}
+
 /** POST/DELETE /api/products/:slug/upvote */
 export interface UpvoteResult {
   upvoted: boolean;
@@ -214,7 +221,8 @@ export interface ModerationReportItem {
   createdAt: string;
   resolvedAt: string | null;
   resolvedBy: { id: string; name: string } | null;
-  reporter: { id: string; name: string };
+  /** null = reporte auto-generado por el sistema (detección de contenido sospechoso). */
+  reporter: { id: string; name: string } | null;
   product: { id: string; name: string; slug: string } | null;
   comment: { id: string; body: string } | null;
 }

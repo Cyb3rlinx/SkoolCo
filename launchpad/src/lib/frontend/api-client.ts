@@ -24,6 +24,7 @@ import type {
   Paginated,
   ProductDetail,
   ProductListItem,
+  ProductUpdateItem,
   PublicUser,
   ProductListQuery,
   ReportStatus,
@@ -192,6 +193,11 @@ export function fetchMyContactRequests() {
   return request<ContactRequestItem[]>(`/api/me/contact-requests`);
 }
 
+/** GET /api/me/sent-contact-requests (auth) — solicitudes que YO envié como comprador. */
+export function fetchSentContactRequests() {
+  return request<ContactRequestItem[]>(`/api/me/sent-contact-requests`);
+}
+
 /** PATCH /api/contact-requests/:id (auth) — compartir email o descartar. */
 export function resolveContactRequest(id: string, status: "SHARED" | "DISMISSED") {
   return request<{ id: string; status: string }>(
@@ -228,6 +234,23 @@ export function fetchComments(slug: string, page = 1, pageSize = 20) {
 /** POST /api/products/:slug/comments (auth). */
 export function postComment(slug: string, body: string) {
   return request<CommentItem>(`/api/products/${encodeURIComponent(slug)}/comments`, {
+    method: "POST",
+    body: JSON.stringify({ body }),
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Bitácora de progreso del maker
+// ---------------------------------------------------------------------------
+
+/** GET /api/products/:slug/updates — pública. */
+export function fetchProductUpdates(slug: string) {
+  return request<ProductUpdateItem[]>(`/api/products/${encodeURIComponent(slug)}/updates`);
+}
+
+/** POST /api/products/:slug/updates (auth) — solo el maker dueño o staff. */
+export function postProductUpdate(slug: string, body: string) {
+  return request<ProductUpdateItem>(`/api/products/${encodeURIComponent(slug)}/updates`, {
     method: "POST",
     body: JSON.stringify({ body }),
   });

@@ -7,8 +7,28 @@ import {
   createProductSchema,
   createContactRequestSchema,
   adminUpdateUserSchema,
+  createProductUpdateSchema,
   usernameSchema,
 } from "@/lib/validation";
+
+describe("createProductUpdateSchema", () => {
+  it("acepta un body válido", () => {
+    expect(createProductUpdateSchema.safeParse({ body: "Lanzamos soporte para modo oscuro." }).success).toBe(true);
+  });
+
+  it("rechaza menos de 5 caracteres", () => {
+    expect(createProductUpdateSchema.safeParse({ body: "hola" }).success).toBe(false);
+  });
+
+  it("rechaza más de 1000 caracteres", () => {
+    expect(createProductUpdateSchema.safeParse({ body: "a".repeat(1001) }).success).toBe(false);
+  });
+
+  it("recorta espacios", () => {
+    const result = createProductUpdateSchema.safeParse({ body: "  novedad importante  " });
+    expect(result.success && result.data.body).toBe("novedad importante");
+  });
+});
 
 describe("usernameSchema", () => {
   it("acepta un username válido", () => {
