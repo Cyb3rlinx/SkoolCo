@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Sparkles } from "lucide-react";
 import { fetchCollections } from "@/lib/frontend/api-client";
 import { useApi } from "@/lib/frontend/hooks";
