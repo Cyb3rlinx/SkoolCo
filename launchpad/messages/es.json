@@ -556,6 +556,16 @@
     "deleting": "Borrando…",
     "notFoundTitle": "Esta colaboración ya no existe",
     "notFoundDescription": "Puede que el autor la haya borrado o que haya expirado.",
-    "backToList": "Volver a Colaboraciones"
+    "backToList": "Volver a Colaboraciones",
+    "myCollaborations": "Mis colaboraciones",
+    "noneYet": "Todavía no publicaste ninguna colaboración.",
+    "contactRequestsReceived": "Solicitudes de contacto (colaboraciones)",
+    "contactRequestsSent": "Mis solicitudes enviadas (colaboraciones)",
+    "shareEmail": "Compartir mi email",
+    "dismiss": "Descartar",
+    "pending": "Pendiente",
+    "emailShared": "Email compartido",
+    "dismissed": "Descartada",
+    "waitingResponse": "Esperando respuesta"
   }
 }

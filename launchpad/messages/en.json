@@ -556,6 +556,16 @@
     "deleting": "Deleting…",
     "notFoundTitle": "This collaboration no longer exists",
     "notFoundDescription": "The author may have deleted it, or it may have expired.",
-    "backToList": "Back to Collaborations"
+    "backToList": "Back to Collaborations",
+    "myCollaborations": "My collaborations",
+    "noneYet": "You haven't published any collaborations yet.",
+    "contactRequestsReceived": "Contact requests (collaborations)",
+    "contactRequestsSent": "My sent requests (collaborations)",
+    "shareEmail": "Share my email",
+    "dismiss": "Dismiss",
+    "pending": "Pending",
+    "emailShared": "Email shared",
+    "dismissed": "Dismissed",
+    "waitingResponse": "Waiting for response"
   }
 }

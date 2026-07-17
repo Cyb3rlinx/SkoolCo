@@ -26,6 +26,9 @@ import { ProductCard } from "@/components/product/product-card";
 import { ContactRequestsSection } from "@/components/profile/contact-requests-section";
 import { SavedProductsSection } from "@/components/profile/saved-products-section";
 import { SentContactRequestsSection } from "@/components/profile/sent-contact-requests-section";
+import { CollaborationsSection } from "@/components/profile/collaborations-section";
+import { CollaborationContactRequestsSection } from "@/components/profile/collaboration-contact-requests-section";
+import { SentCollaborationContactRequestsSection } from "@/components/profile/sent-collaboration-contact-requests-section";
 import { ProfileForm } from "@/components/forms/profile-form";
 import { Field } from "@/components/forms/field";
 import { buttonVariants } from "@/components/ui/button";
@@ -201,6 +204,9 @@ export function ProfileClient() {
       {/* Solicitudes de contacto (puente de compraventa) */}
       <ContactRequestsSection />
       <SentContactRequestsSection />
+      <CollaborationsSection />
+      <CollaborationContactRequestsSection />
+      <SentCollaborationContactRequestsSection />
 
       {/* Danger zone */}
       <Card className="border-destructive/30">

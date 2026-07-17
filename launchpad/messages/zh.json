@@ -556,6 +556,16 @@
     "deleting": "删除中…",
     "notFoundTitle": "该协作信息已不存在",
     "notFoundDescription": "作者可能已将其删除，或者它已过期。",
-    "backToList": "返回协作页面"
+    "backToList": "返回协作页面",
+    "myCollaborations": "我的协作",
+    "noneYet": "你还没有发布任何协作信息。",
+    "contactRequestsReceived": "收到的联系请求（协作）",
+    "contactRequestsSent": "我发送的请求（协作）",
+    "shareEmail": "分享我的邮箱",
+    "dismiss": "忽略",
+    "pending": "待处理",
+    "emailShared": "邮箱已分享",
+    "dismissed": "已忽略",
+    "waitingResponse": "等待回复"
   }
 }

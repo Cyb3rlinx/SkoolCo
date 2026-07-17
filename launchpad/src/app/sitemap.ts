@@ -14,6 +14,7 @@ const STATIC_ROUTES = [
   "/novedades",
   "/privacidad",
   "/terminos",
+  "/colaboraciones",
 ];
 
 /**
@@ -24,7 +25,7 @@ const STATIC_ROUTES = [
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = process.env.NEXTAUTH_URL ?? "https://denveler.com";
 
-  const [products, makers] = await Promise.all([
+  const [products, makers, collaborations] = await Promise.all([
     prisma.product.findMany({
       where: { status: "LIVE" },
       select: { slug: true, updatedAt: true },
@@ -32,6 +33,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     prisma.user.findMany({
       where: { products: { some: { status: "LIVE" } } },
       select: { id: true },
+    }),
+    prisma.collaboration.findMany({
+      select: { id: true, updatedAt: true },
     }),
   ]);
 
@@ -51,5 +55,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: "weekly",
   }));
 
-  return [...staticEntries, ...productEntries, ...makerEntries];
+  const collaborationEntries: MetadataRoute.Sitemap = collaborations.map((c) => ({
+    url: `${siteUrl}/colaboraciones/${c.id}`,
+    lastModified: c.updatedAt,
+    changeFrequency: "daily",
+  }));
+
+  return [...staticEntries, ...productEntries, ...makerEntries, ...collaborationEntries];
 }
