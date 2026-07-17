@@ -57,7 +57,8 @@
     "demoBanner": "Demo data — the API isn't available (did you start the database?)",
     "upvoteLabel": "Upvote this product ({count} votes)",
     "removeUpvoteLabel": "Remove your upvote from this product ({count} votes)",
-    "upvoteFailed": "We couldn't save your vote — is the API available?"
+    "upvoteFailed": "We couldn't save your vote — is the API available?",
+    "language": "Language"
   },
   "notFound": {
     "eyebrow": "Error 404",

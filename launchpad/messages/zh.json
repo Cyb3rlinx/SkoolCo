@@ -57,7 +57,8 @@
     "demoBanner": "演示数据 — API 当前不可用（数据库启动了吗？）",
     "upvoteLabel": "为该产品投票（{count} 票）",
     "removeUpvoteLabel": "取消对该产品的投票（{count} 票）",
-    "upvoteFailed": "投票保存失败 — API 是否可用？"
+    "upvoteFailed": "投票保存失败 — API 是否可用？",
+    "language": "语言"
   },
   "notFound": {
     "eyebrow": "错误 404",

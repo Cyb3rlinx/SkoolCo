@@ -57,7 +57,8 @@
     "demoBanner": "Datos de demo — la API no está disponible (¿levantaste la base de datos?)",
     "upvoteLabel": "Votar este producto ({count} votos)",
     "removeUpvoteLabel": "Quitar voto de este producto ({count} votos)",
-    "upvoteFailed": "No se pudo guardar tu voto — ¿API disponible?"
+    "upvoteFailed": "No se pudo guardar tu voto — ¿API disponible?",
+    "language": "Idioma"
   },
   "notFound": {
     "eyebrow": "Error 404",
