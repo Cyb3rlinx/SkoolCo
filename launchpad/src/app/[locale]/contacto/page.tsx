@@ -24,21 +24,11 @@ export default async function ContactoPage() {
         <p className="mt-2 text-sm text-muted-foreground">{t("directBody")}</p>
         <ul className="mt-4 space-y-2 text-sm">
           <li>
-            <span className="font-semibold">William Díaz</span> —{" "}
             <a
-              href="mailto:willydiaz9009@gmail.com"
+              href="mailto:contacto@denveler.com"
               className="font-semibold text-primary hover:underline"
             >
-              willydiaz9009@gmail.com
-            </a>
-          </li>
-          <li>
-            <span className="font-semibold">Kevin</span> —{" "}
-            <a
-              href="mailto:keev.seven@hotmail.com"
-              className="font-semibold text-primary hover:underline"
-            >
-              keev.seven@hotmail.com
+              contacto@denveler.com
             </a>
           </li>
         </ul>

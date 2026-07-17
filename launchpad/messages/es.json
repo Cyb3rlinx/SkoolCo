@@ -6,7 +6,8 @@
   "nav": {
     "launches": "Lanzamientos",
     "collections": "Colecciones",
-    "collaborations": "Colaboraciones",
+    "achievements": "Logros",
+    "collaborations": "Servicios",
     "leaderboard": "Ranking",
     "extension": "Extensión",
     "resources": "Recursos",
@@ -19,6 +20,8 @@
     "signup": "Crear cuenta",
     "openMenu": "Abrir menú",
     "closeMenu": "Cerrar menú",
+    "profileLabel": "Mi perfil",
+    "adminLabel": "Panel de administración",
     "mainNav": "Principal",
     "mobileNav": "Principal móvil"
   },
@@ -34,6 +37,7 @@
     "submit": "Publicar un producto",
     "howItWorks": "Cómo funciona",
     "makers": "Makers",
+    "achievements": "Logros",
     "rules": "Normas",
     "news": "Novedades",
     "guides": "Guías",
@@ -228,7 +232,7 @@
     "reportWord": "Reportar",
     "intro2": "en la página del producto.",
     "directTitle": "Contacto directo",
-    "directBody": "¿Prefieres escribirnos directamente? El equipo detrás de Denveler:",
+    "directBody": "¿Prefieres escribirnos directamente? Nuestro correo:",
     "form": {
       "name": "Tu nombre",
       "namePlaceholder": "¿Cómo te llamas?",
@@ -656,9 +660,9 @@
     "emptyDescription": "Esta colección está vacía por ahora."
   },
   "collaborations": {
-    "metaTitle": "Colaboraciones",
+    "metaTitle": "Servicios",
     "metaDescription": "Conecta con quien necesita un servicio o con quien puede brindarlo.",
-    "heading": "Colaboraciones",
+    "heading": "Servicios",
     "subheading": "Conecta con quien necesita un servicio o con quien puede brindarlo.",
     "tabAll": "Todos",
     "tabNeeds": "Necesito",
@@ -700,11 +704,11 @@
     "deleting": "Borrando…",
     "notFoundTitle": "Esta colaboración ya no existe",
     "notFoundDescription": "Puede que el autor la haya borrado o que haya expirado.",
-    "backToList": "Volver a Colaboraciones",
-    "myCollaborations": "Mis colaboraciones",
+    "backToList": "Volver a Servicios",
+    "myCollaborations": "Mis servicios",
     "noneYet": "Todavía no publicaste ninguna colaboración.",
-    "contactRequestsReceived": "Solicitudes de contacto (colaboraciones)",
-    "contactRequestsSent": "Mis solicitudes enviadas (colaboraciones)",
+    "contactRequestsReceived": "Solicitudes de contacto (servicios)",
+    "contactRequestsSent": "Mis solicitudes enviadas (servicios)",
     "shareEmail": "Compartir mi email",
     "dismiss": "Descartar",
     "pending": "Pendiente",
@@ -798,5 +802,23 @@
       "errorAdd": "No se pudo agregar.",
       "errorRemove": "No se pudo quitar."
     }
+  },
+  "achievements": {
+    "metaTitle": "Logros",
+    "metaDescription": "Victorias reales que la comunidad compartió desde Skool y otras plataformas — verificadas por Denveler.",
+    "heading": "Logros de la comunidad",
+    "subheading": "Victorias reales, compartidas y verificadas. Desde nuevos clientes hasta retos terminados.",
+    "loadError": "No pudimos cargar los logros.",
+    "emptyTitle": "Todavía no hay logros",
+    "emptyDescription": "Cuando la comunidad comparta logros desde la extensión, van a aparecer acá una vez verificados.",
+    "footerLink": "Logros",
+    "typeLogro": "Logro",
+    "typeMilestone": "Hito",
+    "typeAnnouncement": "Anuncio",
+    "typeOther": "Logro",
+    "viewPost": "Ver publicación",
+    "saveLabel": "Guardar este logro",
+    "unsaveLabel": "Quitar de guardados",
+    "savedSectionTitle": "Logros guardados"
   }
 }

@@ -20,7 +20,7 @@ export const POST = withErrorHandling(async (req: Request) => {
   }
 
   const input = await parseBody(req, contactMessageSchema);
-  const to = process.env.CONTACT_EMAIL ?? "willydiaz9009@gmail.com";
+  const to = process.env.CONTACT_EMAIL ?? "contacto@denveler.com";
 
   // El email no debe revelar si falló el proveedor: respuesta genérica igual.
   try {

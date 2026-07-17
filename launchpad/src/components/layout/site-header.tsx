@@ -4,7 +4,8 @@ import { useState, type FormEvent } from "react";
 import { usePathname as useRawPathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
-import { Menu, Plus, Search, X } from "lucide-react";
+import NextLink from "next/link";
+import { Menu, Plus, Search, Shield, UserRound, X } from "lucide-react";
 import { cn } from "@/lib/frontend/utils";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -21,17 +22,16 @@ export function SiteHeader() {
   const rawPathname = useRawPathname();
   const isAdmin = rawPathname?.startsWith("/admin") ?? false;
   const router = useRouter();
-  const { status } = useSession();
+  const { data: session, status } = useSession();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [query, setQuery] = useState("");
 
   const NAV_LINKS = [
     { href: "/launches", label: t("launches") },
-    { href: "/colecciones", label: t("collections") },
+    { href: "/logros", label: t("achievements") },
     { href: "/colaboraciones", label: t("collaborations") },
     { href: "/leaderboard", label: t("leaderboard") },
     { href: "/extension", label: t("extension") },
-    { href: "/#como-funciona", label: t("resources") },
   ];
 
   function onSearch(e: FormEvent) {
@@ -59,6 +59,7 @@ export function SiteHeader() {
   );
 
   const authed = status === "authenticated";
+  const isStaff = session?.user?.role === "ADMIN" || session?.user?.role === "MODERATOR";
 
   return (
     <header className="sticky top-0 z-40 border-b bg-background/85 backdrop-blur">
@@ -79,6 +80,22 @@ export function SiteHeader() {
 
           {authed ? (
             <>
+              {isStaff && (
+                <NextLink
+                  href="/admin"
+                  aria-label={t("adminLabel")}
+                  className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "hidden sm:inline-flex")}
+                >
+                  <Shield className="h-4 w-4" aria-hidden />
+                </NextLink>
+              )}
+              <Link
+                href="/profile"
+                aria-label={t("profileLabel")}
+                className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "hidden sm:inline-flex")}
+              >
+                <UserRound className="h-4 w-4" aria-hidden />
+              </Link>
               <Link href="/submit" className={cn(buttonVariants({ variant: "gradient", size: "sm" }), "hidden sm:inline-flex")}>
                 <Plus className="h-4 w-4" aria-hidden />
                 {t("publish")}
