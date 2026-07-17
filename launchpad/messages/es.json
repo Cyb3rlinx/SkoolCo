@@ -19,6 +19,8 @@
     "signup": "Crear cuenta",
     "openMenu": "Abrir menú",
     "closeMenu": "Cerrar menú",
+    "profileLabel": "Mi perfil",
+    "adminLabel": "Panel de administración",
     "mainNav": "Principal",
     "mobileNav": "Principal móvil"
   },

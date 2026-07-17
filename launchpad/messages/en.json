@@ -19,6 +19,8 @@
     "signup": "Sign up",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
+    "profileLabel": "My profile",
+    "adminLabel": "Admin panel",
     "mainNav": "Main",
     "mobileNav": "Mobile main"
   },

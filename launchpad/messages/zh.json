@@ -19,6 +19,8 @@
     "signup": "注册",
     "openMenu": "打开菜单",
     "closeMenu": "关闭菜单",
+    "profileLabel": "我的主页",
+    "adminLabel": "管理后台",
     "mainNav": "主导航",
     "mobileNav": "移动端主导航"
   },
