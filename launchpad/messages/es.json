@@ -180,5 +180,55 @@
       "terms": "Al crear tu cuenta aceptas participar con respeto: la comunidad se modera activamente.",
       "errorGeneric": "No pudimos crear tu cuenta. Intenta de nuevo."
     }
+  },
+  "legal": {
+    "lastUpdated": "Última actualización:",
+    "about": {
+      "metaTitle": "Acerca de",
+      "metaDescription": "Denveler es la plataforma donde nacen nuevos productos y los creadores se conectan. Operada por Studio Monk OÜ.",
+      "pageTitle": "Acerca de Denveler",
+      "updated": "16 de julio de 2026"
+    },
+    "rules": {
+      "metaTitle": "Normas de la comunidad",
+      "metaDescription": "Las reglas que mantienen a Denveler útil, honesto y humano.",
+      "pageTitle": "Normas de la comunidad",
+      "updated": "13 de julio de 2026"
+    },
+    "privacy": {
+      "metaTitle": "Política de privacidad",
+      "metaDescription": "Qué datos recoge Denveler, para qué se usan y qué control tienes sobre ellos.",
+      "pageTitle": "Política de privacidad",
+      "updated": "13 de julio de 2026"
+    },
+    "terms": {
+      "metaTitle": "Términos de uso",
+      "metaDescription": "Las reglas de uso de Denveler, claras y sin letra pequeña.",
+      "pageTitle": "Términos de uso",
+      "updated": "13 de julio de 2026"
+    }
+  },
+  "contact": {
+    "metaTitle": "Contacto",
+    "metaDescription": "Escríbenos: dudas, feedback, prensa o cualquier cosa sobre Denveler.",
+    "title": "Contacto",
+    "intro1": "¿Dudas, feedback, prensa o una idea para mejorar Denveler? Escríbenos y te respondemos al correo que dejes. Si tu tema es sobre un producto o comentario específico, también puedes usar el botón",
+    "reportWord": "Reportar",
+    "intro2": "en la página del producto.",
+    "directTitle": "Contacto directo",
+    "directBody": "¿Prefieres escribirnos directamente? El equipo detrás de Denveler:",
+    "form": {
+      "name": "Tu nombre",
+      "namePlaceholder": "¿Cómo te llamas?",
+      "email": "Tu email",
+      "emailPlaceholder": "para poder responderte",
+      "message": "Mensaje",
+      "messagePlaceholder": "Cuéntanos en qué te podemos ayudar…",
+      "send": "Enviar mensaje",
+      "sending": "Enviando…",
+      "success": "¡Mensaje enviado! Te responderemos al correo que dejaste, normalmente dentro de 1–2 días hábiles.",
+      "errorTooShort": "Cuéntanos un poco más (mínimo 10 caracteres).",
+      "errorGeneric": "No se pudo enviar el mensaje."
+    }
   }
 }

@@ -180,5 +180,55 @@
       "terms": "By creating your account you agree to participate respectfully: the community is actively moderated.",
       "errorGeneric": "We couldn't create your account. Please try again."
     }
+  },
+  "legal": {
+    "lastUpdated": "Last updated:",
+    "about": {
+      "metaTitle": "About",
+      "metaDescription": "Denveler is the platform where new products are born and creators connect. Operated by Studio Monk OÜ.",
+      "pageTitle": "About Denveler",
+      "updated": "July 16, 2026"
+    },
+    "rules": {
+      "metaTitle": "Community guidelines",
+      "metaDescription": "The rules that keep Denveler useful, honest, and human.",
+      "pageTitle": "Community guidelines",
+      "updated": "July 13, 2026"
+    },
+    "privacy": {
+      "metaTitle": "Privacy policy",
+      "metaDescription": "What data Denveler collects, what it's used for, and what control you have over it.",
+      "pageTitle": "Privacy policy",
+      "updated": "July 13, 2026"
+    },
+    "terms": {
+      "metaTitle": "Terms of use",
+      "metaDescription": "Denveler's rules of use, clear and with no fine print.",
+      "pageTitle": "Terms of use",
+      "updated": "July 13, 2026"
+    }
+  },
+  "contact": {
+    "metaTitle": "Contact",
+    "metaDescription": "Write to us: questions, feedback, press, or anything about Denveler.",
+    "title": "Contact",
+    "intro1": "Questions, feedback, press, or an idea to improve Denveler? Write to us and we'll reply to the email you leave. If it's about a specific product or comment, you can also use the",
+    "reportWord": "Report",
+    "intro2": "button on the product page.",
+    "directTitle": "Direct contact",
+    "directBody": "Prefer to write to us directly? The team behind Denveler:",
+    "form": {
+      "name": "Your name",
+      "namePlaceholder": "What's your name?",
+      "email": "Your email",
+      "emailPlaceholder": "so we can reply to you",
+      "message": "Message",
+      "messagePlaceholder": "Tell us how we can help…",
+      "send": "Send message",
+      "sending": "Sending…",
+      "success": "Message sent! We'll reply to the email you left, usually within 1–2 business days.",
+      "errorTooShort": "Tell us a bit more (minimum 10 characters).",
+      "errorGeneric": "We couldn't send the message."
+    }
   }
 }
