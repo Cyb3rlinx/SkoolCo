@@ -1,14 +1,16 @@
-import Link from "next/link";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/frontend/utils";
 
 /** Brand mark: Denveler icon + wordmark (cyan → blue gradient, matches brand assets). */
 export function Logo({ withText = true, className }: { withText?: boolean; className?: string }) {
+  const t = useTranslations("common");
   return (
     <Link
       href="/"
       className={cn("flex items-center gap-2 focus-visible:outline-none", className)}
-      aria-label="Denveler — inicio"
+      aria-label={t("logoHome")}
     >
       <Image
         src="/denveler-mark-64.png"

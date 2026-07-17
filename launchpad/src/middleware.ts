@@ -1,4 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
+import createMiddleware from "next-intl/middleware";
+import { routing } from "./i18n/routing";
+
+const intlMiddleware = createMiddleware(routing);
 
 const SECURITY_HEADERS: Record<string, string> = {
   "X-Frame-Options": "DENY",
@@ -35,7 +39,11 @@ export function middleware(req: NextRequest) {
     return res;
   }
 
-  const res = NextResponse.next();
+  // API routes and the admin panel stay outside next-intl's locale routing
+  // (admin is Spanish-only and out of scope for this pass; API responses
+  // never carry a locale prefix).
+  const skipIntl = pathname.startsWith("/api") || pathname.startsWith("/admin");
+  const res = skipIntl ? NextResponse.next() : intlMiddleware(req);
   if (allowed) applyCors(res, origin!);
   applySecurity(res);
   return res;

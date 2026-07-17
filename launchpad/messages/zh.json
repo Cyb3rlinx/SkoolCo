@@ -1,0 +1,184 @@
+{
+  "metadata": {
+    "title": "Denveler — 与社区一起发布你的产品",
+    "description": "由社区驱动的产品发布平台：发布你的项目，获得真实的投票和反馈，赢得关注。"
+  },
+  "nav": {
+    "launches": "发布广场",
+    "leaderboard": "排行榜",
+    "extension": "浏览器插件",
+    "resources": "资源",
+    "searchPlaceholder": "搜索产品…",
+    "searchLabel": "搜索产品",
+    "publish": "发布",
+    "publishProduct": "发布产品",
+    "login": "登录",
+    "loginFull": "登录",
+    "signup": "注册",
+    "openMenu": "打开菜单",
+    "closeMenu": "关闭菜单",
+    "mainNav": "主导航",
+    "mobileNav": "移动端主导航"
+  },
+  "footer": {
+    "tagline": "在这里，社区支持真实的产品。真实的投票、有用的反馈，从第一天起就有曝光度。",
+    "columnPlatform": "平台",
+    "columnCommunity": "社区",
+    "columnResources": "资源",
+    "columnCompany": "公司",
+    "launches": "发布广场",
+    "leaderboard": "排行榜",
+    "extension": "浏览器插件",
+    "submit": "发布产品",
+    "howItWorks": "运作方式",
+    "makers": "创作者",
+    "rules": "社区规范",
+    "news": "动态",
+    "guides": "指南",
+    "help": "帮助中心",
+    "contact": "联系我们",
+    "apiDocs": "开发者 API",
+    "about": "关于我们",
+    "privacy": "隐私政策",
+    "terms": "使用条款",
+    "copyright": "由社区用心打造，为社区而生。© {year} Denveler。",
+    "mvpNote": "MVP 版本 — 欢迎反馈 💜"
+  },
+  "common": {
+    "votes": "票",
+    "comments": "条评论",
+    "retry": "重试",
+    "somethingWrong": "出错了",
+    "loading": "加载中…",
+    "logoHome": "Denveler — 首页",
+    "optional": "选填"
+  },
+  "notFound": {
+    "eyebrow": "错误 404",
+    "title": "这个页面已经发射升空了",
+    "description": "链接不存在，或内容已不可用。我们带你回到有热度的地方吧。",
+    "home": "返回首页",
+    "launches": "查看发布广场"
+  },
+  "userMenu": {
+    "userMenu": "用户菜单",
+    "defaultName": "用户",
+    "myProfile": "我的主页",
+    "publishProduct": "发布产品",
+    "adminPanel": "管理后台",
+    "signOut": "退出登录"
+  },
+  "notifications": {
+    "title": "通知",
+    "markRead": "标记为已读",
+    "loading": "加载中…",
+    "loadError": "无法加载你的通知。",
+    "empty": "暂时还没有通知。当有人为你的发布投票或评论时，会在这里显示。🔔",
+    "unread": "未读",
+    "upvoted": "投票支持了你的产品",
+    "commentedOn": "评论了",
+    "bellLabel": "通知",
+    "bellLabelUnread": "通知（{count} 条未读）"
+  },
+  "home": {
+    "hero": {
+      "badge": "由真实用户驱动，而非算法",
+      "titleLead": "让你的社区成为",
+      "titleHighlight": "产品发布的推动引擎。",
+      "subtitle": "发布你的产品，获得真实的投票、有用的反馈，从第一天起就赢得关注。",
+      "ctaPrimary": "发布我的产品",
+      "ctaSecondary": "浏览发布广场",
+      "topCommunity": "社区排行榜",
+      "viewFullRanking": "查看完整排行榜",
+      "trendingNow": "当前热门",
+      "trendingBlurb": "整理你的时间，把精力集中在重要的事情上。",
+      "recentActivity": "近期动态",
+      "viewAllActivity": "查看全部动态",
+      "communityMomentum": "社区热度",
+      "thisWeek": "本周",
+      "newVotes": "新增投票",
+      "votesCount": "{count} 票",
+      "vsLastWeek": "较上周 +{percent}%",
+      "trendUp": "上升",
+      "trendDown": "下降"
+    },
+    "stats": {
+      "productsLaunched": "已发布产品",
+      "activeMakers": "活跃创作者",
+      "realVotes": "真实用户投票",
+      "activeCommunity": "全天候活跃社区"
+    },
+    "featured": {
+      "title": "精选发布",
+      "viewAll": "查看全部发布",
+      "topOfDay": "今日榜首发布",
+      "votesCount": "{count} 票"
+    },
+    "howItWorks": {
+      "title": "运作方式",
+      "step1Title": "发布你的项目",
+      "step1Body": "介绍你的产品，说明它解决的问题，并与社区分享。",
+      "step2Title": "获得投票与反馈",
+      "step2Body": "社区成员发现你的产品，为它投票并留下有用的评论。",
+      "step3Title": "赢得关注",
+      "step3Body": "最优秀的发布会登上排行榜，触达更多创作者。"
+    },
+    "extensionBanner": {
+      "badge": "社区专属浏览器插件",
+      "title": "为你的 Skool 社区成就喝彩",
+      "body": "发现公开的成就动态，更快打开它们，并直接通过 Denveler 送上真实的支持。没有自动化，没有机器人，不违反平台规则。",
+      "guarantee1": "仅限公开动态",
+      "guarantee2": "无自动化操作",
+      "guarantee3": "遵守 Skool 规则",
+      "cta": "了解该插件",
+      "mockChrome": "插件 · 成就",
+      "mockPanelTitle": "成就",
+      "mockPanelSubtitle": "在你同意的前提下支持你的社区",
+      "mockAchievement1": "用户数突破 100 了！🎉",
+      "mockMeta1": "Skool · 1 小时前",
+      "mockAchievement2": "签下了第一个客户",
+      "mockMeta2": "Skool · 3 小时前",
+      "mockOpenPanel": "打开面板"
+    },
+    "cta": {
+      "creatorTitle": "你是创作者吗？",
+      "creatorBody": "发布你的项目，与社区共同成长，获得帮助你打磨产品的真实反馈。",
+      "creatorCta": "立即发布",
+      "memberTitle": "你是社区成员吗？",
+      "memberBody": "发现精彩的项目，为喜欢的产品投票，从一开始就助力它们成长。",
+      "memberCta": "浏览并投票"
+    }
+  },
+  "auth": {
+    "login": {
+      "metaTitle": "登录",
+      "title": "欢迎回来 👋",
+      "subtitle": "登录后即可投票、评论并发布你的产品。",
+      "noAccount": "第一次来这里？",
+      "createAccount": "创建账户",
+      "email": "邮箱",
+      "password": "密码",
+      "submit": "登录",
+      "submitting": "正在登录…",
+      "forgotPassword": "忘记密码了？",
+      "errorSuspended": "你的账户已被暂停。",
+      "errorInvalid": "邮箱或密码不正确，请检查后重试。"
+    },
+    "signup": {
+      "metaTitle": "注册",
+      "title": "加入社区",
+      "subtitle": "发布你的项目，支持其他创作者，赢得关注。",
+      "hasAccount": "已经有账户了？",
+      "logIn": "登录",
+      "name": "姓名",
+      "nameHint": "社区成员将以此称呼你。",
+      "email": "邮箱",
+      "password": "密码",
+      "passwordHint": "至少 8 个字符。我们会拒绝在已知数据泄露事件中出现过的密码。",
+      "submit": "创建账户",
+      "submitting": "正在创建账户…",
+      "terms": "创建账户即表示你同意以尊重的态度参与：本社区实行积极管理。",
+      "errorGeneric": "无法创建你的账户，请重试。"
+    }
+  }
+}

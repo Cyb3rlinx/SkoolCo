@@ -1,8 +1,9 @@
-import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 import { ArrowRight, ChevronUp, MessageCircle, Star } from "lucide-react";
 import { cn } from "@/lib/frontend/utils";
+import { Link } from "@/i18n/navigation";
 import { Sparkline } from "./sparkline";
-import { FEATURED_LAUNCH, LAUNCHES, type LaunchItem } from "./data";
+import { getFeaturedLaunch, getLaunches, type LandingLocale, type LaunchItem } from "./data";
 
 function ProductTile({ item, size = "md" }: { item: LaunchItem; size?: "md" | "lg" }) {
   return (
@@ -19,11 +20,11 @@ function ProductTile({ item, size = "md" }: { item: LaunchItem; size?: "md" | "l
   );
 }
 
-function VoteButton({ votes }: { votes: number }) {
+function VoteButton({ votes, label }: { votes: number; label: string }) {
   return (
     <span
       className="inline-flex items-center gap-1.5 rounded-xl border bg-white px-3.5 py-2 text-sm font-bold text-primary shadow-soft transition-all duration-200 group-hover:-translate-y-0.5 group-hover:border-primary/30 group-hover:shadow-lift"
-      aria-label={`${votes} votos`}
+      aria-label={label}
     >
       <ChevronUp className="h-4 w-4" aria-hidden />
       {votes}
@@ -32,18 +33,20 @@ function VoteButton({ votes }: { votes: number }) {
 }
 
 export function FeaturedLaunches() {
-  const f = FEATURED_LAUNCH;
+  const t = useTranslations("home.featured");
+  const locale = useLocale() as LandingLocale;
+  const f = getFeaturedLaunch(locale);
+  const launches = getLaunches(locale);
+
   return (
     <section className="container-page py-16 lg:py-20">
       <div className="mb-8 flex items-end justify-between gap-4">
-        <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
-          Lanzamientos destacados
-        </h2>
+        <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl">{t("title")}</h2>
         <Link
           href="/launches"
           className="hidden shrink-0 items-center gap-1 text-sm font-semibold text-primary hover:underline sm:inline-flex"
         >
-          Ver todos los lanzamientos
+          {t("viewAll")}
           <ArrowRight className="h-4 w-4" aria-hidden />
         </Link>
       </div>
@@ -55,7 +58,7 @@ export function FeaturedLaunches() {
       >
         <span className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-accent-foreground">
           <Star className="h-3 w-3" aria-hidden />
-          Top lanzamiento del día
+          {t("topOfDay")}
         </span>
 
         <div className="mt-5 grid items-center gap-8 lg:grid-cols-[1fr_0.9fr]">
@@ -79,7 +82,7 @@ export function FeaturedLaunches() {
                 </span>
                 <span className="flex items-center gap-1 font-semibold text-muted-foreground">
                   <ChevronUp className="h-3.5 w-3.5 text-primary" aria-hidden />
-                  {f.votes} votos
+                  {t("votesCount", { count: f.votes })}
                 </span>
               </div>
             </div>
@@ -90,7 +93,7 @@ export function FeaturedLaunches() {
 
       {/* ------------------------------------------------------ Ranked rows */}
       <ul className="mt-4 space-y-3">
-        {LAUNCHES.map((item) => (
+        {launches.map((item) => (
           <li key={item.rank}>
             <Link
               href="/launches"
@@ -122,7 +125,7 @@ export function FeaturedLaunches() {
                 {item.comments}
               </span>
               <Sparkline data={item.spark} width={72} height={24} className="hidden h-6 w-[72px] xl:block" />
-              <VoteButton votes={item.votes} />
+              <VoteButton votes={item.votes} label={t("votesCount", { count: item.votes })} />
             </Link>
           </li>
         ))}
@@ -133,7 +136,7 @@ export function FeaturedLaunches() {
           href="/launches"
           className="flex items-center justify-center gap-1 rounded-xl border bg-white py-3 text-sm font-semibold"
         >
-          Ver todos los lanzamientos
+          {t("viewAll")}
           <ArrowRight className="h-4 w-4" aria-hidden />
         </Link>
       </div>

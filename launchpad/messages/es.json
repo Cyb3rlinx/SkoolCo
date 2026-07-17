@@ -1,0 +1,184 @@
+{
+  "metadata": {
+    "title": "Denveler — lanza tu producto con la comunidad",
+    "description": "La plataforma de lanzamientos impulsada por la comunidad: publica tu proyecto, recibe votos y feedback real, y gana visibilidad."
+  },
+  "nav": {
+    "launches": "Lanzamientos",
+    "leaderboard": "Ranking",
+    "extension": "Extensión",
+    "resources": "Recursos",
+    "searchPlaceholder": "Buscar productos…",
+    "searchLabel": "Buscar productos",
+    "publish": "Publicar",
+    "publishProduct": "Publicar producto",
+    "login": "Entrar",
+    "loginFull": "Iniciar sesión",
+    "signup": "Crear cuenta",
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú",
+    "mainNav": "Principal",
+    "mobileNav": "Principal móvil"
+  },
+  "footer": {
+    "tagline": "El lugar donde las comunidades apoyan productos reales. Votos honestos, feedback útil y visibilidad desde el día uno.",
+    "columnPlatform": "Plataforma",
+    "columnCommunity": "Comunidad",
+    "columnResources": "Recursos",
+    "columnCompany": "Compañía",
+    "launches": "Lanzamientos",
+    "leaderboard": "Ranking",
+    "extension": "Extensión",
+    "submit": "Publicar un producto",
+    "howItWorks": "Cómo funciona",
+    "makers": "Makers",
+    "rules": "Normas",
+    "news": "Novedades",
+    "guides": "Guías",
+    "help": "Centro de ayuda",
+    "contact": "Contacto",
+    "apiDocs": "API para desarrolladores",
+    "about": "Acerca de",
+    "privacy": "Privacidad",
+    "terms": "Términos",
+    "copyright": "Hecho con cariño por y para la comunidad. © {year} Denveler.",
+    "mvpNote": "MVP — feedback bienvenido 💜"
+  },
+  "common": {
+    "votes": "votos",
+    "comments": "comentarios",
+    "retry": "Reintentar",
+    "somethingWrong": "Algo salió mal",
+    "loading": "Cargando…",
+    "logoHome": "Denveler — inicio",
+    "optional": "Opcional"
+  },
+  "notFound": {
+    "eyebrow": "Error 404",
+    "title": "Esta página se fue de lanzamiento",
+    "description": "El enlace no existe o el contenido ya no está disponible. Volvamos a algo con tracción.",
+    "home": "Ir al inicio",
+    "launches": "Ver lanzamientos"
+  },
+  "userMenu": {
+    "userMenu": "Menú de usuario",
+    "defaultName": "Usuario",
+    "myProfile": "Mi perfil",
+    "publishProduct": "Publicar producto",
+    "adminPanel": "Panel de administración",
+    "signOut": "Cerrar sesión"
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "markRead": "Marcar leídas",
+    "loading": "Cargando…",
+    "loadError": "No pudimos cargar tus notificaciones.",
+    "empty": "Nada por aquí todavía. Cuando alguien vote o comente tus lanzamientos, lo verás acá. 🔔",
+    "unread": "Sin leer",
+    "upvoted": "votó tu producto",
+    "commentedOn": "comentó en",
+    "bellLabel": "Notificaciones",
+    "bellLabelUnread": "Notificaciones ({count} sin leer)"
+  },
+  "home": {
+    "hero": {
+      "badge": "Impulsado por personas reales, no por algoritmos",
+      "titleLead": "Convierte tu comunidad en el",
+      "titleHighlight": "motor de tu lanzamiento.",
+      "subtitle": "Publica tu producto, recibe votos honestos, feedback útil y tracción real desde el día uno.",
+      "ctaPrimary": "Publicar mi producto",
+      "ctaSecondary": "Explorar lanzamientos",
+      "topCommunity": "Top de la comunidad",
+      "viewFullRanking": "Ver ranking completo",
+      "trendingNow": "Tendencia ahora",
+      "trendingBlurb": "Organiza tu tiempo y enfoca tu energía en lo importante.",
+      "recentActivity": "Actividad reciente",
+      "viewAllActivity": "Ver toda la actividad",
+      "communityMomentum": "Momento de la comunidad",
+      "thisWeek": "Esta semana",
+      "newVotes": "nuevos votos",
+      "votesCount": "{count} votos",
+      "vsLastWeek": "{percent}% vs. semana pasada",
+      "trendUp": "Subiendo",
+      "trendDown": "Bajando"
+    },
+    "stats": {
+      "productsLaunched": "Productos lanzados",
+      "activeMakers": "Makers activos",
+      "realVotes": "Votos de personas reales",
+      "activeCommunity": "Comunidad activa"
+    },
+    "featured": {
+      "title": "Lanzamientos destacados",
+      "viewAll": "Ver todos los lanzamientos",
+      "topOfDay": "Top lanzamiento del día",
+      "votesCount": "{count} votos"
+    },
+    "howItWorks": {
+      "title": "Cómo funciona",
+      "step1Title": "Publica tu proyecto",
+      "step1Body": "Presenta tu producto, explica el problema que resuelve y compártelo con la comunidad.",
+      "step2Title": "Recibe votos y feedback",
+      "step2Body": "La comunidad descubre tu producto, lo vota y deja comentarios útiles.",
+      "step3Title": "Gana visibilidad",
+      "step3Body": "Los mejores lanzamientos suben en el ranking y llegan a más makers."
+    },
+    "extensionBanner": {
+      "badge": "Extensión para la comunidad",
+      "title": "Celebra los logros de tu comunidad de Skool",
+      "body": "Descubre publicaciones públicas de logros, ábrelas más rápido y participa con apoyo real desde Denveler. Sin automatización, sin bots, sin romper reglas.",
+      "guarantee1": "Solo posts públicos",
+      "guarantee2": "Sin automatización",
+      "guarantee3": "Respeta las reglas de Skool",
+      "cta": "Conocer la extensión",
+      "mockChrome": "Extensión · Logros",
+      "mockPanelTitle": "Logros",
+      "mockPanelSubtitle": "Apoya a tu comunidad, con tu permiso",
+      "mockAchievement1": "¡Llegué a 100 usuarios! 🎉",
+      "mockMeta1": "Skool · hace 1 h",
+      "mockAchievement2": "Cerré mi primer cliente",
+      "mockMeta2": "Skool · hace 3 h",
+      "mockOpenPanel": "Abrir panel"
+    },
+    "cta": {
+      "creatorTitle": "¿Eres creador?",
+      "creatorBody": "Publica tu proyecto, gana con la comunidad y recibe feedback que te ayudará a construir la mejor versión.",
+      "creatorCta": "Publicar ahora",
+      "memberTitle": "¿Miembro de la comunidad?",
+      "memberBody": "Descubre proyectos increíbles, vota los que te gustan y ayúdalos a crecer desde el inicio.",
+      "memberCta": "Explorar y votar"
+    }
+  },
+  "auth": {
+    "login": {
+      "metaTitle": "Iniciar sesión",
+      "title": "Hola de nuevo 👋",
+      "subtitle": "Entra para votar, comentar y lanzar tus productos.",
+      "noAccount": "¿Primera vez por aquí?",
+      "createAccount": "Crea tu cuenta",
+      "email": "Email",
+      "password": "Contraseña",
+      "submit": "Iniciar sesión",
+      "submitting": "Entrando…",
+      "forgotPassword": "¿Olvidaste tu contraseña?",
+      "errorSuspended": "Tu cuenta está suspendida.",
+      "errorInvalid": "Email o contraseña incorrectos. Revisa e intenta de nuevo."
+    },
+    "signup": {
+      "metaTitle": "Crear cuenta",
+      "title": "Únete a la comunidad",
+      "subtitle": "Lanza tus proyectos, apoya a otros makers y gana visibilidad.",
+      "hasAccount": "¿Ya tienes cuenta?",
+      "logIn": "Inicia sesión",
+      "name": "Nombre",
+      "nameHint": "Así te verá la comunidad.",
+      "email": "Email",
+      "password": "Contraseña",
+      "passwordHint": "Mínimo 8 caracteres. Rechazamos contraseñas filtradas en brechas conocidas.",
+      "submit": "Crear cuenta",
+      "submitting": "Creando cuenta…",
+      "terms": "Al crear tu cuenta aceptas participar con respeto: la comunidad se modera activamente.",
+      "errorGeneric": "No pudimos crear tu cuenta. Intenta de nuevo."
+    }
+  }
+}

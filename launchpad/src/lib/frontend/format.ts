@@ -1,14 +1,19 @@
-/** Date/number formatting helpers (es-locale UI). */
+/** Date/number formatting helpers. Default to `es` for backward compat with
+ * call sites that don't pass a locale (e.g. the admin panel, out of scope
+ * for i18n); pass the current locale (from `useLocale()`) anywhere the UI
+ * is translated. */
 
-const dateFmt = new Intl.DateTimeFormat("es", { day: "numeric", month: "long", year: "numeric" });
-const shortDateFmt = new Intl.DateTimeFormat("es", { day: "numeric", month: "short" });
+const BCP47: Record<string, string> = { zh: "zh-CN" };
+const toBcp47 = (locale: string) => BCP47[locale] ?? locale;
 
-export function formatDate(value: string | Date): string {
-  return dateFmt.format(new Date(value));
+export function formatDate(value: string | Date, locale: string = "es"): string {
+  return new Intl.DateTimeFormat(toBcp47(locale), { day: "numeric", month: "long", year: "numeric" }).format(
+    new Date(value)
+  );
 }
 
-export function formatShortDate(value: string | Date): string {
-  return shortDateFmt.format(new Date(value));
+export function formatShortDate(value: string | Date, locale: string = "es"): string {
+  return new Intl.DateTimeFormat(toBcp47(locale), { day: "numeric", month: "short" }).format(new Date(value));
 }
 
 export function isToday(value: string | Date): boolean {
@@ -25,9 +30,9 @@ export function isFuture(value: string | Date): boolean {
   return new Date(value).getTime() > Date.now();
 }
 
-/** "hace 3 h", "hace 2 días", "ayer"… */
-export function timeAgo(value: string | Date): string {
-  const rtf = new Intl.RelativeTimeFormat("es", { numeric: "auto" });
+/** "hace 3 h", "3 hours ago", "3小时前"… */
+export function timeAgo(value: string | Date, locale: string = "es"): string {
+  const rtf = new Intl.RelativeTimeFormat(toBcp47(locale), { numeric: "auto" });
   const diffMs = new Date(value).getTime() - Date.now();
   const diffSec = Math.round(diffMs / 1000);
   const abs = Math.abs(diffSec);
@@ -35,11 +40,11 @@ export function timeAgo(value: string | Date): string {
   if (abs < 3600) return rtf.format(Math.round(diffSec / 60), "minute");
   if (abs < 86400) return rtf.format(Math.round(diffSec / 3600), "hour");
   if (abs < 86400 * 30) return rtf.format(Math.round(diffSec / 86400), "day");
-  return formatDate(value);
+  return formatDate(value, locale);
 }
 
-export function compactNumber(n: number): string {
-  return new Intl.NumberFormat("es", { notation: "compact" }).format(n);
+export function compactNumber(n: number, locale: string = "es"): string {
+  return new Intl.NumberFormat(toBcp47(locale), { notation: "compact" }).format(n);
 }
 
 /** yyyy-MM-dd for <input type="date"> values. */

@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { signIn } from "next-auth/react";
 import { registerUser } from "@/lib/frontend/api-client";
 import { ApiClientError } from "@/lib/frontend/api-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert } from "@/components/ui/alert";
+import { useRouter } from "@/i18n/navigation";
 import { Field } from "./field";
 
 type FieldErrors = Partial<Record<"name" | "email" | "password", string>>;
@@ -18,6 +19,7 @@ type FieldErrors = Partial<Record<"name" | "email" | "password", string>>;
  * (HaveIBeenPwned) — that error surfaces here as a normal message.
  */
 export function SignupForm({ next }: { next?: string }) {
+  const t = useTranslations("auth.signup");
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -38,6 +40,8 @@ export function SignupForm({ next }: { next?: string }) {
       setSubmitting(false);
       if (err instanceof ApiClientError) {
         // Zod validation errors arrive as { field: [messages] } in details.
+        // Those messages come from the backend and are out of scope for
+        // this translation pass (see api-client / API route validators).
         const details = err.details as Record<string, string[]> | undefined;
         if (err.status === 400 && details) {
           setFieldErrors({
@@ -48,7 +52,7 @@ export function SignupForm({ next }: { next?: string }) {
         }
         setError(err.message);
       } else {
-        setError("No pudimos crear tu cuenta. Intenta de nuevo.");
+        setError(t("errorGeneric"));
       }
       return;
     }
@@ -69,7 +73,7 @@ export function SignupForm({ next }: { next?: string }) {
 
   return (
     <form onSubmit={onSubmit} className="space-y-4" noValidate>
-      <Field id="signup-name" label="Nombre" error={fieldErrors.name} hint="Así te verá la comunidad.">
+      <Field id="signup-name" label={t("name")} error={fieldErrors.name} hint={t("nameHint")}>
         <Input
           id="signup-name"
           autoComplete="name"
@@ -82,7 +86,7 @@ export function SignupForm({ next }: { next?: string }) {
         />
       </Field>
 
-      <Field id="signup-email" label="Email" error={fieldErrors.email}>
+      <Field id="signup-email" label={t("email")} error={fieldErrors.email}>
         <Input
           id="signup-email"
           type="email"
@@ -96,9 +100,9 @@ export function SignupForm({ next }: { next?: string }) {
 
       <Field
         id="signup-password"
-        label="Contraseña"
+        label={t("password")}
         error={fieldErrors.password}
-        hint="Mínimo 8 caracteres. Rechazamos contraseñas filtradas en brechas conocidas."
+        hint={t("passwordHint")}
       >
         <Input
           id="signup-password"
@@ -116,12 +120,10 @@ export function SignupForm({ next }: { next?: string }) {
       {error && <Alert variant="destructive">{error}</Alert>}
 
       <Button type="submit" variant="gradient" className="w-full" disabled={submitting}>
-        {submitting ? "Creando cuenta…" : "Crear cuenta"}
+        {submitting ? t("submitting") : t("submit")}
       </Button>
 
-      <p className="text-center text-xs text-muted-foreground">
-        Al crear tu cuenta aceptas participar con respeto: la comunidad se modera activamente.
-      </p>
+      <p className="text-center text-xs text-muted-foreground">{t("terms")}</p>
     </form>
   );
 }

@@ -1,30 +1,35 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname as useRawPathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
 import { Menu, Plus, Search, X } from "lucide-react";
 import { cn } from "@/lib/frontend/utils";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Logo } from "./logo";
 import { NotificationsBell } from "./notifications-bell";
 import { UserMenu } from "./user-menu";
-
-const NAV_LINKS = [
-  { href: "/launches", label: "Lanzamientos" },
-  { href: "/leaderboard", label: "Ranking" },
-  { href: "/extension", label: "Extensión" },
-  { href: "/#como-funciona", label: "Recursos" },
-];
+import { LanguageSwitcher } from "./language-switcher";
 
 export function SiteHeader() {
+  const t = useTranslations("nav");
   const pathname = usePathname();
+  const rawPathname = useRawPathname();
+  const isAdmin = rawPathname?.startsWith("/admin") ?? false;
   const router = useRouter();
   const { status } = useSession();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [query, setQuery] = useState("");
+
+  const NAV_LINKS = [
+    { href: "/launches", label: t("launches") },
+    { href: "/leaderboard", label: t("leaderboard") },
+    { href: "/extension", label: t("extension") },
+    { href: "/#como-funciona", label: t("resources") },
+  ];
 
   function onSearch(e: FormEvent) {
     e.preventDefault();
@@ -58,7 +63,7 @@ export function SiteHeader() {
         <Logo />
 
         {/* Desktop nav */}
-        <nav className="ml-4 hidden items-center gap-1 md:flex" aria-label="Principal">
+        <nav className="ml-4 hidden items-center gap-1 md:flex" aria-label={t("mainNav")}>
           {NAV_LINKS.map((l) => navLink(l.href, l.label))}
         </nav>
 
@@ -71,20 +76,21 @@ export function SiteHeader() {
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Buscar productos…"
-            aria-label="Buscar productos"
+            placeholder={t("searchPlaceholder")}
+            aria-label={t("searchLabel")}
             className="h-9 pl-9"
           />
         </form>
 
         <div className="ml-auto flex items-center gap-1.5 lg:ml-0">
+          {!isAdmin && <LanguageSwitcher className="hidden sm:flex" />}
           <NotificationsBell />
 
           {authed ? (
             <>
               <Link href="/submit" className={cn(buttonVariants({ variant: "gradient", size: "sm" }), "hidden sm:inline-flex")}>
                 <Plus className="h-4 w-4" aria-hidden />
-                Publicar
+                {t("publish")}
               </Link>
               <UserMenu />
             </>
@@ -94,10 +100,10 @@ export function SiteHeader() {
                 href="/login"
                 className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "hidden sm:inline-flex")}
               >
-                Entrar
+                {t("login")}
               </Link>
               <Link href="/signup" className={cn(buttonVariants({ variant: "gradient", size: "sm" }), "hidden sm:inline-flex")}>
-                Crear cuenta
+                {t("signup")}
               </Link>
             </>
           )}
@@ -107,7 +113,7 @@ export function SiteHeader() {
             variant="ghost"
             size="icon"
             className="md:hidden"
-            aria-label={mobileOpen ? "Cerrar menú" : "Abrir menú"}
+            aria-label={mobileOpen ? t("closeMenu") : t("openMenu")}
             aria-expanded={mobileOpen}
             onClick={() => setMobileOpen((o) => !o)}
           >
@@ -128,14 +134,15 @@ export function SiteHeader() {
               <Input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Buscar productos…"
-                aria-label="Buscar productos"
+                placeholder={t("searchPlaceholder")}
+                aria-label={t("searchLabel")}
                 className="pl-9"
               />
             </form>
-            <nav className="flex flex-col" aria-label="Principal móvil">
+            <nav className="flex flex-col" aria-label={t("mobileNav")}>
               {NAV_LINKS.map((l) => navLink(l.href, l.label))}
             </nav>
+            {!isAdmin && <LanguageSwitcher className="self-start" />}
             <div className="flex flex-col gap-2 border-t pt-3">
               {authed ? (
                 <Link
@@ -144,7 +151,7 @@ export function SiteHeader() {
                   className={buttonVariants({ variant: "gradient" })}
                 >
                   <Plus className="h-4 w-4" aria-hidden />
-                  Publicar producto
+                  {t("publishProduct")}
                 </Link>
               ) : (
                 <>
@@ -153,14 +160,14 @@ export function SiteHeader() {
                     onClick={() => setMobileOpen(false)}
                     className={buttonVariants({ variant: "gradient" })}
                   >
-                    Crear cuenta
+                    {t("signup")}
                   </Link>
                   <Link
                     href="/login"
                     onClick={() => setMobileOpen(false)}
                     className={buttonVariants({ variant: "outline" })}
                   >
-                    Iniciar sesión
+                    {t("loginFull")}
                   </Link>
                 </>
               )}
