@@ -247,21 +247,21 @@ export const mockCommentsByProduct: Record<string, CommentItem[]> = {
       body: "Congrats on the launch! The adaptive scheduling is a great idea.",
       createdAt: daysAgo(2),
       updatedAt: daysAgo(2),
-      user: users.luis,
+      user: { ...users.luis, badges: [] },
     },
     {
       id: "mock_cm_2",
       body: "Been beta testing this for two weeks — genuinely helps.",
       createdAt: daysAgo(2),
       updatedAt: daysAgo(2),
-      user: users.mod,
+      user: { ...users.mod, badges: [] },
     },
     {
       id: "mock_cm_3",
       body: "How does it decide when I'm at my best? Calendar history or manual input?",
       createdAt: daysAgo(1),
       updatedAt: daysAgo(1),
-      user: users.marco,
+      user: { ...users.marco, badges: [] },
     },
   ],
   schemapeek: [
@@ -270,14 +270,14 @@ export const mockCommentsByProduct: Record<string, CommentItem[]> = {
       body: "The ER diagrams look super clean. Does it support Postgres views?",
       createdAt: hoursAgo(3),
       updatedAt: hoursAgo(3),
-      user: users.ana,
+      user: { ...users.ana, badges: [] },
     },
     {
       id: "mock_cm_5",
       body: "Tried it on our staging DB — the index suggestions alone are worth it.",
       createdAt: hoursAgo(1),
       updatedAt: hoursAgo(1),
-      user: users.sofia,
+      user: { ...users.sofia, badges: [] },
     },
   ],
   meetinglite: [
@@ -286,7 +286,7 @@ export const mockCommentsByProduct: Record<string, CommentItem[]> = {
       body: "The per-topic timer changed our standups. Great launch!",
       createdAt: daysAgo(1),
       updatedAt: daysAgo(1),
-      user: users.luis,
+      user: { ...users.luis, badges: [] },
     },
   ],
   apiwatch: [
@@ -295,7 +295,7 @@ export const mockCommentsByProduct: Record<string, CommentItem[]> = {
       body: "Schema-contract alerts are something I didn't know I needed.",
       createdAt: daysAgo(4),
       updatedAt: daysAgo(4),
-      user: users.ana,
+      user: { ...users.ana, badges: [] },
     },
   ],
   lingualoop: [
@@ -304,7 +304,7 @@ export const mockCommentsByProduct: Record<string, CommentItem[]> = {
       body: "The streak with real news keeps me coming back. Nice touch.",
       createdAt: daysAgo(6),
       updatedAt: daysAgo(6),
-      user: users.mod,
+      user: { ...users.mod, badges: [] },
     },
   ],
 };
@@ -324,6 +324,7 @@ export const mockLeaderboard: LeaderboardEntry[] = [
 export const mockMe: MeProfile = {
   id: users.ana.id,
   name: users.ana.name,
+  username: "ana",
   email: "ana@example.com",
   avatarUrl: null,
   bio: "Indie hacker shipping weekly",

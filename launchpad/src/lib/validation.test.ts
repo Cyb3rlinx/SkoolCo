@@ -7,7 +7,32 @@ import {
   createProductSchema,
   createContactRequestSchema,
   adminUpdateUserSchema,
+  usernameSchema,
 } from "@/lib/validation";
+
+describe("usernameSchema", () => {
+  it("acepta un username válido", () => {
+    expect(usernameSchema.parse("willy-dev")).toBe("willy-dev");
+  });
+
+  it("normaliza a minúsculas", () => {
+    expect(usernameSchema.parse("Willy-Dev")).toBe("willy-dev");
+  });
+
+  it("rechaza menos de 3 caracteres", () => {
+    expect(usernameSchema.safeParse("ab").success).toBe(false);
+  });
+
+  it("rechaza caracteres fuera de [a-z0-9-]", () => {
+    expect(usernameSchema.safeParse("willy_dev").success).toBe(false);
+    expect(usernameSchema.safeParse("willy dev").success).toBe(false);
+  });
+
+  it("rechaza nombres reservados", () => {
+    expect(usernameSchema.safeParse("admin").success).toBe(false);
+    expect(usernameSchema.safeParse("DENVELER").success).toBe(false);
+  });
+});
 
 describe("password schemas", () => {
   it("forgot requires a valid email", () => {
