@@ -25,18 +25,27 @@ const STATIC_ROUTES = [
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = process.env.NEXTAUTH_URL ?? "https://denveler.com";
 
+  // .catch → []: el sitemap se prerenderiza en build; una tabla que aún no
+  // existe en prod (migración pendiente) o una BD caída no deben tumbar el
+  // deploy entero — solo omiten sus entradas.
   const [products, makers, collaborations] = await Promise.all([
-    prisma.product.findMany({
-      where: { status: "LIVE" },
-      select: { slug: true, updatedAt: true },
-    }),
-    prisma.user.findMany({
-      where: { products: { some: { status: "LIVE" } } },
-      select: { id: true },
-    }),
-    prisma.collaboration.findMany({
-      select: { id: true, updatedAt: true },
-    }),
+    prisma.product
+      .findMany({
+        where: { status: "LIVE" },
+        select: { slug: true, updatedAt: true },
+      })
+      .catch(() => []),
+    prisma.user
+      .findMany({
+        where: { products: { some: { status: "LIVE" } } },
+        select: { id: true },
+      })
+      .catch(() => []),
+    prisma.collaboration
+      .findMany({
+        select: { id: true, updatedAt: true },
+      })
+      .catch(() => []),
   ]);
 
   const staticEntries: MetadataRoute.Sitemap = STATIC_ROUTES.map((path) => ({
