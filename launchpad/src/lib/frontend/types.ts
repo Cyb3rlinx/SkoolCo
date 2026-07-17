@@ -39,6 +39,7 @@ export interface UserRef {
 export interface PublicUser {
   id: string;
   name: string;
+  username: string | null;
   avatarUrl: string | null;
   bio: string | null;
   createdAt: string;
@@ -49,6 +50,7 @@ export interface PublicUser {
 export interface MeProfile {
   id: string;
   name: string;
+  username: string | null;
   email: string;
   avatarUrl: string | null;
   bio: string | null;

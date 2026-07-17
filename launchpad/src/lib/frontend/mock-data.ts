@@ -324,6 +324,7 @@ export const mockLeaderboard: LeaderboardEntry[] = [
 export const mockMe: MeProfile = {
   id: users.ana.id,
   name: users.ana.name,
+  username: "ana",
   email: "ana@example.com",
   avatarUrl: null,
   bio: "Indie hacker shipping weekly",
