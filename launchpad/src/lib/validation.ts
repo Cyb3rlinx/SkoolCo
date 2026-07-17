@@ -76,7 +76,7 @@ export const listProductsQuerySchema = z.object({
   q: z.string().trim().min(1).max(100).optional(), // free-text search
   maker: z.string().trim().min(1).max(40).optional(), // "me" or a user id
   openToOffers: z.coerce.boolean().optional(), // ?openToOffers=true — solo productos abiertos a ofertas
-  sort: z.enum(["newest", "top", "launching"]).default("newest"),
+  sort: z.enum(["newest", "top", "launching", "trending"]).default("newest"),
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(50).default(20),
 });
@@ -87,7 +87,10 @@ export const listProductsQuerySchema = z.object({
 
 export const createCommentSchema = z.object({
   body: z.string().trim().min(1).max(2000),
+  parentId: z.string().min(1).optional(),
 });
+
+export const REPORT_CATEGORIES = ["SPAM", "SCAM", "INAPPROPRIATE", "OTHER"] as const;
 
 /** POST /api/products/:slug/updates — bitácora de progreso del maker. */
 export const createProductUpdateSchema = z.object({
@@ -99,6 +102,7 @@ export const createReportSchema = z
     productId: z.string().optional(),
     commentId: z.string().optional(),
     reason: z.string().trim().min(5).max(1000),
+    category: z.enum(REPORT_CATEGORIES).optional(),
   })
   .refine((v) => Boolean(v.productId) !== Boolean(v.commentId), {
     message: "Provide exactly one of productId or commentId",
@@ -192,9 +196,10 @@ export const adminUpdateUserSchema = z
   .object({
     role: z.enum(["USER", "MODERATOR", "ADMIN"]).optional(),
     suspended: z.boolean().optional(),
+    verified: z.boolean().optional(),
   })
-  .refine((v) => v.role !== undefined || v.suspended !== undefined, {
-    message: "Debes enviar al menos un cambio (role o suspended).",
+  .refine((v) => v.role !== undefined || v.suspended !== undefined || v.verified !== undefined, {
+    message: "Debes enviar al menos un cambio (role, suspended o verified).",
   });
 
 /** POST /api/admin/users/:id/badges — otorga una insignia del catálogo. */

@@ -35,6 +35,11 @@ export interface UserRef {
   avatarUrl: string | null;
 }
 
+/** UserRef plus maker-verification status (product maker, public profile). */
+export interface MakerRef extends UserRef {
+  verifiedAt: string | null;
+}
+
 /** GET /api/users/:id — public maker profile. */
 export interface PublicUser {
   id: string;
@@ -42,6 +47,7 @@ export interface PublicUser {
   username: string | null;
   avatarUrl: string | null;
   bio: string | null;
+  verifiedAt: string | null;
   createdAt: string;
   badges: UserBadgeItem[];
   _count: { products: number; upvotes: number; comments: number; followers: number };
@@ -89,7 +95,7 @@ export interface ProductListItem {
   openToOffers: boolean;
   soldAt: string | null;
   category: { id: string; name: string; slug: string };
-  maker: UserRef;
+  maker: MakerRef;
   _count: { upvotes: number; comments: number };
 }
 
@@ -104,6 +110,7 @@ export interface ProductDetail extends ProductListItem {
   description: string;
   updatedAt: string;
   upvotedByMe: boolean;
+  savedByMe?: boolean;
   /** Gallery screenshots (empty for older mocks). */
   images?: ProductImage[];
   /** Puente de compraventa — declarado por el maker, NO verificado. */
@@ -121,7 +128,7 @@ export interface ProductListQuery {
   q?: string;
   maker?: string; // "me" or a user id
   openToOffers?: boolean;
-  sort?: "newest" | "top" | "launching";
+  sort?: "newest" | "top" | "launching" | "trending";
   page?: number;
   pageSize?: number;
 }
@@ -161,7 +168,9 @@ export interface CommentItem {
   body: string;
   createdAt: string;
   updatedAt: string;
+  parentId: string | null;
   user: UserRef & { badges: { slug: string; icon: string; name: string }[] };
+  replies?: CommentItem[];
 }
 
 /** GET/POST /api/products/:slug/updates — bitácora de progreso del maker. */
@@ -175,6 +184,22 @@ export interface ProductUpdateItem {
 export interface UpvoteResult {
   upvoted: boolean;
   upvoteCount: number;
+}
+
+/** POST/DELETE /api/products/:slug/save */
+export interface SaveResult {
+  saved: boolean;
+}
+
+export interface InsightsBucket {
+  date: string;
+  count: number;
+}
+
+/** GET /api/products/:slug/insights — maker/staff only. */
+export interface ProductInsights {
+  upvotes: InsightsBucket[];
+  comments: InsightsBucket[];
 }
 
 // ---------------------------------------------------------------------------
@@ -217,11 +242,13 @@ export interface NotificationsPage extends Paginated<NotificationItem> {
 // ---------------------------------------------------------------------------
 
 export type ReportStatus = "OPEN" | "REVIEWING" | "RESOLVED" | "DISMISSED";
+export type ReportCategory = "SPAM" | "SCAM" | "INAPPROPRIATE" | "OTHER";
 
 /** Item shape of GET /api/reports (moderator/admin only). */
 export interface ModerationReportItem {
   id: string;
   reason: string;
+  category: ReportCategory;
   status: ReportStatus;
   createdAt: string;
   resolvedAt: string | null;
@@ -278,6 +305,7 @@ export interface AdminUserItem {
   role: "USER" | "MODERATOR" | "ADMIN";
   createdAt: string;
   suspendedAt: string | null;
+  verifiedAt: string | null;
   _count?: { products: number };
 }
 

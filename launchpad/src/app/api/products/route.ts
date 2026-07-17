@@ -6,6 +6,7 @@ import { createProductSchema, listProductsQuerySchema } from "@/lib/validation";
 import { uniqueProductSlug, productListSelect } from "@/lib/products";
 import { withErrorHandling, parseBody, ok, created, errorResponse } from "@/lib/api";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
+import { recentWindowStart, TRENDING_WINDOW_HOURS } from "@/lib/trending";
 import { detectSuspiciousContent } from "@/lib/auto-flag";
 
 /**
@@ -62,6 +63,38 @@ export const GET = withErrorHandling(async (req: Request) => {
       { tagline: { contains: query.q, mode: "insensitive" } },
       { description: { contains: query.q, mode: "insensitive" } },
     ];
+  }
+
+  // "Trending" no es expresable como un orderBy directo (necesita contar
+  // votos SOLO de la ventana reciente), así que se resuelve aparte:
+  // candidatos completos + conteo filtrado + orden en JS + paginación en memoria.
+  if (query.sort === "trending") {
+    const windowStart = recentWindowStart(new Date(), TRENDING_WINDOW_HOURS);
+    const candidates = await prisma.product.findMany({
+      where,
+      select: {
+        ...productListSelect,
+        _count: {
+          select: {
+            upvotes: { where: { createdAt: { gte: windowStart } } },
+            comments: true,
+          },
+        },
+      },
+      take: 500, // tope razonable para esta escala; evita un full-scan sin límite
+    });
+
+    const sorted = candidates.sort((a, b) => b._count.upvotes - a._count.upvotes);
+    const total = sorted.length;
+    const items = sorted.slice((query.page - 1) * query.pageSize, query.page * query.pageSize);
+
+    return ok({
+      items,
+      page: query.page,
+      pageSize: query.pageSize,
+      total,
+      totalPages: Math.ceil(total / query.pageSize),
+    });
   }
 
   const orderBy: Prisma.ProductOrderByWithRelationInput =

@@ -13,12 +13,15 @@ import { buttonVariants } from "@/components/ui/button";
 import { DemoBanner, EmptyState, ErrorState } from "@/components/ui/states";
 import { ProductLogo } from "@/components/product/product-logo";
 import { UpvoteButton } from "@/components/product/upvote-button";
+import { SaveButton } from "@/components/product/save-button";
 import { ProductGallery } from "@/components/product/product-gallery";
 import { CommentSection } from "@/components/product/comment-section";
 import { ProductUpdatesSection } from "@/components/product/product-updates-section";
 import { MakerCard } from "@/components/product/maker-card";
 import { OfferCard } from "@/components/product/offer-card";
 import { OfferSettings } from "@/components/product/offer-settings";
+import { InsightsSection } from "@/components/product/insights-section";
+import { RelaunchButton } from "@/components/product/relaunch-button";
 import { ChangeLogoButton } from "@/components/product/change-logo-button";
 import { EmbedBadgeCard } from "@/components/product/embed-badge-card";
 import { RelatedLaunches } from "@/components/product/related-launches";
@@ -133,13 +136,14 @@ export function ProductDetailClient({ slug }: { slug: string }) {
             )}
           </div>
         </div>
-        <div className="shrink-0 self-start sm:self-center">
+        <div className="flex shrink-0 items-start gap-2 self-start sm:items-center sm:self-center">
           <UpvoteButton
             slug={product.slug}
             count={product._count.upvotes}
             upvoted={product.upvotedByMe}
             variant="large"
           />
+          <SaveButton slug={product.slug} saved={product.savedByMe} />
         </div>
       </div>
 
@@ -173,6 +177,8 @@ export function ProductDetailClient({ slug }: { slug: string }) {
         <aside className="space-y-6">
           <MakerCard maker={product.maker} />
 
+          <RelaunchButton slug={product.slug} makerId={product.maker.id} status={product.status} />
+
           <OfferCard
             slug={product.slug}
             makerId={product.maker.id}
@@ -192,6 +198,8 @@ export function ProductDetailClient({ slug }: { slug: string }) {
             soldAt={product.soldAt}
             onUpdated={refetch}
           />
+
+          <InsightsSection slug={product.slug} makerId={product.maker.id} />
 
           <Card>
             <CardContent className="space-y-3 p-5 text-sm">

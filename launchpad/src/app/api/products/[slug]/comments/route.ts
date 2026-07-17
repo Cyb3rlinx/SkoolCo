@@ -16,6 +16,7 @@ const commentSelect = {
   body: true,
   createdAt: true,
   updatedAt: true,
+  parentId: true,
   user: {
     select: {
       id: true,
@@ -29,6 +30,15 @@ const commentSelect = {
   },
 } as const;
 
+const replySelect = {
+  ...commentSelect,
+  replies: {
+    where: { deletedAt: null },
+    orderBy: { createdAt: "asc" as const },
+    select: commentSelect,
+  },
+};
+
 const BADGE_PRIORITY = ["fundador", "vendido", "top-10-mes", "primer-lanzamiento"];
 
 interface RawComment {
@@ -36,24 +46,49 @@ interface RawComment {
   body: string;
   createdAt: Date;
   updatedAt: Date;
+  parentId: string | null;
   user: {
     id: string;
     name: string;
     avatarUrl: string | null;
     badges: { badge: { slug: string; icon: string; name: string } }[];
   };
+  replies?: RawComment[];
+}
+
+interface CommentDto {
+  id: string;
+  body: string;
+  createdAt: Date;
+  updatedAt: Date;
+  parentId: string | null;
+  user: {
+    id: string;
+    name: string;
+    avatarUrl: string | null;
+    badges: { slug: string; icon: string; name: string }[];
+  };
+  replies?: CommentDto[];
 }
 
 /** Insignias del autor, ordenadas por prioridad y recortadas a 2 para no saturar el hilo. */
-function toCommentDto(c: RawComment) {
+function toCommentDto(c: RawComment): CommentDto {
   const badges = c.user.badges
     .map((ub) => ub.badge)
     .sort((a, b) => BADGE_PRIORITY.indexOf(a.slug) - BADGE_PRIORITY.indexOf(b.slug))
     .slice(0, 2);
-  return { ...c, user: { id: c.user.id, name: c.user.name, avatarUrl: c.user.avatarUrl, badges } };
+  return {
+    ...c,
+    user: { id: c.user.id, name: c.user.name, avatarUrl: c.user.avatarUrl, badges },
+    replies: c.replies?.map(toCommentDto),
+  };
 }
 
-/** GET /api/products/:idOrSlug/comments — newest first, soft-deleted hidden. */
+/**
+ * GET /api/products/:idOrSlug/comments — newest first, soft-deleted hidden.
+ * Pagination applies to top-level comments only; replies (one level deep)
+ * are nested under their parent and always returned in full.
+ */
 export const GET = withErrorHandling(async (req: Request, { params }: Params) => {
   const product = await findProduct(params.slug);
   const url = new URL(req.url);
@@ -62,13 +97,13 @@ export const GET = withErrorHandling(async (req: Request, { params }: Params) =>
 
   const [items, total] = await Promise.all([
     prisma.comment.findMany({
-      where: { productId: product.id, deletedAt: null },
+      where: { productId: product.id, deletedAt: null, parentId: null },
       orderBy: { createdAt: "desc" },
-      select: commentSelect,
+      select: replySelect,
       skip: (page - 1) * pageSize,
       take: pageSize,
     }),
-    prisma.comment.count({ where: { productId: product.id, deletedAt: null } }),
+    prisma.comment.count({ where: { productId: product.id, deletedAt: null, parentId: null } }),
   ]);
 
   return ok({
@@ -95,18 +130,27 @@ export const POST = withErrorHandling(async (req: Request, { params }: Params) =
 
   const input = await parseBody(req, createCommentSchema);
 
+  let parent: { id: string; userId: string; parentId: string | null } | null = null;
+  if (input.parentId) {
+    parent = await prisma.comment.findFirst({
+      where: { id: input.parentId, productId: product.id, deletedAt: null },
+      select: { id: true, userId: true, parentId: true },
+    });
+    if (!parent) throw new ApiError(404, "Parent comment not found");
+    if (parent.parentId) throw new ApiError(400, "Replies can only be one level deep");
+  }
+
   const comment = await prisma.comment.create({
-    data: { userId: user.id, productId: product.id, body: input.body },
+    data: { userId: user.id, productId: product.id, body: input.body, parentId: parent?.id ?? null },
     select: commentSelect,
   });
 
-  await notify({
-    userId: product.makerId,
-    actorId: user.id,
-    type: "COMMENT",
-    productId: product.id,
-    commentId: comment.id,
-  });
+  const recipients = new Set([product.makerId, ...(parent ? [parent.userId] : [])]);
+  await Promise.all(
+    [...recipients].map((userId) =>
+      notify({ userId, actorId: user.id, type: "COMMENT", productId: product.id, commentId: comment.id })
+    )
+  );
 
   // Auto-flagging: contenido evidentemente sospechoso entra directo a la cola
   // de moderación (reporterId null = generado por el sistema, no por un usuario).

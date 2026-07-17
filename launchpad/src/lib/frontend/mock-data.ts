@@ -12,6 +12,7 @@ import type {
   CommentItem,
   CommunityLink,
   LeaderboardEntry,
+  MakerRef,
   MeProfile,
   ModerationReportItem,
   NotificationItem,
@@ -30,12 +31,12 @@ const hoursAgo = (h: number) => new Date(now - h * 3_600_000).toISOString();
 // --- Users -----------------------------------------------------------------
 
 const users = {
-  ana: { id: "mock_u_ana", name: "Ana Maker", avatarUrl: null },
-  luis: { id: "mock_u_luis", name: "Luis Builder", avatarUrl: null },
-  sofia: { id: "mock_u_sofia", name: "Sofía Design", avatarUrl: null },
-  marco: { id: "mock_u_marco", name: "Marco Data", avatarUrl: null },
-  mod: { id: "mock_u_mod", name: "Morgan Mod", avatarUrl: null },
-} satisfies Record<string, UserRef>;
+  ana: { id: "mock_u_ana", name: "Ana Maker", avatarUrl: null, verifiedAt: daysAgo(30) },
+  luis: { id: "mock_u_luis", name: "Luis Builder", avatarUrl: null, verifiedAt: null },
+  sofia: { id: "mock_u_sofia", name: "Sofía Design", avatarUrl: null, verifiedAt: null },
+  marco: { id: "mock_u_marco", name: "Marco Data", avatarUrl: null, verifiedAt: null },
+  mod: { id: "mock_u_mod", name: "Morgan Mod", avatarUrl: null, verifiedAt: null },
+} satisfies Record<string, MakerRef>;
 
 // --- Categories --------------------------------------------------------------
 
@@ -60,7 +61,7 @@ interface MockProductInput {
   name: string;
   tagline: string;
   description: string;
-  maker: UserRef;
+  maker: MakerRef;
   category: ReturnType<typeof cat>;
   launchDate: string;
   upvotes: number;
@@ -213,7 +214,7 @@ export function paginate<T>(items: T[], page = 1, pageSize = 20): Paginated<T> {
 export function filterMockProducts(query: {
   q?: string;
   category?: string;
-  sort?: "newest" | "top" | "launching";
+  sort?: "newest" | "top" | "launching" | "trending";
   page?: number;
   pageSize?: number;
 } = {}): Paginated<ProductListItem> {
@@ -230,8 +231,11 @@ export function filterMockProducts(query: {
     );
   }
 
+  // Los mocks no tienen timestamps por voto individual, así que "trending"
+  // (votos recientes) se aproxima con "top" en modo demo — mejor esfuerzo
+  // razonable sin datos reales, no una simulación falsa de tendencia.
   const sorted = [...details].sort((a, b) =>
-    query.sort === "top"
+    query.sort === "top" || query.sort === "trending"
       ? b._count.upvotes - a._count.upvotes
       : new Date(b.launchDate).getTime() - new Date(a.launchDate).getTime()
   );
@@ -249,6 +253,7 @@ export const mockCommentsByProduct: Record<string, CommentItem[]> = {
       body: "Congrats on the launch! The adaptive scheduling is a great idea.",
       createdAt: daysAgo(2),
       updatedAt: daysAgo(2),
+      parentId: null,
       user: { ...users.luis, badges: [] },
     },
     {
@@ -256,6 +261,7 @@ export const mockCommentsByProduct: Record<string, CommentItem[]> = {
       body: "Been beta testing this for two weeks — genuinely helps.",
       createdAt: daysAgo(2),
       updatedAt: daysAgo(2),
+      parentId: null,
       user: { ...users.mod, badges: [] },
     },
     {
@@ -263,6 +269,7 @@ export const mockCommentsByProduct: Record<string, CommentItem[]> = {
       body: "How does it decide when I'm at my best? Calendar history or manual input?",
       createdAt: daysAgo(1),
       updatedAt: daysAgo(1),
+      parentId: null,
       user: { ...users.marco, badges: [] },
     },
   ],
@@ -272,6 +279,7 @@ export const mockCommentsByProduct: Record<string, CommentItem[]> = {
       body: "The ER diagrams look super clean. Does it support Postgres views?",
       createdAt: hoursAgo(3),
       updatedAt: hoursAgo(3),
+      parentId: null,
       user: { ...users.ana, badges: [] },
     },
     {
@@ -279,6 +287,7 @@ export const mockCommentsByProduct: Record<string, CommentItem[]> = {
       body: "Tried it on our staging DB — the index suggestions alone are worth it.",
       createdAt: hoursAgo(1),
       updatedAt: hoursAgo(1),
+      parentId: null,
       user: { ...users.sofia, badges: [] },
     },
   ],
@@ -288,6 +297,7 @@ export const mockCommentsByProduct: Record<string, CommentItem[]> = {
       body: "The per-topic timer changed our standups. Great launch!",
       createdAt: daysAgo(1),
       updatedAt: daysAgo(1),
+      parentId: null,
       user: { ...users.luis, badges: [] },
     },
   ],
@@ -297,6 +307,7 @@ export const mockCommentsByProduct: Record<string, CommentItem[]> = {
       body: "Schema-contract alerts are something I didn't know I needed.",
       createdAt: daysAgo(4),
       updatedAt: daysAgo(4),
+      parentId: null,
       user: { ...users.ana, badges: [] },
     },
   ],
@@ -306,6 +317,7 @@ export const mockCommentsByProduct: Record<string, CommentItem[]> = {
       body: "The streak with real news keeps me coming back. Nice touch.",
       createdAt: daysAgo(6),
       updatedAt: daysAgo(6),
+      parentId: null,
       user: { ...users.mod, badges: [] },
     },
   ],
@@ -382,6 +394,7 @@ export const mockReports: ModerationReportItem[] = [
   {
     id: "mock_r_1",
     reason: "Example report for testing the moderation queue.",
+    category: "OTHER",
     status: "OPEN",
     createdAt: daysAgo(1),
     resolvedAt: null,

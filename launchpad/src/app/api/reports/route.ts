@@ -39,8 +39,9 @@ export const POST = withErrorHandling(async (req: Request) => {
       productId: input.productId ?? null,
       commentId: input.commentId ?? null,
       reason: input.reason,
+      category: input.category ?? "OTHER",
     },
-    select: { id: true, status: true, createdAt: true },
+    select: { id: true, status: true, category: true, createdAt: true },
   });
 
   return created(report);
@@ -66,6 +67,7 @@ export const GET = withErrorHandling(async (req: Request) => {
     select: {
       id: true,
       reason: true,
+      category: true,
       status: true,
       createdAt: true,
       resolvedAt: true,

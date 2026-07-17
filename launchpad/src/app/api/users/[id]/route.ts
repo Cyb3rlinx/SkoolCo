@@ -23,6 +23,7 @@ export const GET = withErrorHandling(async (_req: Request, { params }: Params) =
       username: true,
       avatarUrl: true,
       bio: true,
+      verifiedAt: true,
       createdAt: true,
       badges: {
         select: {

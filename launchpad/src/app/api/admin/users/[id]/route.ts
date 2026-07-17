@@ -81,6 +81,9 @@ export const PATCH = withErrorHandling(async (req: Request, { params }: Params) 
         ...(input.suspended !== undefined
           ? { suspendedAt: input.suspended ? new Date() : null }
           : {}),
+        ...(input.verified !== undefined
+          ? { verifiedAt: input.verified ? new Date() : null }
+          : {}),
       },
       select: {
         id: true,
@@ -89,6 +92,7 @@ export const PATCH = withErrorHandling(async (req: Request, { params }: Params) 
         role: true,
         createdAt: true,
         suspendedAt: true,
+        verifiedAt: true,
       },
     });
   });

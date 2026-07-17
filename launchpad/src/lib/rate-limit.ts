@@ -28,6 +28,7 @@ export interface RateLimitRule {
 
 export const RATE_LIMITS = {
   upvote: { limit: 30, windowMs: 60_000 }, // 30 upvote toggles / minute
+  save: { limit: 30, windowMs: 60_000 }, // 30 save toggles / minute
   comment: { limit: 10, windowMs: 60_000 }, // 10 comments / minute
   productUpdate: { limit: 10, windowMs: 60 * 60_000 }, // 10 updates de bitácora / hora / maker
   productCreate: { limit: 5, windowMs: 60 * 60_000 }, // 5 launches / hour

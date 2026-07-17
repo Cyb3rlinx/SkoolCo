@@ -28,8 +28,11 @@ import type {
   ProductListItem,
   ProductUpdateItem,
   PublicUser,
+  ProductInsights,
   ProductListQuery,
+  ReportCategory,
   ReportStatus,
+  SaveResult,
   UpvoteResult,
   UserBadgeItem,
 } from "./types";
@@ -222,6 +225,37 @@ export function removeUpvote(slug: string) {
   });
 }
 
+/** POST /api/products/:slug/save (auth, idempotent). */
+export function saveProduct(slug: string) {
+  return request<SaveResult>(`/api/products/${encodeURIComponent(slug)}/save`, {
+    method: "POST",
+  });
+}
+
+/** DELETE /api/products/:slug/save (auth, idempotent). */
+export function unsaveProduct(slug: string) {
+  return request<SaveResult>(`/api/products/${encodeURIComponent(slug)}/save`, {
+    method: "DELETE",
+  });
+}
+
+/** GET /api/me/saved (auth) */
+export function fetchSavedProducts() {
+  return request<ProductListItem[]>(`/api/me/saved`);
+}
+
+/** GET /api/products/:slug/insights (auth, maker/staff only). */
+export function fetchProductInsights(slug: string) {
+  return request<ProductInsights>(`/api/products/${encodeURIComponent(slug)}/insights`);
+}
+
+/** POST /api/products/:slug/relaunch (auth, maker/staff, source must be ARCHIVED). */
+export function relaunchProduct(slug: string) {
+  return request<ProductDetail>(`/api/products/${encodeURIComponent(slug)}/relaunch`, {
+    method: "POST",
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Comments
 // ---------------------------------------------------------------------------
@@ -233,11 +267,11 @@ export function fetchComments(slug: string, page = 1, pageSize = 20) {
   );
 }
 
-/** POST /api/products/:slug/comments (auth). */
-export function postComment(slug: string, body: string) {
+/** POST /api/products/:slug/comments (auth). Pass parentId to reply (one level deep). */
+export function postComment(slug: string, body: string, parentId?: string) {
   return request<CommentItem>(`/api/products/${encodeURIComponent(slug)}/comments`, {
     method: "POST",
-    body: JSON.stringify({ body }),
+    body: JSON.stringify(parentId ? { body, parentId } : { body }),
   });
 }
 
@@ -366,11 +400,16 @@ export function resolveReport(id: string, status: Exclude<ReportStatus, "OPEN">)
 }
 
 /** POST /api/reports (auth) — report a product or a comment. */
-export function createReport(input: { productId?: string; commentId?: string; reason: string }) {
-  return request<{ id: string; status: ReportStatus; createdAt: string }>(`/api/reports`, {
-    method: "POST",
-    body: JSON.stringify(input),
-  });
+export function createReport(input: {
+  productId?: string;
+  commentId?: string;
+  reason: string;
+  category?: ReportCategory;
+}) {
+  return request<{ id: string; status: ReportStatus; category: ReportCategory; createdAt: string }>(
+    `/api/reports`,
+    { method: "POST", body: JSON.stringify(input) }
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -451,7 +490,7 @@ export function fetchAdminUsers(q: string, page: number) {
 /** PATCH /api/admin/users/:id */
 export function updateAdminUser(
   id: string,
-  input: { role?: "USER" | "MODERATOR" | "ADMIN"; suspended?: boolean }
+  input: { role?: "USER" | "MODERATOR" | "ADMIN"; suspended?: boolean; verified?: boolean }
 ) {
   return request<AdminUserItem>(`/api/admin/users/${id}`, {
     method: "PATCH",

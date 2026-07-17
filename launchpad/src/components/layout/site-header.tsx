@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Logo } from "./logo";
 import { NotificationsBell } from "./notifications-bell";
 import { UserMenu } from "./user-menu";
+import { SearchAutocomplete } from "./search-autocomplete";
 
 const NAV_LINKS = [
   { href: "/launches", label: "Lanzamientos" },
@@ -64,19 +65,7 @@ export function SiteHeader() {
         </nav>
 
         {/* Search (desktop) */}
-        <form onSubmit={onSearch} role="search" className="relative ml-auto hidden w-56 lg:block">
-          <Search
-            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
-            aria-hidden
-          />
-          <Input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Buscar productos…"
-            aria-label="Buscar productos"
-            className="h-9 pl-9"
-          />
-        </form>
+        <SearchAutocomplete className="ml-auto hidden w-56 lg:block" />
 
         <div className="ml-auto flex items-center gap-1.5 lg:ml-0">
           <NotificationsBell />

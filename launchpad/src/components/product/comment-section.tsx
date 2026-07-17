@@ -45,6 +45,8 @@ export function CommentSection({ slug, live }: { slug: string; live: boolean }) 
   const { status } = useSession();
   const pathname = usePathname();
   const [body, setBody] = useState("");
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyBody, setReplyBody] = useState("");
 
   const { data, loading, error, demo, refetch, setData } = useApi(
     () => fetchComments(slug),
@@ -55,6 +57,12 @@ export function CommentSection({ slug, live }: { slug: string; live: boolean }) 
   );
 
   const { mutate, submitting, error: submitError, clearError } = useMutation(postComment);
+  const {
+    mutate: mutateReply,
+    submitting: submittingReply,
+    error: replyError,
+    clearError: clearReplyError,
+  } = useMutation(postComment);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -65,7 +73,28 @@ export function CommentSection({ slug, live }: { slug: string; live: boolean }) 
       setBody("");
       setData((prev) =>
         prev
-          ? { ...prev, total: prev.total + 1, items: [comment, ...prev.items] }
+          ? { ...prev, total: prev.total + 1, items: [{ ...comment, replies: [] }, ...prev.items] }
+          : prev
+      );
+    }
+  }
+
+  async function onReplySubmit(e: FormEvent, parentId: string) {
+    e.preventDefault();
+    const text = replyBody.trim();
+    if (!text) return;
+    const reply = await mutateReply(slug, text, parentId);
+    if (reply) {
+      setReplyBody("");
+      setReplyingTo(null);
+      setData((prev) =>
+        prev
+          ? {
+              ...prev,
+              items: prev.items.map((c) =>
+                c.id === parentId ? { ...c, replies: [...(c.replies ?? []), reply] } : c
+              ),
+            }
           : prev
       );
     }
@@ -148,22 +177,92 @@ export function CommentSection({ slug, live }: { slug: string; live: boolean }) 
       {!loading && !error && (
         <ul className="space-y-4">
           {data?.items.map((c) => (
-            <li key={c.id} className="flex gap-3 rounded-2xl border bg-card p-4 shadow-soft">
-              <Avatar name={c.user.name} src={c.user.avatarUrl} size="sm" />
-              <div className="min-w-0 flex-1">
-                <p className="text-sm">
-                  <span className="font-bold">{c.user.name}</span>
-                  {c.user.badges.map((b) => (
-                    <span key={b.slug} title={b.name} className="ml-1" aria-hidden>
-                      {b.icon}
-                    </span>
-                  ))}{" "}
-                  <span className="text-xs text-muted-foreground">· {timeAgo(c.createdAt)}</span>
-                </p>
-                <p className="mt-1 whitespace-pre-line text-sm text-foreground/90">
-                  {renderBody(c.body)}
-                </p>
+            <li key={c.id} className="rounded-2xl border bg-card p-4 shadow-soft">
+              <div className="flex gap-3">
+                <Avatar name={c.user.name} src={c.user.avatarUrl} size="sm" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm">
+                    <span className="font-bold">{c.user.name}</span>
+                    {c.user.badges.map((b) => (
+                      <span key={b.slug} title={b.name} className="ml-1" aria-hidden>
+                        {b.icon}
+                      </span>
+                    ))}{" "}
+                    <span className="text-xs text-muted-foreground">· {timeAgo(c.createdAt)}</span>
+                  </p>
+                  <p className="mt-1 whitespace-pre-line text-sm text-foreground/90">
+                    {renderBody(c.body)}
+                  </p>
+                  {status === "authenticated" && live && (
+                    <button
+                      type="button"
+                      className="mt-2 text-xs font-semibold text-muted-foreground hover:text-foreground"
+                      onClick={() => {
+                        setReplyingTo(replyingTo === c.id ? null : c.id);
+                        setReplyBody("");
+                        if (replyError) clearReplyError();
+                      }}
+                    >
+                      Responder
+                    </button>
+                  )}
+
+                  {replyingTo === c.id && (
+                    <form onSubmit={(e) => onReplySubmit(e, c.id)} className="mt-3 space-y-2">
+                      <Textarea
+                        value={replyBody}
+                        onChange={(e) => {
+                          setReplyBody(e.target.value);
+                          if (replyError) clearReplyError();
+                        }}
+                        placeholder={`Responder a ${c.user.name}…`}
+                        aria-label={`Responder a ${c.user.name}`}
+                        maxLength={2000}
+                        required
+                      />
+                      {replyError && <Alert variant="destructive">{replyError}</Alert>}
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setReplyingTo(null)}
+                        >
+                          Cancelar
+                        </Button>
+                        <Button
+                          type="submit"
+                          size="sm"
+                          disabled={submittingReply || replyBody.trim().length === 0}
+                        >
+                          {submittingReply ? "Publicando…" : "Responder"}
+                        </Button>
+                      </div>
+                    </form>
+                  )}
+                </div>
               </div>
+
+              {c.replies && c.replies.length > 0 && (
+                <ul className="mt-3 space-y-3 border-l-2 pl-4 sm:ml-11">
+                  {c.replies.map((r) => (
+                    <li key={r.id} className="flex gap-3">
+                      <Avatar name={r.user.name} src={r.user.avatarUrl} size="sm" />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm">
+                          <span className="font-bold">{r.user.name}</span>{" "}
+                          <span className="text-xs text-muted-foreground">
+                            · {timeAgo(r.createdAt)}
+                          </span>
+                        </p>
+                        <p className="mt-1 whitespace-pre-line text-sm text-foreground/90">
+                          {r.body}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </li>
           ))}
         </ul>

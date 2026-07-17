@@ -24,6 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState, ErrorState } from "@/components/ui/states";
 import { ProductCard } from "@/components/product/product-card";
 import { ContactRequestsSection } from "@/components/profile/contact-requests-section";
+import { SavedProductsSection } from "@/components/profile/saved-products-section";
 import { SentContactRequestsSection } from "@/components/profile/sent-contact-requests-section";
 import { ProfileForm } from "@/components/forms/profile-form";
 import { Field } from "@/components/forms/field";
@@ -193,6 +194,9 @@ export function ProfileClient() {
           })}
         </div>
       </section>
+
+      {/* Productos guardados */}
+      <SavedProductsSection />
 
       {/* Solicitudes de contacto (puente de compraventa) */}
       <ContactRequestsSection />

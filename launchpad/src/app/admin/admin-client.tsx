@@ -13,7 +13,7 @@ import {
 import { mockCommunityLinks, mockReports } from "@/lib/frontend/mock-data";
 import { useApi } from "@/lib/frontend/hooks";
 import { timeAgo } from "@/lib/frontend/format";
-import type { CommunityLink, ModerationReportItem, ReportStatus } from "@/lib/frontend/types";
+import type { CommunityLink, ModerationReportItem, ReportCategory, ReportStatus } from "@/lib/frontend/types";
 import { StatsSection } from "@/components/admin/stats-section";
 import { UsersSection } from "@/components/admin/users-section";
 import { ProductsSection } from "@/components/admin/products-section";
@@ -32,6 +32,13 @@ const REPORT_STATUS_META: Record<ReportStatus, { label: string; variant: "warnin
   REVIEWING: { label: "En revisión", variant: "secondary" },
   RESOLVED: { label: "Resuelto", variant: "success" },
   DISMISSED: { label: "Descartado", variant: "outline" },
+};
+
+const REPORT_CATEGORY_LABEL: Record<ReportCategory, string> = {
+  SPAM: "Spam",
+  SCAM: "Estafa o fraude",
+  INAPPROPRIATE: "Contenido inapropiado",
+  OTHER: "Otro",
 };
 
 type Section = "stats" | "users" | "products" | "collections" | "badges" | "reports" | "links";
@@ -160,6 +167,7 @@ function ReportRow({
         <div className="min-w-0 flex-1 space-y-2">
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant={meta.variant}>{meta.label}</Badge>
+            <Badge variant="outline">{REPORT_CATEGORY_LABEL[report.category]}</Badge>
             <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
               <Flag className="h-3 w-3" aria-hidden />
               {report.product ? "Producto" : "Comentario"} · {timeAgo(report.createdAt)}
