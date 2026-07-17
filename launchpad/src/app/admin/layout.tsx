@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Manrope } from "next/font/google";
+import { NextIntlClientProvider } from "next-intl";
 import { Providers } from "@/components/providers";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
+import esMessages from "../../../messages/es.json";
 import "../globals.css";
 
 const manrope = Manrope({
@@ -29,11 +31,16 @@ export default function AdminRootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="es" className={manrope.variable}>
       <body className="flex min-h-screen flex-col font-sans">
-        <Providers>
-          <SiteHeader />
-          <main className="flex-1">{children}</main>
-          <SiteFooter />
-        </Providers>
+        {/* SiteHeader/SiteFooter are shared with the [locale] tree and use
+            useTranslations — provide a fixed Spanish context here since
+            /admin is intentionally not part of the i18n routing setup. */}
+        <NextIntlClientProvider locale="es" messages={esMessages}>
+          <Providers>
+            <SiteHeader />
+            <main className="flex-1">{children}</main>
+            <SiteFooter />
+          </Providers>
+        </NextIntlClientProvider>
       </body>
     </html>
   );
