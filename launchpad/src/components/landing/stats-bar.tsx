@@ -1,13 +1,15 @@
+import { useTranslations } from "next-intl";
 import { Clock3, Rocket, ShieldCheck, Users2 } from "lucide-react";
 
-const STATS = [
-  { icon: Rocket, value: "9K+", label: "Productos lanzados" },
-  { icon: Users2, value: "6K+", label: "Makers activos" },
-  { icon: ShieldCheck, value: "100%", label: "Votos de personas reales" },
-  { icon: Clock3, value: "24/7", label: "Comunidad activa" },
-];
-
 export function StatsBar() {
+  const t = useTranslations("home.stats");
+  const STATS = [
+    { icon: Rocket, value: "9K+", label: t("productsLaunched") },
+    { icon: Users2, value: "6K+", label: t("activeMakers") },
+    { icon: ShieldCheck, value: "100%", label: t("realVotes") },
+    { icon: Clock3, value: "24/7", label: t("activeCommunity") },
+  ];
+
   return (
     <section className="border-y bg-white">
       <div className="container-page grid grid-cols-2 gap-x-4 gap-y-8 py-10 lg:grid-cols-4">

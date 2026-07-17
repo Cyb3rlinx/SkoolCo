@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
 import { Bell, MessageCircle, TriangleAlert } from "lucide-react";
 import { fetchNotifications, markNotificationsRead } from "@/lib/frontend/api-client";
@@ -12,13 +12,7 @@ import type { NotificationItem } from "@/lib/frontend/types";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-
-function notificationText(n: NotificationItem): string {
-  if (n.type === "UPVOTE") return "votó tu producto";
-  if (n.type === "FOLLOWED_LAUNCH") return "publicó un nuevo lanzamiento:";
-  if (n.type === "MENTION") return "te mencionó en un comentario en";
-  return "comentó en";
-}
+import { Link } from "@/i18n/navigation";
 
 /**
  * In-app notifications bell. Data: GET /api/notifications (badge uses
@@ -26,6 +20,8 @@ function notificationText(n: NotificationItem): string {
  * Only rendered for signed-in users.
  */
 export function NotificationsBell() {
+  const t = useTranslations("notifications");
+  const locale = useLocale();
   const { status } = useSession();
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -41,6 +37,13 @@ export function NotificationsBell() {
 
   const unread = data?.unreadCount ?? 0;
 
+  function notificationText(n: NotificationItem): string {
+    if (n.type === "UPVOTE") return t("upvoted");
+    if (n.type === "MENTION") return t("mentioned");
+    if (n.type === "FOLLOWED_LAUNCH") return t("followedLaunch");
+    return t("commentedOn");
+  }
+
   async function markAllRead() {
     try {
       await markNotificationsRead();
@@ -55,7 +58,7 @@ export function NotificationsBell() {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        aria-label={`Notificaciones${unread > 0 ? ` (${unread} sin leer)` : ""}`}
+        aria-label={unread > 0 ? t("bellLabelUnread", { count: unread }) : t("bellLabel")}
         aria-expanded={open}
         className="relative flex h-10 w-10 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
@@ -70,10 +73,10 @@ export function NotificationsBell() {
       {open && (
         <div className="absolute right-0 z-50 mt-2 w-80 overflow-hidden rounded-2xl border bg-card shadow-lift">
           <div className="flex items-center justify-between border-b px-4 py-3">
-            <p className="text-sm font-bold">Notificaciones</p>
+            <p className="text-sm font-bold">{t("title")}</p>
             {unread > 0 && (
               <Button variant="ghost" size="sm" onClick={markAllRead}>
-                Marcar leídas
+                {t("markRead")}
               </Button>
             )}
           </div>
@@ -81,22 +84,19 @@ export function NotificationsBell() {
           <div className="max-h-96 overflow-y-auto">
             {loading && (
               <div className="flex items-center justify-center gap-2 px-4 py-8 text-sm text-muted-foreground">
-                <Spinner /> Cargando…
+                <Spinner /> {t("loading")}
               </div>
             )}
 
             {!loading && error && (
               <div className="flex items-center gap-2 px-4 py-6 text-sm text-muted-foreground">
                 <TriangleAlert className="h-4 w-4 text-warning" aria-hidden />
-                No pudimos cargar tus notificaciones.
+                {t("loadError")}
               </div>
             )}
 
             {!loading && !error && data && data.items.length === 0 && (
-              <p className="px-4 py-8 text-center text-sm text-muted-foreground">
-                Nada por aquí todavía. Cuando alguien vote o comente tus lanzamientos, lo verás
-                acá. 🔔
-              </p>
+              <p className="px-4 py-8 text-center text-sm text-muted-foreground">{t("empty")}</p>
             )}
 
             {!loading &&
@@ -119,13 +119,13 @@ export function NotificationsBell() {
                       </span>
                     )}
                     <span className="mt-0.5 block text-xs text-muted-foreground">
-                      {timeAgo(n.createdAt)}
+                      {timeAgo(n.createdAt, locale)}
                     </span>
                   </span>
                   {!n.readAt && (
                     <span
                       className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary"
-                      aria-label="Sin leer"
+                      aria-label={t("unread")}
                     />
                   )}
                 </Link>

@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Search } from "lucide-react";
 import { fetchProducts } from "@/lib/frontend/api-client";
 import { ProductLogo } from "@/components/product/product-logo";
 import { Input } from "@/components/ui/input";
+import { useRouter } from "@/i18n/navigation";
 import type { ProductListItem } from "@/lib/frontend/types";
 
 /**
@@ -14,6 +15,7 @@ import type { ProductListItem } from "@/lib/frontend/types";
  * listado completo con el filtro aplicado (comportamiento anterior intacto).
  */
 export function SearchAutocomplete({ className }: { className?: string }) {
+  const t = useTranslations("nav");
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<ProductListItem[]>([]);
@@ -68,8 +70,8 @@ export function SearchAutocomplete({ className }: { className?: string }) {
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => suggestions.length > 0 && setOpen(true)}
           onKeyDown={(e) => e.key === "Escape" && setOpen(false)}
-          placeholder="Buscar productos…"
-          aria-label="Buscar productos"
+          placeholder={t("searchPlaceholder")}
+          aria-label={t("searchLabel")}
           className="h-9 pl-9"
           autoComplete="off"
         />

@@ -1,22 +1,24 @@
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { ArrowRight, Star, Users2 } from "lucide-react";
-
-const CTAS = [
-  {
-    icon: Star,
-    title: "¿Eres creador?",
-    body: "Publica tu proyecto, gana con la comunidad y recibe feedback que te ayudará a construir la mejor versión.",
-    link: { label: "Publicar ahora", href: "/submit" },
-  },
-  {
-    icon: Users2,
-    title: "¿Miembro de la comunidad?",
-    body: "Descubre proyectos increíbles, vota los que te gustan y ayúdalos a crecer desde el inicio.",
-    link: { label: "Explorar y votar", href: "/launches" },
-  },
-];
+import { Link } from "@/i18n/navigation";
 
 export function CTASection() {
+  const t = useTranslations("home.cta");
+  const CTAS = [
+    {
+      icon: Star,
+      title: t("creatorTitle"),
+      body: t("creatorBody"),
+      link: { label: t("creatorCta"), href: "/submit" },
+    },
+    {
+      icon: Users2,
+      title: t("memberTitle"),
+      body: t("memberBody"),
+      link: { label: t("memberCta"), href: "/launches" },
+    },
+  ];
+
   return (
     <section className="container-page pb-20">
       <div className="grid gap-6 md:grid-cols-2">

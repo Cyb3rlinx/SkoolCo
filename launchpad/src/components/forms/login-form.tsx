@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert } from "@/components/ui/alert";
+import { Link, useRouter } from "@/i18n/navigation";
 import { Field } from "./field";
 
 /**
@@ -16,6 +16,7 @@ import { Field } from "./field";
  * covers both.
  */
 export function LoginForm({ next }: { next?: string }) {
+  const t = useTranslations("auth.login");
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,11 +32,7 @@ export function LoginForm({ next }: { next?: string }) {
     setSubmitting(false);
 
     if (res?.error) {
-      setError(
-        res.error === "Tu cuenta está suspendida."
-          ? "Tu cuenta está suspendida."
-          : "Email o contraseña incorrectos. Revisa e intenta de nuevo."
-      );
+      setError(res.error === "Tu cuenta está suspendida." ? t("errorSuspended") : t("errorInvalid"));
       return;
     }
 
@@ -45,7 +42,7 @@ export function LoginForm({ next }: { next?: string }) {
 
   return (
     <form onSubmit={onSubmit} className="space-y-4" noValidate>
-      <Field id="login-email" label="Email">
+      <Field id="login-email" label={t("email")}>
         <Input
           id="login-email"
           type="email"
@@ -57,7 +54,7 @@ export function LoginForm({ next }: { next?: string }) {
         />
       </Field>
 
-      <Field id="login-password" label="Contraseña">
+      <Field id="login-password" label={t("password")}>
         <Input
           id="login-password"
           type="password"
@@ -72,12 +69,12 @@ export function LoginForm({ next }: { next?: string }) {
       {error && <Alert variant="destructive">{error}</Alert>}
 
       <Button type="submit" variant="gradient" className="w-full" disabled={submitting}>
-        {submitting ? "Entrando…" : "Iniciar sesión"}
+        {submitting ? t("submitting") : t("submit")}
       </Button>
 
       <p className="text-center text-sm">
         <Link href="/forgot-password" className="font-semibold text-primary hover:underline">
-          ¿Olvidaste tu contraseña?
+          {t("forgotPassword")}
         </Link>
       </p>
     </form>

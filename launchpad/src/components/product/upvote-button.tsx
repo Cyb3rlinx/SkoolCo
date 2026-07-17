@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
 import { ChevronUp } from "lucide-react";
 import { removeUpvote, upvoteProduct } from "@/lib/frontend/api-client";
 import { cn } from "@/lib/frontend/utils";
 import { compactNumber } from "@/lib/frontend/format";
+import { usePathname, useRouter } from "@/i18n/navigation";
 
 interface UpvoteButtonProps {
   slug: string;
@@ -32,6 +33,8 @@ export function UpvoteButton({
   onChange,
   className,
 }: UpvoteButtonProps) {
+  const t = useTranslations("common");
+  const locale = useLocale();
   const { status } = useSession();
   const router = useRouter();
   const pathname = usePathname();
@@ -84,8 +87,12 @@ export function UpvoteButton({
       type="button"
       onClick={toggle}
       aria-pressed={state.upvoted}
-      aria-label={`${state.upvoted ? "Quitar voto de" : "Votar"} este producto (${state.count} votos)`}
-      title={failed ? "No se pudo guardar tu voto — ¿API disponible?" : undefined}
+      aria-label={
+        state.upvoted
+          ? t("removeUpvoteLabel", { count: state.count })
+          : t("upvoteLabel", { count: state.count })
+      }
+      title={failed ? t("upvoteFailed") : undefined}
       className={cn(
         base,
         look,
@@ -102,7 +109,7 @@ export function UpvoteButton({
         )}
         aria-hidden
       />
-      {compactNumber(state.count)}
+      {compactNumber(state.count, locale)}
     </button>
   );
 }

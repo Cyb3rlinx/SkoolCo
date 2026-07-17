@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useTranslations } from "next-intl";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/frontend/utils";
 
@@ -23,11 +24,12 @@ export function Field({
   optional?: boolean;
   className?: string;
 }) {
+  const t = useTranslations("common");
   return (
     <div className={cn("space-y-1.5", className)}>
       <div className="flex items-baseline justify-between">
         <Label htmlFor={id}>{label}</Label>
-        {optional && <span className="text-xs text-muted-foreground">Opcional</span>}
+        {optional && <span className="text-xs text-muted-foreground">{t("optional")}</span>}
       </div>
       {children}
       {error ? (

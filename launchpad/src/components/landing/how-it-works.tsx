@@ -1,30 +1,18 @@
+import { useTranslations } from "next-intl";
 import { Rocket, ThumbsUp, TrendingUp } from "lucide-react";
 
-const STEPS = [
-  {
-    icon: Rocket,
-    title: "Publica tu proyecto",
-    body: "Presenta tu producto, explica el problema que resuelve y compártelo con la comunidad.",
-  },
-  {
-    icon: ThumbsUp,
-    title: "Recibe votos y feedback",
-    body: "La comunidad descubre tu producto, lo vota y deja comentarios útiles.",
-  },
-  {
-    icon: TrendingUp,
-    title: "Gana visibilidad",
-    body: "Los mejores lanzamientos suben en el ranking y llegan a más makers.",
-  },
-];
-
 export function HowItWorks() {
+  const t = useTranslations("home.howItWorks");
+  const STEPS = [
+    { icon: Rocket, title: t("step1Title"), body: t("step1Body") },
+    { icon: ThumbsUp, title: t("step2Title"), body: t("step2Body") },
+    { icon: TrendingUp, title: t("step3Title"), body: t("step3Body") },
+  ];
+
   return (
     <section id="como-funciona" className="bg-[#F5FBFC]">
       <div className="container-page py-16 lg:py-20">
-        <h2 className="text-center text-2xl font-extrabold tracking-tight sm:text-3xl">
-          Cómo funciona
-        </h2>
+        <h2 className="text-center text-2xl font-extrabold tracking-tight sm:text-3xl">{t("title")}</h2>
 
         <div className="relative mt-12 grid gap-6 md:grid-cols-3">
           {/* Dotted connector between the cards (desktop only) */}

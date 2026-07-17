@@ -1,14 +1,17 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import Link from "next/link";
+import NextLink from "next/link";
+import { useTranslations } from "next-intl";
 import { signOut, useSession } from "next-auth/react";
 import { LogOut, Rocket, Shield, UserRound } from "lucide-react";
 import { useClickOutside } from "@/lib/frontend/use-click-outside";
 import { Avatar } from "@/components/ui/avatar";
+import { Link } from "@/i18n/navigation";
 
 /** Avatar dropdown for the signed-in user (profile, moderation, sign out). */
 export function UserMenu() {
+  const t = useTranslations("userMenu");
   const { data: session } = useSession();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -27,11 +30,11 @@ export function UserMenu() {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        aria-label="Menú de usuario"
+        aria-label={t("userMenu")}
         aria-expanded={open}
         className="flex items-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
       >
-        <Avatar name={user.name ?? "Usuario"} src={user.image} size="sm" />
+        <Avatar name={user.name ?? t("defaultName")} src={user.image} size="sm" />
       </button>
 
       {open && (
@@ -49,17 +52,19 @@ export function UserMenu() {
           </div>
           <Link href="/profile" onClick={() => setOpen(false)} className={itemClass}>
             <UserRound className="h-4 w-4 text-muted-foreground" aria-hidden />
-            Mi perfil
+            {t("myProfile")}
           </Link>
           <Link href="/submit" onClick={() => setOpen(false)} className={itemClass}>
             <Rocket className="h-4 w-4 text-muted-foreground" aria-hidden />
-            Publicar producto
+            {t("publishProduct")}
           </Link>
           {isStaff && (
-            <Link href="/admin" onClick={() => setOpen(false)} className={itemClass}>
+            // Plain (non-locale-prefixed) link: /admin is intentionally
+            // outside the i18n routing setup (see src/middleware.ts).
+            <NextLink href="/admin" onClick={() => setOpen(false)} className={itemClass}>
               <Shield className="h-4 w-4 text-muted-foreground" aria-hidden />
-              Panel de administración
-            </Link>
+              {t("adminPanel")}
+            </NextLink>
           )}
           <button
             type="button"
@@ -67,7 +72,7 @@ export function UserMenu() {
             className={`${itemClass} w-full border-t text-destructive`}
           >
             <LogOut className="h-4 w-4" aria-hidden />
-            Cerrar sesión
+            {t("signOut")}
           </button>
         </div>
       )}

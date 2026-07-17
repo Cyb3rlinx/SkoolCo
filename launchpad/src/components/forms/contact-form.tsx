@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert } from "@/components/ui/alert";
 
 /** Formulario público de contacto — POST /api/contact (sin sesión). */
 export function ContactForm() {
+  const t = useTranslations("contact.form");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
@@ -18,7 +20,7 @@ export function ContactForm() {
     e.preventDefault();
     setError(null);
     if (message.trim().length < 10) {
-      setError("Cuéntanos un poco más (mínimo 10 caracteres).");
+      setError(t("errorTooShort"));
       return;
     }
     setBusy(true);
@@ -29,33 +31,30 @@ export function ContactForm() {
         body: JSON.stringify({ name, email, message }),
       });
       if (!res.ok) {
+        // Server-side error message (out of scope for translation — see
+        // API route validators).
         const body = (await res.json().catch(() => null)) as
           | { error?: { message?: string } }
           | null;
-        throw new Error(body?.error?.message ?? "No se pudo enviar el mensaje.");
+        throw new Error(body?.error?.message ?? t("errorGeneric"));
       }
       setSent(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo enviar el mensaje.");
+      setError(err instanceof Error ? err.message : t("errorGeneric"));
     } finally {
       setBusy(false);
     }
   }
 
   if (sent) {
-    return (
-      <Alert variant="success">
-        ¡Mensaje enviado! Te responderemos al correo que dejaste, normalmente dentro de 1–2 días
-        hábiles.
-      </Alert>
-    );
+    return <Alert variant="success">{t("success")}</Alert>;
   }
 
   return (
     <form onSubmit={onSubmit} className="space-y-4" noValidate>
       <div className="space-y-1">
         <label htmlFor="contact-name" className="text-sm font-semibold">
-          Tu nombre
+          {t("name")}
         </label>
         <Input
           id="contact-name"
@@ -63,12 +62,12 @@ export function ContactForm() {
           onChange={(e) => setName(e.target.value)}
           required
           maxLength={80}
-          placeholder="¿Cómo te llamas?"
+          placeholder={t("namePlaceholder")}
         />
       </div>
       <div className="space-y-1">
         <label htmlFor="contact-email" className="text-sm font-semibold">
-          Tu email
+          {t("email")}
         </label>
         <Input
           id="contact-email"
@@ -77,12 +76,12 @@ export function ContactForm() {
           onChange={(e) => setEmail(e.target.value)}
           required
           maxLength={254}
-          placeholder="para poder responderte"
+          placeholder={t("emailPlaceholder")}
         />
       </div>
       <div className="space-y-1">
         <label htmlFor="contact-message" className="text-sm font-semibold">
-          Mensaje
+          {t("message")}
         </label>
         <textarea
           id="contact-message"
@@ -92,13 +91,13 @@ export function ContactForm() {
           minLength={10}
           maxLength={2000}
           rows={6}
-          placeholder="Cuéntanos en qué te podemos ayudar…"
+          placeholder={t("messagePlaceholder")}
           className="w-full rounded-xl border bg-background px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         />
       </div>
       {error && <Alert variant="destructive">{error}</Alert>}
       <Button type="submit" disabled={busy}>
-        {busy ? "Enviando…" : "Enviar mensaje"}
+        {busy ? t("sending") : t("send")}
       </Button>
     </form>
   );

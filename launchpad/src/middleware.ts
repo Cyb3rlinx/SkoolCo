@@ -1,4 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
+import createMiddleware from "next-intl/middleware";
+import { routing } from "./i18n/routing";
+import { isAllowedOrigin } from "./lib/cors";
+
+export { isAllowedOrigin };
+
+const intlMiddleware = createMiddleware(routing);
 
 const SECURITY_HEADERS: Record<string, string> = {
   "X-Frame-Options": "DENY",
@@ -7,16 +14,6 @@ const SECURITY_HEADERS: Record<string, string> = {
   "Strict-Transport-Security": "max-age=63072000; includeSubDomains",
   "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
 };
-
-/** True only if `origin` is explicitly listed in the comma-separated env value. */
-export function isAllowedOrigin(origin: string | null, envValue: string | undefined): boolean {
-  if (!origin || !envValue) return false;
-  return envValue
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean)
-    .includes(origin);
-}
 
 // Routes the browser extension calls cross-origin.
 const CORS_PATHS = ["/api/extension", "/api/community-links"];
@@ -35,7 +32,11 @@ export function middleware(req: NextRequest) {
     return res;
   }
 
-  const res = NextResponse.next();
+  // API routes and the admin panel stay outside next-intl's locale routing
+  // (admin is Spanish-only and out of scope for this pass; API responses
+  // never carry a locale prefix).
+  const skipIntl = pathname.startsWith("/api") || pathname.startsWith("/admin");
+  const res = skipIntl ? NextResponse.next() : intlMiddleware(req);
   if (allowed) applyCors(res, origin!);
   applySecurity(res);
   return res;

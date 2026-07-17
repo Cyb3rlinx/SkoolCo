@@ -1,14 +1,15 @@
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { ArrowRight, CheckCircle2, Puzzle, Rocket, Trophy } from "lucide-react";
-
-const GUARANTEES = ["Solo posts públicos", "Sin automatización", "Respeta las reglas de Skool"];
-
-const MOCK_LOGROS = [
-  { text: "¡Llegué a 100 usuarios! 🎉", meta: "Skool · hace 1 h" },
-  { text: "Cerré mi primer cliente", meta: "Skool · hace 3 h" },
-];
+import { Link } from "@/i18n/navigation";
 
 export function ExtensionBanner() {
+  const t = useTranslations("home.extensionBanner");
+  const GUARANTEES = [t("guarantee1"), t("guarantee2"), t("guarantee3")];
+  const MOCK_LOGROS = [
+    { text: t("mockAchievement1"), meta: t("mockMeta1") },
+    { text: t("mockAchievement2"), meta: t("mockMeta2") },
+  ];
+
   return (
     <section className="container-page py-16 lg:py-20">
       <div className="brand-gradient-deep relative overflow-hidden rounded-[28px] text-white shadow-lift">
@@ -22,17 +23,14 @@ export function ExtensionBanner() {
           <div className="space-y-6">
             <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wider">
               <Puzzle className="h-3.5 w-3.5" aria-hidden />
-              Extensión para la comunidad
+              {t("badge")}
             </span>
 
             <h2 className="max-w-lg text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl">
-              Celebra los logros de tu comunidad de Skool
+              {t("title")}
             </h2>
 
-            <p className="max-w-lg text-white/80">
-              Descubre publicaciones públicas de logros, ábrelas más rápido y participa con
-              apoyo real desde Denveler. Sin automatización, sin bots, sin romper reglas.
-            </p>
+            <p className="max-w-lg text-white/80">{t("body")}</p>
 
             <ul className="flex flex-wrap gap-x-5 gap-y-2">
               {GUARANTEES.map((g) => (
@@ -47,7 +45,7 @@ export function ExtensionBanner() {
               href="/extension"
               className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-[#001B4D] shadow-soft transition-transform duration-200 hover:-translate-y-0.5"
             >
-              Conocer la extensión
+              {t("cta")}
               <ArrowRight className="h-4 w-4" aria-hidden />
             </Link>
           </div>
@@ -67,9 +65,7 @@ export function ExtensionBanner() {
                 <span className="h-2.5 w-2.5 rounded-full bg-[#D9289D]/60" aria-hidden />
                 <span className="h-2.5 w-2.5 rounded-full bg-[#F97316]/60" aria-hidden />
                 <span className="h-2.5 w-2.5 rounded-full bg-[#0F8F8A]/60" aria-hidden />
-                <span className="ml-2 text-[10px] font-semibold text-[#8A8FA3]">
-                  Extensión · Logros
-                </span>
+                <span className="ml-2 text-[10px] font-semibold text-[#8A8FA3]">{t("mockChrome")}</span>
               </div>
 
               <div className="rounded-[16px] bg-white p-4 text-foreground">
@@ -78,10 +74,8 @@ export function ExtensionBanner() {
                     <Trophy className="h-4 w-4 text-white" />
                   </span>
                   <div>
-                    <p className="text-sm font-extrabold leading-none">Logros</p>
-                    <p className="mt-0.5 text-[10px] text-muted-foreground">
-                      Apoya a tu comunidad, con tu permiso
-                    </p>
+                    <p className="text-sm font-extrabold leading-none">{t("mockPanelTitle")}</p>
+                    <p className="mt-0.5 text-[10px] text-muted-foreground">{t("mockPanelSubtitle")}</p>
                   </div>
                 </div>
 
@@ -95,7 +89,7 @@ export function ExtensionBanner() {
                 </div>
 
                 <div className="brand-gradient rounded-xl py-2.5 text-center text-xs font-bold text-white">
-                  Abrir panel
+                  {t("mockOpenPanel")}
                 </div>
               </div>
             </div>

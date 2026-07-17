@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useTranslations } from "next-intl";
 import { FlaskConical, Inbox, RefreshCw, SearchX } from "lucide-react";
 import { cn } from "@/lib/frontend/utils";
 import { Button } from "./button";
@@ -37,7 +38,7 @@ export function EmptyState({
 
 /** Error state with retry. */
 export function ErrorState({
-  message = "No pudimos cargar esta sección.",
+  message,
   onRetry,
   className,
 }: {
@@ -45,6 +46,7 @@ export function ErrorState({
   onRetry?: () => void;
   className?: string;
 }) {
+  const t = useTranslations("common");
   return (
     <div
       role="alert"
@@ -53,12 +55,12 @@ export function ErrorState({
         className
       )}
     >
-      <p className="text-base font-bold text-destructive">Algo salió mal</p>
-      <p className="max-w-sm text-sm text-muted-foreground">{message}</p>
+      <p className="text-base font-bold text-destructive">{t("somethingWrong")}</p>
+      <p className="max-w-sm text-sm text-muted-foreground">{message ?? t("loadErrorDefault")}</p>
       {onRetry && (
         <Button variant="outline" size="sm" onClick={onRetry}>
           <RefreshCw className="h-3.5 w-3.5" aria-hidden />
-          Reintentar
+          {t("retry")}
         </Button>
       )}
     </div>
@@ -70,6 +72,7 @@ export function ErrorState({
  * Keeps the demo honest: real integration vs. sample data is always visible.
  */
 export function DemoBanner({ className }: { className?: string }) {
+  const t = useTranslations("common");
   return (
     <div
       className={cn(
@@ -78,7 +81,7 @@ export function DemoBanner({ className }: { className?: string }) {
       )}
     >
       <FlaskConical className="h-3.5 w-3.5" aria-hidden />
-      Datos de demo — la API no está disponible (¿levantaste la base de datos?)
+      {t("demoBanner")}
     </div>
   );
 }
