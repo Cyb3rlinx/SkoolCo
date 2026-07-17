@@ -17,6 +17,8 @@ import type { CommunityLink, ModerationReportItem, ReportCategory, ReportStatus 
 import { StatsSection } from "@/components/admin/stats-section";
 import { UsersSection } from "@/components/admin/users-section";
 import { ProductsSection } from "@/components/admin/products-section";
+import { CollectionsSection } from "@/components/admin/collections-section";
+import { BadgesSection } from "@/components/admin/badges-section";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -39,7 +41,7 @@ const REPORT_CATEGORY_LABEL: Record<ReportCategory, string> = {
   OTHER: "Otro",
 };
 
-type Section = "stats" | "users" | "products" | "reports" | "links";
+type Section = "stats" | "users" | "products" | "collections" | "badges" | "reports" | "links";
 
 export function AdminClient() {
   const { data: session } = useSession();
@@ -59,6 +61,8 @@ export function AdminClient() {
           { value: "stats" as const, label: "Resumen" },
           { value: "users" as const, label: "Usuarios" },
           { value: "products" as const, label: "Productos" },
+          { value: "collections" as const, label: "Colecciones" },
+          { value: "badges" as const, label: "Insignias" },
         ]
       : []),
     { value: "reports", label: "Reportes" },
@@ -71,6 +75,8 @@ export function AdminClient() {
       {section === "stats" && <StatsSection onGoToTab={setSection} />}
       {section === "users" && <UsersSection />}
       {section === "products" && <ProductsSection />}
+      {section === "collections" && <CollectionsSection />}
+      {section === "badges" && <BadgesSection />}
       {section === "reports" && <ReportsQueue />}
       {section === "links" && <CommunityLinksQueue />}
     </div>
@@ -184,7 +190,7 @@ function ReportRow({
           </p>
 
           <p className="text-xs text-muted-foreground">
-            Reportado por {report.reporter.name}
+            {report.reporter ? `Reportado por ${report.reporter.name}` : "🤖 Auto-detectado por el sistema"}
             {report.resolvedBy && ` · resuelto por ${report.resolvedBy.name}`}
           </p>
         </div>

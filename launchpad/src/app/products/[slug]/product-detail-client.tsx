@@ -16,13 +16,16 @@ import { UpvoteButton } from "@/components/product/upvote-button";
 import { SaveButton } from "@/components/product/save-button";
 import { ProductGallery } from "@/components/product/product-gallery";
 import { CommentSection } from "@/components/product/comment-section";
+import { ProductUpdatesSection } from "@/components/product/product-updates-section";
 import { MakerCard } from "@/components/product/maker-card";
 import { OfferCard } from "@/components/product/offer-card";
 import { OfferSettings } from "@/components/product/offer-settings";
 import { InsightsSection } from "@/components/product/insights-section";
 import { RelaunchButton } from "@/components/product/relaunch-button";
 import { ChangeLogoButton } from "@/components/product/change-logo-button";
+import { EmbedBadgeCard } from "@/components/product/embed-badge-card";
 import { RelatedLaunches } from "@/components/product/related-launches";
+import { VoteWidgetCard } from "@/components/product/vote-widget-card";
 import { ReportButton } from "@/components/product/report-button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -166,6 +169,8 @@ export function ProductDetailClient({ slug }: { slug: string }) {
             </p>
           </section>
 
+          <ProductUpdatesSection slug={product.slug} makerId={product.maker.id} />
+
           <CommentSection slug={product.slug} live={product.status === "LIVE"} />
         </div>
 
@@ -180,6 +185,7 @@ export function ProductDetailClient({ slug }: { slug: string }) {
             openToOffers={product.openToOffers}
             declaredMrrUsd={product.declaredMrrUsd}
             monetizationNote={product.monetizationNote}
+            mrrVerifiedAt={product.mrrVerifiedAt}
           />
 
           <OfferSettings
@@ -189,6 +195,7 @@ export function ProductDetailClient({ slug }: { slug: string }) {
             declaredMrrUsd={product.declaredMrrUsd}
             monetizationNote={product.monetizationNote}
             offerViewCount={product.offerViewCount}
+            soldAt={product.soldAt}
             onUpdated={refetch}
           />
 
@@ -209,6 +216,10 @@ export function ProductDetailClient({ slug }: { slug: string }) {
               </div>
             </CardContent>
           </Card>
+
+          <VoteWidgetCard slug={product.slug} makerId={product.maker.id} />
+
+          <EmbedBadgeCard slug={product.slug} makerId={product.maker.id} />
 
           <RelatedLaunches categorySlug={product.category.slug} excludeSlug={product.slug} />
         </aside>

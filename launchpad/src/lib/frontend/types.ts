@@ -44,17 +44,21 @@ export interface MakerRef extends UserRef {
 export interface PublicUser {
   id: string;
   name: string;
+  username: string | null;
   avatarUrl: string | null;
   bio: string | null;
   verifiedAt: string | null;
   createdAt: string;
-  _count: { products: number; upvotes: number; comments: number };
+  badges: UserBadgeItem[];
+  _count: { products: number; upvotes: number; comments: number; followers: number };
+  isFollowedByMe: boolean;
 }
 
 /** GET /api/me */
 export interface MeProfile {
   id: string;
   name: string;
+  username: string | null;
   email: string;
   avatarUrl: string | null;
   bio: string | null;
@@ -88,6 +92,8 @@ export interface ProductListItem {
   launchDate: string;
   status: ProductStatus;
   createdAt: string;
+  openToOffers: boolean;
+  soldAt: string | null;
   category: { id: string; name: string; slug: string };
   maker: MakerRef;
   _count: { upvotes: number; comments: number };
@@ -108,11 +114,12 @@ export interface ProductDetail extends ProductListItem {
   /** Gallery screenshots (empty for older mocks). */
   images?: ProductImage[];
   /** Puente de compraventa — declarado por el maker, NO verificado. */
-  openToOffers?: boolean;
   declaredMrrUsd?: number | null;
   monetizationNote?: string | null;
   /** Vistas de la oferta (sin deduplicar); solo tiene sentido para el maker. */
   offerViewCount?: number;
+  /** Confirmado por un admin/moderador con evidencia. */
+  mrrVerifiedAt?: string | null;
 }
 
 export interface ProductListQuery {
@@ -120,6 +127,7 @@ export interface ProductListQuery {
   category?: string; // category slug
   q?: string;
   maker?: string; // "me" or a user id
+  openToOffers?: boolean;
   sort?: "newest" | "top" | "launching" | "trending";
   page?: number;
   pageSize?: number;
@@ -161,8 +169,15 @@ export interface CommentItem {
   createdAt: string;
   updatedAt: string;
   parentId: string | null;
-  user: UserRef;
+  user: UserRef & { badges: { slug: string; icon: string; name: string }[] };
   replies?: CommentItem[];
+}
+
+/** GET/POST /api/products/:slug/updates — bitácora de progreso del maker. */
+export interface ProductUpdateItem {
+  id: string;
+  body: string;
+  createdAt: string;
 }
 
 /** POST/DELETE /api/products/:slug/upvote */
@@ -206,7 +221,7 @@ export interface LeaderboardEntry {
 // Notifications
 // ---------------------------------------------------------------------------
 
-export type NotificationType = "UPVOTE" | "COMMENT";
+export type NotificationType = "UPVOTE" | "COMMENT" | "MENTION" | "FOLLOWED_LAUNCH";
 
 export interface NotificationItem {
   id: string;
@@ -238,7 +253,8 @@ export interface ModerationReportItem {
   createdAt: string;
   resolvedAt: string | null;
   resolvedBy: { id: string; name: string } | null;
-  reporter: { id: string; name: string };
+  /** null = reporte auto-generado por el sistema (detección de contenido sospechoso). */
+  reporter: { id: string; name: string } | null;
   product: { id: string; name: string; slug: string } | null;
   comment: { id: string; body: string } | null;
 }
@@ -293,6 +309,36 @@ export interface AdminUserItem {
   _count?: { products: number };
 }
 
+export interface CollectionSummary {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  createdAt: string;
+  productCount: number;
+}
+
+export interface CollectionDetail {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  createdAt: string;
+  products: ProductListItem[];
+}
+
+export interface BadgeInfo {
+  slug: string;
+  name: string;
+  description: string;
+  icon: string;
+}
+
+export interface UserBadgeItem extends BadgeInfo {
+  grantedByAdmin: boolean;
+  createdAt: string;
+}
+
 export interface AdminProductItem {
   id: string;
   name: string;
@@ -301,6 +347,8 @@ export interface AdminProductItem {
   launchDate: string;
   createdAt: string;
   logoUrl: string | null;
+  declaredMrrUsd: number | null;
+  mrrVerifiedAt: string | null;
   maker: { name: string; email: string };
   _count: { upvotes: number; comments: number };
 }

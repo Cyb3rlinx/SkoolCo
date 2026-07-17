@@ -8,12 +8,33 @@ import { fetchComments, postComment } from "@/lib/frontend/api-client";
 import { mockCommentsByProduct, paginate } from "@/lib/frontend/mock-data";
 import { useApi, useMutation } from "@/lib/frontend/hooks";
 import { timeAgo } from "@/lib/frontend/format";
+import { extractMentions } from "@/lib/mentions";
 import { Avatar } from "@/components/ui/avatar";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DemoBanner, ErrorState } from "@/components/ui/states";
+
+function renderBody(body: string) {
+  const mentioned = new Set(extractMentions(body));
+  const parts = body.split(/(@[a-z0-9-]{3,30}\b)/gi);
+  return parts.map((part, i) => {
+    const match = /^@([a-z0-9-]{3,30})$/i.exec(part);
+    if (match && mentioned.has(match[1].toLowerCase())) {
+      return (
+        <a
+          key={i}
+          href={`/makers/${match[1].toLowerCase()}`}
+          className="font-semibold text-primary hover:underline"
+        >
+          {part}
+        </a>
+      );
+    }
+    return <span key={i}>{part}</span>;
+  });
+}
 
 /**
  * Comments block for the product detail page.
@@ -161,10 +182,17 @@ export function CommentSection({ slug, live }: { slug: string; live: boolean }) 
                 <Avatar name={c.user.name} src={c.user.avatarUrl} size="sm" />
                 <div className="min-w-0 flex-1">
                   <p className="text-sm">
-                    <span className="font-bold">{c.user.name}</span>{" "}
+                    <span className="font-bold">{c.user.name}</span>
+                    {c.user.badges.map((b) => (
+                      <span key={b.slug} title={b.name} className="ml-1" aria-hidden>
+                        {b.icon}
+                      </span>
+                    ))}{" "}
                     <span className="text-xs text-muted-foreground">· {timeAgo(c.createdAt)}</span>
                   </p>
-                  <p className="mt-1 whitespace-pre-line text-sm text-foreground/90">{c.body}</p>
+                  <p className="mt-1 whitespace-pre-line text-sm text-foreground/90">
+                    {renderBody(c.body)}
+                  </p>
                   {status === "authenticated" && live && (
                     <button
                       type="button"

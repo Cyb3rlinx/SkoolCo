@@ -15,6 +15,7 @@ import { SearchAutocomplete } from "./search-autocomplete";
 
 const NAV_LINKS = [
   { href: "/launches", label: "Lanzamientos" },
+  { href: "/colecciones", label: "Colecciones" },
   { href: "/leaderboard", label: "Ranking" },
   { href: "/extension", label: "Extensión" },
   { href: "/#como-funciona", label: "Recursos" },

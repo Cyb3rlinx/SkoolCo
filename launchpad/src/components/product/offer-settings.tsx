@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { Handshake } from "lucide-react";
-import { ApiClientError, updateProduct } from "@/lib/frontend/api-client";
+import { ApiClientError, markProductSold, updateProduct } from "@/lib/frontend/api-client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,7 @@ export function OfferSettings({
   declaredMrrUsd,
   monetizationNote,
   offerViewCount,
+  soldAt,
   onUpdated,
 }: {
   slug: string;
@@ -28,6 +29,7 @@ export function OfferSettings({
   declaredMrrUsd?: number | null;
   monetizationNote?: string | null;
   offerViewCount?: number;
+  soldAt?: string | null;
   onUpdated: () => void;
 }) {
   const { data: session } = useSession();
@@ -37,8 +39,38 @@ export function OfferSettings({
   const [note, setNote] = useState(monetizationNote ?? "");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [marking, setMarking] = useState(false);
 
   if (session?.user?.id !== makerId) return null;
+
+  async function onMarkSold() {
+    if (!window.confirm("¿Confirmas que vendiste este producto? Esto apaga \"Abierto a ofertas\" y no se puede deshacer desde acá.")) return;
+    setMarking(true);
+    try {
+      await markProductSold(slug);
+      onUpdated();
+    } catch (err) {
+      setError(err instanceof ApiClientError ? err.message : "No se pudo marcar como vendido.");
+    } finally {
+      setMarking(false);
+    }
+  }
+
+  if (soldAt) {
+    return (
+      <Card className="border-dashed">
+        <CardContent className="space-y-1 p-5">
+          <p className="flex items-center gap-2 text-sm font-bold">
+            <Handshake className="h-4 w-4 text-primary" aria-hidden />
+            Vendido ✅
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Marcaste este producto como vendido. Ya no aparece como abierto a ofertas.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   async function onSave(e: React.FormEvent) {
     e.preventDefault();
@@ -92,9 +124,17 @@ export function OfferSettings({
                   : "Todavía nadie vio tu oferta."}
               </p>
             )}
-            <Button variant="outline" size="sm" onClick={() => setEditing(true)}>
-              Configurar
-            </Button>
+            {error && <Alert variant="destructive">{error}</Alert>}
+            <div className="flex flex-wrap gap-2">
+              <Button variant="outline" size="sm" onClick={() => setEditing(true)}>
+                Configurar
+              </Button>
+              {openToOffers && (
+                <Button variant="ghost" size="sm" disabled={marking} onClick={onMarkSold}>
+                  {marking ? "Marcando…" : "Marcar como vendido"}
+                </Button>
+              )}
+            </div>
           </>
         ) : (
           <form onSubmit={onSave} className="space-y-3" noValidate>

@@ -170,6 +170,8 @@ export function SubmitLaunchForm() {
         verifiedAt: null,
       },
       _count: { upvotes: 1, comments: 0 },
+      openToOffers: false,
+      soldAt: null,
     }),
     [name, tagline, logoUrl, filePreview, websiteUrl, mode, categories, categoryId, session]
   );

@@ -33,6 +33,7 @@ export function LaunchesClient() {
   const category = searchParams.get("category") ?? "";
   const sort = (searchParams.get("sort") as "newest" | "top" | "trending" | null) ?? "newest";
   const windowParam = (searchParams.get("window") as Window | null) ?? "today";
+  const openToOffers = searchParams.get("openToOffers") === "1";
 
   /** Update one query param while keeping the rest (shareable URLs). */
   const setParam = useCallback(
@@ -53,10 +54,11 @@ export function LaunchesClient() {
     () => ({
       q: q || undefined,
       category: category || undefined,
+      openToOffers: openToOffers || undefined,
       sort,
       pageSize: 50,
     }),
-    [q, category, sort]
+    [q, category, openToOffers, sort]
   );
 
   const heading =
@@ -82,6 +84,16 @@ export function LaunchesClient() {
       {/* Filters */}
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <Tabs items={TAB_ITEMS} value={windowParam} onChange={(v) => setParam("window", v === "today" ? "" : v)} />
+
+        <label className="flex items-center gap-2 text-sm font-medium">
+          <input
+            type="checkbox"
+            checked={openToOffers}
+            onChange={(e) => setParam("openToOffers", e.target.checked ? "1" : "")}
+            className="h-4 w-4 rounded border-input"
+          />
+          Solo abiertos a ofertas
+        </label>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:w-auto lg:min-w-[540px]">
           <div className="space-y-1.5">
