@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/db";
-import { getSessionUser, ApiError } from "@/lib/auth";
+import { requireUser, ApiError } from "@/lib/auth";
 import { collaborationSelect } from "@/lib/collaborations";
 import { withErrorHandling, ok, noContent } from "@/lib/api";
 
@@ -19,8 +19,7 @@ export const GET = withErrorHandling(
 /** DELETE /api/collaborations/:id — el autor o un admin/moderador la borran. */
 export const DELETE = withErrorHandling(
   async (_req: Request, { params }: { params: { id: string } }) => {
-    const user = await getSessionUser();
-    if (!user) throw new ApiError(401, "Authentication required");
+    const user = await requireUser();
 
     const collaboration = await prisma.collaboration.findUnique({
       where: { id: params.id },
