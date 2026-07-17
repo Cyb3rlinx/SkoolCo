@@ -6,6 +6,7 @@ import { withErrorHandling, parseBody, ok, created, errorResponse } from "@/lib/
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 import { findProduct } from "@/lib/products";
 import { notify } from "@/lib/notifications";
+import { extractMentions } from "@/lib/mentions";
 
 type Params = { params: { slug: string } };
 
@@ -65,6 +66,25 @@ export const POST = withErrorHandling(async (req: Request, { params }: Params) =
     productId: product.id,
     commentId: comment.id,
   });
+
+  const mentionedUsernames = extractMentions(input.body);
+  if (mentionedUsernames.length > 0) {
+    const mentionedUsers = await prisma.user.findMany({
+      where: { username: { in: mentionedUsernames }, suspendedAt: null, id: { not: user.id } },
+      select: { id: true },
+    });
+    await Promise.all(
+      mentionedUsers.map((mentioned) =>
+        notify({
+          userId: mentioned.id,
+          actorId: user.id,
+          type: "MENTION",
+          productId: product.id,
+          commentId: comment.id,
+        })
+      )
+    );
+  }
 
   return created(comment);
 });

@@ -183,7 +183,7 @@ export interface LeaderboardEntry {
 // Notifications
 // ---------------------------------------------------------------------------
 
-export type NotificationType = "UPVOTE" | "COMMENT";
+export type NotificationType = "UPVOTE" | "COMMENT" | "MENTION";
 
 export interface NotificationItem {
   id: string;
