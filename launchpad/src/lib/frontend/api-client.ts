@@ -368,6 +368,18 @@ export function fetchUser(id: string) {
   return request<PublicUser>(`/api/users/${encodeURIComponent(id)}`);
 }
 
+/** POST /api/users/:id/follow (auth). */
+export function followUser(id: string) {
+  return request<{ following: boolean }>(`/api/users/${encodeURIComponent(id)}/follow`, {
+    method: "POST",
+  });
+}
+
+/** DELETE /api/users/:id/follow (auth). */
+export function unfollowUser(id: string) {
+  return request<void>(`/api/users/${encodeURIComponent(id)}/follow`, { method: "DELETE" });
+}
+
 /** POST /api/community-links (auth) — submit a public skool.com achievement link. */
 export function submitCommunityLink(input: {
   title: string;

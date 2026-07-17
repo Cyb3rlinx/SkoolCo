@@ -15,6 +15,7 @@ import { Spinner } from "@/components/ui/spinner";
 
 function notificationText(n: NotificationItem): string {
   if (n.type === "UPVOTE") return "votó tu producto";
+  if (n.type === "FOLLOWED_LAUNCH") return "publicó un nuevo lanzamiento:";
   return "comentó en";
 }
 

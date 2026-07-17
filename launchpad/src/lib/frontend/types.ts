@@ -42,7 +42,8 @@ export interface PublicUser {
   avatarUrl: string | null;
   bio: string | null;
   createdAt: string;
-  _count: { products: number; upvotes: number; comments: number };
+  _count: { products: number; upvotes: number; comments: number; followers: number };
+  isFollowedByMe: boolean;
 }
 
 /** GET /api/me */
@@ -185,7 +186,7 @@ export interface LeaderboardEntry {
 // Notifications
 // ---------------------------------------------------------------------------
 
-export type NotificationType = "UPVOTE" | "COMMENT";
+export type NotificationType = "UPVOTE" | "COMMENT" | "FOLLOWED_LAUNCH";
 
 export interface NotificationItem {
   id: string;

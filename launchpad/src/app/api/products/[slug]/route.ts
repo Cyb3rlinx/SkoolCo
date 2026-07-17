@@ -4,6 +4,7 @@ import { getSessionUser, requireUser, ApiError } from "@/lib/auth";
 import { updateProductSchema } from "@/lib/validation";
 import { productListSelect, findProduct } from "@/lib/products";
 import { withErrorHandling, parseBody, ok, noContent } from "@/lib/api";
+import { notify } from "@/lib/notifications";
 
 type Params = { params: { slug: string } };
 
@@ -90,6 +91,24 @@ export const PATCH = withErrorHandling(async (req: Request, { params }: Params) 
     data: input,
     select: detailSelect,
   });
+
+  // Avisar a los seguidores del maker cuando su producto pasa A "LIVE".
+  if (input.status === "LIVE" && base.status !== "LIVE") {
+    const followers = await prisma.follow.findMany({
+      where: { followingId: base.makerId },
+      select: { followerId: true },
+    });
+    await Promise.all(
+      followers.map((f) =>
+        notify({
+          userId: f.followerId,
+          actorId: base.makerId,
+          type: "FOLLOWED_LAUNCH",
+          productId: base.id,
+        })
+      )
+    );
+  }
 
   return ok(product);
 });
