@@ -5,6 +5,7 @@ import { updateProductSchema } from "@/lib/validation";
 import { productListSelect, findProduct } from "@/lib/products";
 import { withErrorHandling, parseBody, ok, noContent } from "@/lib/api";
 import { notify } from "@/lib/notifications";
+import { shouldGrantFundador, shouldGrantPrimerLanzamiento, grantBadgeIfMissing } from "@/lib/badges";
 
 type Params = { params: { slug: string } };
 
@@ -92,7 +93,7 @@ export const PATCH = withErrorHandling(async (req: Request, { params }: Params) 
     select: detailSelect,
   });
 
-  // Avisar a los seguidores del maker cuando su producto pasa A "LIVE".
+  // Al pasar A "LIVE" desde otro estado: avisar seguidores + insignias automáticas.
   if (input.status === "LIVE" && base.status !== "LIVE") {
     const followers = await prisma.follow.findMany({
       where: { followingId: base.makerId },
@@ -108,6 +109,17 @@ export const PATCH = withErrorHandling(async (req: Request, { params }: Params) 
         })
       )
     );
+
+    const [liveMakerCount, makerLiveProductCount] = await Promise.all([
+      prisma.user.count({ where: { products: { some: { status: "LIVE" } } } }),
+      prisma.product.count({ where: { makerId: base.makerId, status: "LIVE" } }),
+    ]);
+    if (shouldGrantFundador(liveMakerCount)) {
+      await grantBadgeIfMissing(base.makerId, "fundador", null);
+    }
+    if (shouldGrantPrimerLanzamiento(makerLiveProductCount)) {
+      await grantBadgeIfMissing(base.makerId, "primer-lanzamiento", null);
+    }
   }
 
   return ok(product);

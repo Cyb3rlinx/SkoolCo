@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { detectPlatform } from "@/lib/platforms";
+import { RESERVED_USERNAMES } from "@/lib/username";
 
 // ---------------------------------------------------------------------------
 // Auth
@@ -10,6 +11,15 @@ export const registerSchema = z.object({
   email: z.string().trim().toLowerCase().email().max(254),
   password: z.string().min(8).max(128),
 });
+
+export const usernameSchema = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .min(3)
+  .max(30)
+  .regex(/^[a-z0-9-]+$/, "Solo minúsculas, números y guiones")
+  .refine((v) => !RESERVED_USERNAMES.has(v), "Ese nombre de usuario no está disponible");
 
 /** Absolute http(s) URL or an internal uploaded-image path (/api/uploads/:id). */
 export const imageUrlSchema = z
@@ -25,6 +35,7 @@ export const updateProfileSchema = z.object({
   name: z.string().trim().min(2).max(80).optional(),
   bio: z.string().trim().max(500).optional(),
   avatarUrl: imageUrlSchema.optional().nullable(),
+  username: usernameSchema.optional(),
 });
 
 // ---------------------------------------------------------------------------
@@ -76,6 +87,11 @@ export const listProductsQuerySchema = z.object({
 
 export const createCommentSchema = z.object({
   body: z.string().trim().min(1).max(2000),
+});
+
+/** POST /api/products/:slug/updates — bitácora de progreso del maker. */
+export const createProductUpdateSchema = z.object({
+  body: z.string().trim().min(5).max(1000),
 });
 
 export const createReportSchema = z
@@ -180,6 +196,11 @@ export const adminUpdateUserSchema = z
   .refine((v) => v.role !== undefined || v.suspended !== undefined, {
     message: "Debes enviar al menos un cambio (role o suspended).",
   });
+
+/** POST /api/admin/users/:id/badges — otorga una insignia del catálogo. */
+export const grantBadgeSchema = z.object({
+  badgeSlug: z.string().min(1).max(60),
+});
 
 /** POST /api/contact — formulario público de contacto. */
 export const contactMessageSchema = z.object({

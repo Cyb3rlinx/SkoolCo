@@ -137,6 +137,20 @@ export function MakerProfileClient({ id }: { id: string }) {
                 <UserCheck className="h-3 w-3" aria-hidden /> {profile._count.followers} seguidores
               </Badge>
             </div>
+            {profile.badges.length > 0 && (
+              <div className="flex flex-wrap gap-2 pt-1">
+                {profile.badges.map((b) => (
+                  <span
+                    key={b.slug}
+                    title={b.description}
+                    className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary"
+                  >
+                    <span aria-hidden>{b.icon}</span>
+                    {b.name}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

@@ -15,10 +15,12 @@ import { ProductLogo } from "@/components/product/product-logo";
 import { UpvoteButton } from "@/components/product/upvote-button";
 import { ProductGallery } from "@/components/product/product-gallery";
 import { CommentSection } from "@/components/product/comment-section";
+import { ProductUpdatesSection } from "@/components/product/product-updates-section";
 import { MakerCard } from "@/components/product/maker-card";
 import { OfferCard } from "@/components/product/offer-card";
 import { OfferSettings } from "@/components/product/offer-settings";
 import { ChangeLogoButton } from "@/components/product/change-logo-button";
+import { EmbedBadgeCard } from "@/components/product/embed-badge-card";
 import { RelatedLaunches } from "@/components/product/related-launches";
 import { VoteWidgetCard } from "@/components/product/vote-widget-card";
 import { ReportButton } from "@/components/product/report-button";
@@ -163,6 +165,8 @@ export function ProductDetailClient({ slug }: { slug: string }) {
             </p>
           </section>
 
+          <ProductUpdatesSection slug={product.slug} makerId={product.maker.id} />
+
           <CommentSection slug={product.slug} live={product.status === "LIVE"} />
         </div>
 
@@ -206,6 +210,8 @@ export function ProductDetailClient({ slug }: { slug: string }) {
           </Card>
 
           <VoteWidgetCard slug={product.slug} makerId={product.maker.id} />
+
+          <EmbedBadgeCard slug={product.slug} makerId={product.maker.id} />
 
           <RelatedLaunches categorySlug={product.category.slug} excludeSlug={product.slug} />
         </aside>

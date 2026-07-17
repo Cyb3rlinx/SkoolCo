@@ -35,6 +35,17 @@ async function main() {
     );
   }
 
+  // --- Insignias (catálogo fijo) -------------------------------------------
+  const badgeData = [
+    { slug: "fundador", name: "Fundador", description: "Uno de los primeros 10 makers en lanzar en Denveler", icon: "🏛️" },
+    { slug: "primer-lanzamiento", name: "Primer lanzamiento", description: "Publicó su primer producto en Denveler", icon: "🚀" },
+    { slug: "top-10-mes", name: "Top 10 del mes", description: "Producto entre los 10 más votados del mes", icon: "🏆" },
+    { slug: "vendido", name: "Vendido", description: "Concretó la venta de su producto a través de Denveler", icon: "🤝" },
+  ];
+  for (const b of badgeData) {
+    await prisma.badge.upsert({ where: { slug: b.slug }, update: {}, create: b });
+  }
+
   // --- Users ---------------------------------------------------------------
   const [admin, mod, ana, luis] = await Promise.all([
     prisma.user.upsert({
