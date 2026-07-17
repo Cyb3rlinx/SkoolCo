@@ -158,7 +158,7 @@ function ReportRow({
   const target = report.product
     ? { label: report.product.name, href: `/products/${report.product.slug}` }
     : report.comment
-      ? { label: `Comentario: "${report.comment.body.slice(0, 60)}…"`, href: null }
+      ? { label: `Comentario: “${report.comment.body.slice(0, 60)}…”`, href: null }
       : report.collaboration
         ? { label: report.collaboration.title, href: `/colaboraciones/${report.collaboration.id}` }
         : { label: "Contenido eliminado", href: null };
@@ -188,7 +188,7 @@ function ReportRow({
           </p>
 
           <p className="rounded-lg bg-muted/60 px-3 py-2 text-sm text-foreground/90">
-            "{report.reason}"
+            “{report.reason}”
           </p>
 
           <p className="text-xs text-muted-foreground">
