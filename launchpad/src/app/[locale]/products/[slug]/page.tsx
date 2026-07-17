@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cache } from "react";
 import { prisma } from "@/lib/db";
 import { ProductDetailClient } from "./product-detail-client";
 
@@ -6,15 +7,30 @@ interface Props {
   params: { slug: string };
 }
 
+/** Cached so generateMetadata and the page body share one DB hit per request. */
+const getProduct = cache(async (slug: string) => {
+  return prisma.product
+    .findUnique({
+      where: { slug },
+      select: {
+        name: true,
+        tagline: true,
+        description: true,
+        logoUrl: true,
+        websiteUrl: true,
+        status: true,
+        launchDate: true,
+        category: { select: { name: true } },
+        maker: { select: { name: true } },
+      },
+    })
+    .catch(() => null); // DB down → fall back to slug-derived title
+});
+
 /** Real title/description for search results and social shares. The page body
  * stays client-fetched; this runs server-side only for metadata. */
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const product = await prisma.product
-    .findUnique({
-      where: { slug: params.slug },
-      select: { name: true, tagline: true, status: true },
-    })
-    .catch(() => null); // DB down → fall back to slug-derived title
+  const product = await getProduct(params.slug);
 
   if (!product || product.status !== "LIVE") {
     const readable = params.slug.replace(/-/g, " ");
@@ -29,6 +45,36 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function ProductDetailPage({ params }: Props) {
-  return <ProductDetailClient slug={params.slug} />;
+export default async function ProductDetailPage({ params }: Props) {
+  const product = await getProduct(params.slug);
+  const siteUrl = process.env.NEXTAUTH_URL ?? "https://denveler.com";
+
+  const jsonLd =
+    product && product.status === "LIVE"
+      ? {
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name: product.name,
+          description: product.description,
+          category: product.category.name,
+          releaseDate: product.launchDate.toISOString(),
+          url: `${siteUrl}/products/${params.slug}`,
+          ...(product.logoUrl ? { image: product.logoUrl } : {}),
+          ...(product.websiteUrl ? { sameAs: product.websiteUrl } : {}),
+          brand: { "@type": "Organization", name: product.maker.name },
+        }
+      : null;
+
+  return (
+    <>
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
+      <ProductDetailClient slug={params.slug} />
+    </>
+  );
 }

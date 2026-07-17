@@ -32,10 +32,15 @@ export function middleware(req: NextRequest) {
     return res;
   }
 
-  // API routes and the admin panel stay outside next-intl's locale routing
-  // (admin is Spanish-only and out of scope for this pass; API responses
-  // never carry a locale prefix).
-  const skipIntl = pathname.startsWith("/api") || pathname.startsWith("/admin");
+  // API routes, the admin panel, and root-level metadata files stay outside
+  // next-intl's locale routing (admin is Spanish-only and out of scope for
+  // this pass; API responses never carry a locale prefix; robots.txt and
+  // sitemap.xml are single files with no locale variant).
+  const skipIntl =
+    pathname.startsWith("/api") ||
+    pathname.startsWith("/admin") ||
+    pathname === "/robots.txt" ||
+    pathname === "/sitemap.xml";
   const res = skipIntl ? NextResponse.next() : intlMiddleware(req);
   if (allowed) applyCors(res, origin!);
   applySecurity(res);
