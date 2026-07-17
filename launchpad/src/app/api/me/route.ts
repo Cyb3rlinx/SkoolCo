@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { requireUser, ApiError } from "@/lib/auth";
 import { updateProfileSchema, deleteAccountSchema } from "@/lib/validation";
 import { withErrorHandling, parseBody, ok, noContent, errorResponse } from "@/lib/api";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 const profileSelect = {
   id: true,
@@ -30,6 +31,11 @@ export const GET = withErrorHandling(async () => {
 /** PATCH /api/me — update name, bio, avatarUrl, username (una sola vez). */
 export const PATCH = withErrorHandling(async (req: Request) => {
   const sessionUser = await requireUser();
+
+  if (!(await checkRateLimit(`me-edit:${sessionUser.id}`, RATE_LIMITS.selfAction))) {
+    return errorResponse(429, "Estás editando demasiado rápido. Intenta de nuevo en un minuto.");
+  }
+
   const { username, ...rest } = await parseBody(req, updateProfileSchema);
 
   let usernameUpdate: { username: string; usernameChangedAt: Date } | Record<string, never> = {};

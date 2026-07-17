@@ -3,7 +3,8 @@ import { prisma } from "@/lib/db";
 import { getSessionUser, requireUser, ApiError } from "@/lib/auth";
 import { updateProductSchema } from "@/lib/validation";
 import { productListSelect, findProduct } from "@/lib/products";
-import { withErrorHandling, parseBody, ok, noContent } from "@/lib/api";
+import { withErrorHandling, parseBody, ok, noContent, errorResponse } from "@/lib/api";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 import { notify } from "@/lib/notifications";
 import { shouldGrantFundador, shouldGrantPrimerLanzamiento, grantBadgeIfMissing } from "@/lib/badges";
 
@@ -84,6 +85,10 @@ export const PATCH = withErrorHandling(async (req: Request, { params }: Params) 
 
   if (base.makerId !== user.id && !isStaff) {
     throw new ApiError(403, "You can only edit your own products");
+  }
+
+  if (!(await checkRateLimit(`product-edit:${user.id}`, RATE_LIMITS.productEdit))) {
+    return errorResponse(429, "You're editing too fast. Try again later.");
   }
 
   const input = await parseBody(req, updateProductSchema);

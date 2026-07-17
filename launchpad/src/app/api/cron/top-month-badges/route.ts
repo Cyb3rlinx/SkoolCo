@@ -14,6 +14,9 @@ import { grantBadgeIfMissing } from "@/lib/badges";
  */
 export const GET = withErrorHandling(async (req: Request) => {
   const secret = process.env.CRON_SECRET;
+  if (!secret && process.env.NODE_ENV === "production") {
+    throw new ApiError(500, "CRON_SECRET no configurado en producción");
+  }
   if (secret && req.headers.get("authorization") !== `Bearer ${secret}`) {
     throw new ApiError(401, "Unauthorized");
   }
