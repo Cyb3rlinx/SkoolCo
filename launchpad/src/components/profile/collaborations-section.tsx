@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Handshake, Trash2 } from "lucide-react";
 import { fetchMyCollaborations, deleteCollaboration } from "@/lib/frontend/api-client";
 import { useApi } from "@/lib/frontend/hooks";
@@ -15,6 +15,7 @@ import { Link } from "@/i18n/navigation";
 /** Anuncios de "Colaboraciones" publicados por el usuario, con borrado directo. */
 export function CollaborationsSection() {
   const t = useTranslations("collaborations");
+  const locale = useLocale();
   const { data, loading, error, refetch } = useApi(fetchMyCollaborations, {});
 
   if (!loading && !error && (data?.length ?? 0) === 0) return null;
@@ -43,7 +44,7 @@ export function CollaborationsSection() {
                   <Badge variant={c.type === "NEEDS" ? "warning" : "success"}>
                     {c.type === "NEEDS" ? t("typeNeeds") : t("typeOffers")}
                   </Badge>
-                  <span className="text-xs text-muted-foreground">{formatDate(c.createdAt)}</span>
+                  <span className="text-xs text-muted-foreground">{formatDate(c.createdAt, locale)}</span>
                 </div>
                 <Link href={`/colaboraciones/${c.id}`} className="font-bold hover:text-primary hover:underline">
                   {c.title}

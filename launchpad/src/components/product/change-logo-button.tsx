@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
 import { ImagePlus } from "lucide-react";
 import { ApiClientError, updateProduct, uploadImage } from "@/lib/frontend/api-client";
@@ -21,6 +22,7 @@ export function ChangeLogoButton({
   makerId: string;
   onUpdated: () => void;
 }) {
+  const t = useTranslations("product.changeLogo");
   const { data: session } = useSession();
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
@@ -37,11 +39,11 @@ export function ChangeLogoButton({
     setError(null);
 
     if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
-      setError("Usa PNG, JPG o WebP.");
+      setError(t("errorFileType"));
       return;
     }
     if (file.size > 2 * 1024 * 1024) {
-      setError("Máximo 2MB.");
+      setError(t("errorFileSize"));
       return;
     }
 
@@ -51,7 +53,7 @@ export function ChangeLogoButton({
       await updateProduct(slug, { logoUrl: url });
       onUpdated();
     } catch (err) {
-      setError(err instanceof ApiClientError ? err.message : "No se pudo actualizar el logo.");
+      setError(err instanceof ApiClientError ? err.message : t("errorUpdate"));
     } finally {
       setBusy(false);
       e.target.value = "";
@@ -69,7 +71,7 @@ export function ChangeLogoButton({
         aria-busy={busy}
       >
         <ImagePlus className="h-3.5 w-3.5" aria-hidden />
-        {busy ? "Subiendo…" : "Cambiar logo"}
+        {busy ? t("uploading") : t("cta")}
       </Button>
       <input
         ref={inputRef}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Handshake } from "lucide-react";
 import {
   ApiClientError,
@@ -21,6 +21,7 @@ import { Link } from "@/i18n/navigation";
 /** Solicitudes de contacto recibidas por las colaboraciones del usuario. */
 export function CollaborationContactRequestsSection() {
   const t = useTranslations("collaborations");
+  const locale = useLocale();
   const requests = useApi(fetchMyCollaborationContactRequests, {});
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +39,7 @@ export function CollaborationContactRequestsSection() {
       await resolveCollaborationContactRequest(id, status);
       requests.refetch();
     } catch (err) {
-      setError(err instanceof ApiClientError ? err.message : "No se pudo actualizar.");
+      setError(err instanceof ApiClientError ? err.message : t("errorUpdateRequest"));
     } finally {
       setBusyId(null);
     }
@@ -67,7 +68,7 @@ export function CollaborationContactRequestsSection() {
               <CardContent className="space-y-2 p-5">
                 <div className="flex flex-wrap items-center gap-2 text-sm">
                   <span className="font-bold">{r.responder?.name}</span>
-                  <span className="text-muted-foreground">está interesado en</span>
+                  <span className="text-muted-foreground">{t("interestedIn")}</span>
                   <Link
                     href={`/colaboraciones/${r.collaboration.id}`}
                     className="font-bold text-primary hover:underline"
@@ -75,7 +76,7 @@ export function CollaborationContactRequestsSection() {
                     {r.collaboration.title}
                   </Link>
                   <Badge variant={chip.variant}>{chip.text}</Badge>
-                  <span className="ml-auto text-xs text-muted-foreground">{formatDate(r.createdAt)}</span>
+                  <span className="ml-auto text-xs text-muted-foreground">{formatDate(r.createdAt, locale)}</span>
                 </div>
                 <p className="rounded-xl bg-muted p-3 text-sm">{r.message}</p>
                 {r.status === "PENDING" && (

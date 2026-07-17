@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { CalendarDays, MessageCircle, Pencil, Rocket, ThumbsUp, Trash2 } from "lucide-react";
@@ -40,14 +41,25 @@ async function fetchMyLaunches(): Promise<ProductListItem[]> {
   return mine.items;
 }
 
-const STATUS_LABEL: Record<string, { text: string; variant: "success" | "warning" | "secondary" | "outline" }> = {
-  LIVE: { text: "Publicado", variant: "success" },
-  SCHEDULED: { text: "Programado", variant: "warning" },
-  DRAFT: { text: "Borrador", variant: "secondary" },
-  ARCHIVED: { text: "Archivado", variant: "outline" },
+const STATUS_VARIANT: Record<string, "success" | "warning" | "secondary" | "outline"> = {
+  LIVE: "success",
+  SCHEDULED: "warning",
+  DRAFT: "secondary",
+  ARCHIVED: "outline",
+};
+
+const STATUS_KEY: Record<string, "published" | "scheduled" | "draft" | "archived"> = {
+  LIVE: "published",
+  SCHEDULED: "scheduled",
+  DRAFT: "draft",
+  ARCHIVED: "archived",
 };
 
 export function ProfileClient() {
+  const t = useTranslations("profile");
+  const tStatus = useTranslations("product.status");
+  const tMaker = useTranslations("makerProfile");
+  const locale = useLocale();
   const router = useRouter();
   const { data: session } = useSession();
   const [editing, setEditing] = useState(false);
@@ -90,7 +102,7 @@ export function ProfileClient() {
   }
 
   if (me.error || !me.data) {
-    return <ErrorState message={me.error ?? "No pudimos cargar tu perfil."} onRetry={me.refetch} />;
+    return <ErrorState message={me.error ?? t("loadError")} onRetry={me.refetch} />;
   }
 
   const profile: MeProfile = me.data;
@@ -116,24 +128,29 @@ export function ProfileClient() {
                 <div className="flex flex-wrap items-center gap-2">
                   <h1 className="text-2xl font-extrabold tracking-tight">{profile.name}</h1>
                   {profile.role !== "USER" && (
-                    <Badge variant="gradient">{profile.role === "ADMIN" ? "Admin" : "Mod"}</Badge>
+                    <Badge variant="gradient">
+                      {profile.role === "ADMIN" ? t("roleAdmin") : t("roleMod")}
+                    </Badge>
                   )}
                 </div>
                 <p className="text-sm text-muted-foreground">{profile.email}</p>
                 {profile.bio && <p className="max-w-xl text-sm">{profile.bio}</p>}
                 <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
                   <CalendarDays className="h-3.5 w-3.5" aria-hidden />
-                  En la comunidad desde {formatDate(profile.createdAt)}
+                  {tMaker("memberSince", { date: formatDate(profile.createdAt, locale) })}
                 </p>
                 <div className="flex flex-wrap gap-2 pt-1">
                   <Badge variant="secondary">
-                    <Rocket className="h-3 w-3" aria-hidden /> {profile._count.products} lanzamientos
+                    <Rocket className="h-3 w-3" aria-hidden />{" "}
+                    {tMaker("launchesCount", { count: profile._count.products })}
                   </Badge>
                   <Badge variant="secondary">
-                    <ThumbsUp className="h-3 w-3" aria-hidden /> {profile._count.upvotes} votos dados
+                    <ThumbsUp className="h-3 w-3" aria-hidden />{" "}
+                    {tMaker("votesGiven", { count: profile._count.upvotes })}
                   </Badge>
                   <Badge variant="secondary">
-                    <MessageCircle className="h-3 w-3" aria-hidden /> {profile._count.comments} comentarios
+                    <MessageCircle className="h-3 w-3" aria-hidden />{" "}
+                    {tMaker("commentsCount", { count: profile._count.comments })}
                   </Badge>
                 </div>
               </>
@@ -142,7 +159,7 @@ export function ProfileClient() {
           {!editing && (
             <Button variant="outline" size="sm" onClick={() => setEditing(true)}>
               <Pencil className="h-3.5 w-3.5" aria-hidden />
-              Editar perfil
+              {t("editProfile")}
             </Button>
           )}
         </CardContent>
@@ -152,11 +169,11 @@ export function ProfileClient() {
       <section className="space-y-4" aria-labelledby="my-launches-title">
         <div className="flex items-center justify-between">
           <h2 id="my-launches-title" className="text-xl font-extrabold">
-            Mis lanzamientos
+            {t("myLaunches")}
           </h2>
           <Link href="/submit" className={buttonVariants({ variant: "gradient", size: "sm" })}>
             <Rocket className="h-3.5 w-3.5" aria-hidden />
-            Nuevo lanzamiento
+            {t("newLaunch")}
           </Link>
         </div>
 
@@ -173,11 +190,11 @@ export function ProfileClient() {
 
         {!launches.loading && !launches.error && launches.data && launches.data.length === 0 && (
           <EmptyState
-            title="Todavía no lanzaste nada"
-            description="Tu primer lanzamiento está a un formulario de distancia. La comunidad quiere verlo."
+            title={t("emptyLaunchesTitle")}
+            description={t("emptyLaunchesDescription")}
             action={
               <Link href="/submit" className={buttonVariants({ variant: "gradient" })}>
-                Publicar mi primer producto
+                {t("publishFirstProduct")}
               </Link>
             }
           />
@@ -185,12 +202,13 @@ export function ProfileClient() {
 
         <div className="space-y-3">
           {launches.data?.map((p) => {
-            const s = STATUS_LABEL[p.status] ?? STATUS_LABEL.DRAFT;
+            const variant = STATUS_VARIANT[p.status] ?? STATUS_VARIANT.DRAFT;
+            const statusKey = STATUS_KEY[p.status] ?? STATUS_KEY.DRAFT;
             return (
               <div key={p.id} className="relative">
                 <ProductCard product={p} />
-                <Badge variant={s.variant} className="absolute -top-2 left-4">
-                  {s.text}
+                <Badge variant={variant} className="absolute -top-2 left-4">
+                  {tStatus(statusKey)}
                 </Badge>
               </div>
             );
@@ -211,15 +229,13 @@ export function ProfileClient() {
       {/* Danger zone */}
       <Card className="border-destructive/30">
         <CardHeader>
-          <CardTitle className="text-destructive">Zona de peligro</CardTitle>
+          <CardTitle className="text-destructive">{t("dangerZoneTitle")}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-          <p className="text-sm text-muted-foreground">
-            Eliminar tu cuenta borra tus productos, votos y comentarios. No hay vuelta atrás.
-          </p>
+          <p className="text-sm text-muted-foreground">{t("dangerZoneDescription")}</p>
           <Button variant="destructive" size="sm" onClick={() => setConfirmOpen(true)}>
             <Trash2 className="h-3.5 w-3.5" aria-hidden />
-            Eliminar cuenta
+            {t("deleteAccount")}
           </Button>
         </CardContent>
       </Card>
@@ -227,11 +243,11 @@ export function ProfileClient() {
       <Dialog
         open={confirmOpen}
         onClose={() => setConfirmOpen(false)}
-        title="¿Eliminar tu cuenta?"
-        description="Esta acción es permanente. Confirma con tu contraseña."
+        title={t("deleteDialogTitle")}
+        description={t("deleteDialogDescription")}
       >
         <form onSubmit={onDelete} className="space-y-4" noValidate>
-          <Field id="del-password" label="Contraseña">
+          <Field id="del-password" label={t("passwordLabel")}>
             <Input
               id="del-password"
               type="password"
@@ -245,10 +261,10 @@ export function ProfileClient() {
           {del.error && <Alert variant="destructive">{del.error}</Alert>}
           <div className="flex justify-end gap-2">
             <Button variant="ghost" onClick={() => setConfirmOpen(false)}>
-              Cancelar
+              {t("cancel")}
             </Button>
             <Button type="submit" variant="destructive" disabled={del.submitting || !password}>
-              {del.submitting ? "Eliminando…" : "Eliminar definitivamente"}
+              {del.submitting ? t("deleting") : t("deletePermanently")}
             </Button>
           </div>
         </form>

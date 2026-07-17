@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   ApiClientError,
   addToCollection,
@@ -22,6 +23,7 @@ import { EmptyState, ErrorState } from "@/components/ui/states";
 
 /** Pestaña Colecciones — crear, borrar, y agregar/quitar productos (solo ADMIN). */
 export function CollectionsSection() {
+  const t = useTranslations("admin.collections");
   const { data, loading, error, refetch } = useApi(fetchCollections, {});
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -38,14 +40,14 @@ export function CollectionsSection() {
       setDescription("");
       refetch();
     } catch (err) {
-      setCreateError(err instanceof ApiClientError ? err.message : "No se pudo crear la colección.");
+      setCreateError(err instanceof ApiClientError ? err.message : t("errorCreate"));
     } finally {
       setCreating(false);
     }
   }
 
   async function onDelete(id: string) {
-    if (!window.confirm("¿Borrar esta colección? No borra los productos, solo la selección.")) return;
+    if (!window.confirm(t("confirmDelete"))) return;
     await deleteCollection(id);
     refetch();
   }
@@ -54,16 +56,16 @@ export function CollectionsSection() {
     <div className="space-y-6">
       <Card>
         <CardContent className="space-y-3 p-4">
-          <p className="font-semibold">Nueva colección</p>
+          <p className="font-semibold">{t("newCollection")}</p>
           <Input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="Título (ej. Mejores herramientas de IA de la semana)"
+            placeholder={t("titlePlaceholder")}
           />
           <Textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Descripción corta"
+            placeholder={t("descriptionPlaceholder")}
           />
           {createError && <Alert variant="destructive">{createError}</Alert>}
           <Button
@@ -71,7 +73,7 @@ export function CollectionsSection() {
             disabled={creating || title.trim().length < 3 || description.trim().length < 10}
             onClick={onCreate}
           >
-            {creating ? "Creando…" : "Crear colección"}
+            {creating ? t("creating") : t("createAction")}
           </Button>
         </CardContent>
       </Card>
@@ -79,7 +81,7 @@ export function CollectionsSection() {
       {loading && <Skeleton className="h-24 rounded-2xl" aria-busy="true" />}
       {!loading && error && <ErrorState message={error} onRetry={refetch} />}
       {!loading && !error && data && data.length === 0 && (
-        <EmptyState title="Sin colecciones" description="Crea la primera arriba." />
+        <EmptyState title={t("noneTitle")} description={t("noneDescription")} />
       )}
 
       {!loading && !error && data && data.length > 0 && (
@@ -91,7 +93,7 @@ export function CollectionsSection() {
                   <div>
                     <p className="font-semibold">{c.title}</p>
                     <p className="text-xs text-muted-foreground">
-                      {c.productCount} productos · /colecciones/{c.slug}
+                      {t("productCount", { count: c.productCount, slug: c.slug })}
                     </p>
                   </div>
                   <div className="flex gap-2">
@@ -100,10 +102,10 @@ export function CollectionsSection() {
                       size="sm"
                       onClick={() => setExpandedId(expandedId === c.id ? null : c.id)}
                     >
-                      {expandedId === c.id ? "Cerrar" : "Gestionar productos"}
+                      {expandedId === c.id ? t("close") : t("manageProducts")}
                     </Button>
                     <Button variant="destructive" size="sm" onClick={() => onDelete(c.id)}>
-                      Borrar
+                      {t("delete")}
                     </Button>
                   </div>
                 </div>
@@ -132,6 +134,7 @@ function CollectionProductManager({
   slug: string;
   onChanged: () => void;
 }) {
+  const t = useTranslations("admin.collections");
   const [q, setQ] = useState("");
   const [busyId, setBusyId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -150,7 +153,7 @@ function CollectionProductManager({
       current.refetch();
       onChanged();
     } catch (err) {
-      setActionError(err instanceof ApiClientError ? err.message : "No se pudo agregar.");
+      setActionError(err instanceof ApiClientError ? err.message : t("errorAdd"));
     } finally {
       setBusyId(null);
     }
@@ -164,7 +167,7 @@ function CollectionProductManager({
       current.refetch();
       onChanged();
     } catch (err) {
-      setActionError(err instanceof ApiClientError ? err.message : "No se pudo quitar.");
+      setActionError(err instanceof ApiClientError ? err.message : t("errorRemove"));
     } finally {
       setBusyId(null);
     }
@@ -175,10 +178,10 @@ function CollectionProductManager({
       {actionError && <Alert variant="destructive">{actionError}</Alert>}
 
       <div>
-        <p className="mb-1 text-xs font-semibold text-muted-foreground">Productos en la colección</p>
+        <p className="mb-1 text-xs font-semibold text-muted-foreground">{t("productsInCollection")}</p>
         {current.loading && <Skeleton className="h-10 rounded-lg" />}
         {!current.loading && (current.data?.products.length ?? 0) === 0 && (
-          <p className="text-xs text-muted-foreground">Sin productos todavía.</p>
+          <p className="text-xs text-muted-foreground">{t("noneYet")}</p>
         )}
         <div className="space-y-1">
           {current.data?.products.map((p) => (
@@ -190,7 +193,7 @@ function CollectionProductManager({
                 disabled={busyId === p.id}
                 onClick={() => onRemove(p.id)}
               >
-                Quitar
+                {t("remove")}
               </Button>
             </div>
           ))}
@@ -198,11 +201,11 @@ function CollectionProductManager({
       </div>
 
       <div>
-        <p className="mb-1 text-xs font-semibold text-muted-foreground">Agregar producto</p>
+        <p className="mb-1 text-xs font-semibold text-muted-foreground">{t("addProduct")}</p>
         <Input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Buscar producto por nombre…"
+          placeholder={t("searchProductPlaceholder")}
         />
         {q.trim().length > 0 && (
           <div className="mt-1 space-y-1">
@@ -212,7 +215,7 @@ function CollectionProductManager({
                 <div key={p.id} className="flex items-center justify-between rounded-lg border p-2 text-sm">
                   <span>{p.name}</span>
                   <Button size="sm" disabled={busyId === p.id} onClick={() => onAdd(p.id)}>
-                    Agregar
+                    {t("add")}
                   </Button>
                 </div>
               ))}

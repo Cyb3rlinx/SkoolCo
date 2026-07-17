@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations, useLocale } from "next-intl";
 import Link from "next/link";
 import { Handshake } from "lucide-react";
 import {
@@ -17,17 +18,25 @@ import { Alert } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorState } from "@/components/ui/states";
 
-const STATUS_CHIP = {
-  PENDING: { text: "Pendiente", variant: "warning" as const },
-  SHARED: { text: "Email compartido", variant: "success" as const },
-  DISMISSED: { text: "Descartada", variant: "outline" as const },
+const STATUS_VARIANT = {
+  PENDING: "warning" as const,
+  SHARED: "success" as const,
+  DISMISSED: "outline" as const,
 };
 
 /** Solicitudes de contacto recibidas por los productos del usuario (puente de compraventa). */
 export function ContactRequestsSection() {
+  const t = useTranslations("contactRequests");
+  const locale = useLocale();
   const requests = useApi(fetchMyContactRequests, {});
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const STATUS_TEXT = {
+    PENDING: t("statusPending"),
+    SHARED: t("statusShared"),
+    DISMISSED: t("statusDismissed"),
+  };
 
   async function resolve(id: string, status: "SHARED" | "DISMISSED") {
     setError(null);
@@ -36,7 +45,7 @@ export function ContactRequestsSection() {
       await resolveContactRequest(id, status);
       requests.refetch();
     } catch (err) {
-      setError(err instanceof ApiClientError ? err.message : "No se pudo actualizar.");
+      setError(err instanceof ApiClientError ? err.message : t("errorUpdate"));
     } finally {
       setBusyId(null);
     }
@@ -51,7 +60,7 @@ export function ContactRequestsSection() {
     <section className="space-y-4" aria-labelledby="contact-requests-title">
       <h2 id="contact-requests-title" className="flex items-center gap-2 text-xl font-extrabold">
         <Handshake className="h-5 w-5 text-primary" aria-hidden />
-        Solicitudes de contacto
+        {t("receivedTitle")}
       </h2>
 
       {requests.loading && <Skeleton className="h-24 w-full rounded-2xl" aria-busy="true" />}
@@ -62,22 +71,21 @@ export function ContactRequestsSection() {
 
       <div className="space-y-3">
         {requests.data?.map((r) => {
-          const chip = STATUS_CHIP[r.status];
           return (
             <Card key={r.id}>
               <CardContent className="space-y-2 p-5">
                 <div className="flex flex-wrap items-center gap-2 text-sm">
                   <span className="font-bold">{r.buyer.name}</span>
-                  <span className="text-muted-foreground">está interesado en</span>
+                  <span className="text-muted-foreground">{t("interestedIn")}</span>
                   <Link
                     href={`/products/${r.product.slug}`}
                     className="font-bold text-primary hover:underline"
                   >
                     {r.product.name}
                   </Link>
-                  <Badge variant={chip.variant}>{chip.text}</Badge>
+                  <Badge variant={STATUS_VARIANT[r.status]}>{STATUS_TEXT[r.status]}</Badge>
                   <span className="ml-auto text-xs text-muted-foreground">
-                    {formatDate(r.createdAt)}
+                    {formatDate(r.createdAt, locale)}
                   </span>
                 </div>
                 <p className="rounded-xl bg-muted p-3 text-sm">{r.message}</p>
@@ -88,7 +96,7 @@ export function ContactRequestsSection() {
                       disabled={busyId === r.id}
                       onClick={() => resolve(r.id, "SHARED")}
                     >
-                      Compartir mi email
+                      {t("shareEmail")}
                     </Button>
                     <Button
                       variant="ghost"
@@ -96,7 +104,7 @@ export function ContactRequestsSection() {
                       disabled={busyId === r.id}
                       onClick={() => resolve(r.id, "DISMISSED")}
                     >
-                      Descartar
+                      {t("dismiss")}
                     </Button>
                   </div>
                 )}

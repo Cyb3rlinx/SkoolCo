@@ -2,6 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element */
 import { useRef, useState, type FormEvent } from "react";
+import { useTranslations } from "next-intl";
 import { ImagePlus } from "lucide-react";
 import { ApiClientError, updateMe, uploadImage } from "@/lib/frontend/api-client";
 import { useMutation } from "@/lib/frontend/hooks";
@@ -22,6 +23,7 @@ export function ProfileForm({
   onSaved: (updated: MeProfile) => void;
   onCancel: () => void;
 }) {
+  const t = useTranslations("profile");
   const [name, setName] = useState(profile.name);
   const [bio, setBio] = useState(profile.bio ?? "");
   const [avatarUrl, setAvatarUrl] = useState(profile.avatarUrl ?? "");
@@ -36,11 +38,11 @@ export function ProfileForm({
     setUploadError(null);
 
     if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
-      setUploadError("Usa PNG, JPG o WebP.");
+      setUploadError(t("errorFileType"));
       return;
     }
     if (file.size > 2 * 1024 * 1024) {
-      setUploadError("Máximo 2MB.");
+      setUploadError(t("errorFileSize"));
       return;
     }
 
@@ -49,9 +51,7 @@ export function ProfileForm({
       const { url } = await uploadImage(file);
       setAvatarUrl(url);
     } catch (err) {
-      setUploadError(
-        err instanceof ApiClientError ? err.message : "No pudimos subir la imagen."
-      );
+      setUploadError(err instanceof ApiClientError ? err.message : t("errorUpload"));
     } finally {
       setUploading(false);
       e.target.value = "";
@@ -70,7 +70,7 @@ export function ProfileForm({
 
   return (
     <form onSubmit={onSubmit} className="space-y-4" noValidate>
-      <Field id="pf-name" label="Nombre">
+      <Field id="pf-name" label={t("nameLabel")}>
         <Input
           id="pf-name"
           value={name}
@@ -81,22 +81,22 @@ export function ProfileForm({
         />
       </Field>
 
-      <Field id="pf-bio" label="Bio" optional hint={`Cuenta en qué andas. ${bio.length}/500`}>
+      <Field id="pf-bio" label={t("bioLabel")} optional hint={t("bioHint", { count: bio.length })}>
         <Textarea
           id="pf-bio"
           value={bio}
           onChange={(e) => setBio(e.target.value)}
           maxLength={500}
-          placeholder="Indie hacker lanzando cosas cada semana…"
+          placeholder={t("bioPlaceholder")}
         />
       </Field>
 
       <Field
         id="pf-avatar"
-        label="Avatar"
+        label={t("avatarLabel")}
         optional
         error={uploadError ?? undefined}
-        hint="Sube una imagen PNG, JPG o WebP (máx. 2MB), o pega una URL pública."
+        hint={t("avatarHint")}
       >
         <div className="flex items-center gap-3">
           <button
@@ -104,13 +104,13 @@ export function ProfileForm({
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
             className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-dashed text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary disabled:opacity-60"
-            aria-label="Subir imagen de avatar"
+            aria-label={t("uploadAvatarLabel")}
             aria-busy={uploading}
           >
             {uploading ? (
-              <span className="text-[9px] font-semibold">Subiendo…</span>
+              <span className="text-[9px] font-semibold">{t("uploading")}</span>
             ) : avatarUrl ? (
-              <img src={avatarUrl} alt="Vista previa del avatar" className="h-full w-full object-cover" />
+              <img src={avatarUrl} alt={t("avatarPreviewAlt")} className="h-full w-full object-cover" />
             ) : (
               <ImagePlus className="h-5 w-5" aria-hidden />
             )}
@@ -137,10 +137,10 @@ export function ProfileForm({
 
       <div className="flex gap-2">
         <Button type="submit" disabled={submitting}>
-          {submitting ? "Guardando…" : "Guardar cambios"}
+          {submitting ? t("saving") : t("save")}
         </Button>
         <Button variant="ghost" onClick={onCancel} disabled={submitting}>
-          Cancelar
+          {t("cancel")}
         </Button>
       </div>
     </form>
