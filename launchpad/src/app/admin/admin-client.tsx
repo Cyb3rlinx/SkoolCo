@@ -176,7 +176,7 @@ function ReportRow({
           </p>
 
           <p className="text-xs text-muted-foreground">
-            Reportado por {report.reporter.name}
+            {report.reporter ? `Reportado por ${report.reporter.name}` : "🤖 Auto-detectado por el sistema"}
             {report.resolvedBy && ` · resuelto por ${report.resolvedBy.name}`}
           </p>
         </div>

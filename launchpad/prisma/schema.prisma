@@ -217,7 +217,8 @@ enum ReportStatus {
 
 model ModerationReport {
   id         String       @id @default(cuid())
-  reporterId String       @map("reporter_id")
+  /// NULL = reporte auto-generado por el sistema (detección de contenido sospechoso), no por un usuario.
+  reporterId String?      @map("reporter_id")
   productId  String?      @map("product_id")
   commentId  String?      @map("comment_id")
   reason     String
@@ -226,7 +227,7 @@ model ModerationReport {
   resolvedAt DateTime?    @map("resolved_at") // audit: when it was resolved/dismissed
   createdAt  DateTime     @default(now()) @map("created_at")
 
-  reporter   User     @relation("ReportsFiled", fields: [reporterId], references: [id], onDelete: Cascade)
+  reporter   User?    @relation("ReportsFiled", fields: [reporterId], references: [id], onDelete: Cascade)
   resolvedBy User?    @relation("ReportsResolved", fields: [resolvedById], references: [id])
   product    Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
   comment    Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)

@@ -6,6 +6,7 @@ import { withErrorHandling, parseBody, ok, created, errorResponse } from "@/lib/
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 import { findProduct } from "@/lib/products";
 import { notify } from "@/lib/notifications";
+import { detectSuspiciousContent } from "@/lib/auto-flag";
 
 type Params = { params: { slug: string } };
 
@@ -65,6 +66,23 @@ export const POST = withErrorHandling(async (req: Request, { params }: Params) =
     productId: product.id,
     commentId: comment.id,
   });
+
+  // Auto-flagging: contenido evidentemente sospechoso entra directo a la cola
+  // de moderación (reporterId null = generado por el sistema, no por un usuario).
+  const suspiciousReason = detectSuspiciousContent(input.body);
+  if (suspiciousReason) {
+    try {
+      await prisma.moderationReport.create({
+        data: {
+          reporterId: null,
+          commentId: comment.id,
+          reason: `Auto-detectado: ${suspiciousReason}`,
+        },
+      });
+    } catch (err) {
+      console.error("[auto-flag] no se pudo crear el reporte automático:", err);
+    }
+  }
 
   return created(comment);
 });
