@@ -13,11 +13,16 @@ import type {
   AdminStats,
   AdminUserItem,
   Category,
+  CollaborationContactRequestItem,
+  CollaborationItem,
+  CollaborationListQuery,
+  CollaborationType,
   CollectionDetail,
   CollectionSummary,
   CommentItem,
   CommunityLink,
   ContactRequestItem,
+  CreateCollaborationInput,
   CreateProductInput,
   LeaderboardEntry,
   MeProfile,
@@ -207,6 +212,68 @@ export function fetchSentContactRequests() {
 export function resolveContactRequest(id: string, status: "SHARED" | "DISMISSED") {
   return request<{ id: string; status: string }>(
     `/api/contact-requests/${encodeURIComponent(id)}`,
+    { method: "PATCH", body: JSON.stringify({ status }) }
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Colaboraciones
+// ---------------------------------------------------------------------------
+
+/** GET /api/collaborations */
+export function fetchCollaborations(query: CollaborationListQuery = {}) {
+  return request<Paginated<CollaborationItem>>(
+    `/api/collaborations${qs(query as Record<string, string | number | boolean | undefined>)}`
+  );
+}
+
+/** GET /api/collaborations/:id */
+export function fetchCollaboration(id: string) {
+  return request<CollaborationItem>(`/api/collaborations/${encodeURIComponent(id)}`);
+}
+
+/** POST /api/collaborations (auth) — publicar un anuncio. */
+export function createCollaboration(input: CreateCollaborationInput) {
+  return request<CollaborationItem>(`/api/collaborations`, {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+}
+
+/** DELETE /api/collaborations/:id (auth) — autor o admin/moderador. */
+export function deleteCollaboration(id: string) {
+  return request<void>(`/api/collaborations/${encodeURIComponent(id)}`, { method: "DELETE" });
+}
+
+/** POST /api/collaborations/:id/contact-requests (auth) — pedir contacto al autor. */
+export function requestCollaborationContact(id: string, message: string) {
+  return request<{ id: string; status: string; createdAt: string }>(
+    `/api/collaborations/${encodeURIComponent(id)}/contact-requests`,
+    { method: "POST", body: JSON.stringify({ message }) }
+  );
+}
+
+/** GET /api/me/collaborations (auth) — mis anuncios publicados. */
+export function fetchMyCollaborations() {
+  return request<{ id: string; type: CollaborationType; title: string; createdAt: string }[]>(
+    `/api/me/collaborations`
+  );
+}
+
+/** GET /api/me/collaboration-contact-requests (auth) — solicitudes recibidas. */
+export function fetchMyCollaborationContactRequests() {
+  return request<CollaborationContactRequestItem[]>(`/api/me/collaboration-contact-requests`);
+}
+
+/** GET /api/me/sent-collaboration-contact-requests (auth) — solicitudes que YO envié. */
+export function fetchSentCollaborationContactRequests() {
+  return request<CollaborationContactRequestItem[]>(`/api/me/sent-collaboration-contact-requests`);
+}
+
+/** PATCH /api/collaboration-contact-requests/:id (auth) — compartir email o descartar. */
+export function resolveCollaborationContactRequest(id: string, status: "SHARED" | "DISMISSED") {
+  return request<{ id: string; status: string }>(
+    `/api/collaboration-contact-requests/${encodeURIComponent(id)}`,
     { method: "PATCH", body: JSON.stringify({ status }) }
   );
 }
