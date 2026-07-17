@@ -33,7 +33,7 @@ ALTER TABLE "moderation_reports" ADD COLUMN "collaboration_id" TEXT;
 -- CreateIndex
 CREATE INDEX "collaborations_type_created_at_idx" ON "collaborations"("type", "created_at");
 CREATE INDEX "collaborations_author_id_idx" ON "collaborations"("author_id");
-CREATE UNIQUE INDEX "collaboration_contact_requests_collaboration_id_responder_id_key" ON "collaboration_contact_requests"("collaboration_id", "responder_id");
+CREATE UNIQUE INDEX "collaboration_contact_requests_collab_responder_key" ON "collaboration_contact_requests"("collaboration_id", "responder_id");
 CREATE INDEX "collaboration_contact_requests_collaboration_id_status_idx" ON "collaboration_contact_requests"("collaboration_id", "status");
 
 -- AddForeignKey
