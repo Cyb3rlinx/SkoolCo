@@ -191,6 +191,11 @@ export function fetchMyContactRequests() {
   return request<ContactRequestItem[]>(`/api/me/contact-requests`);
 }
 
+/** GET /api/me/sent-contact-requests (auth) — solicitudes que YO envié como comprador. */
+export function fetchSentContactRequests() {
+  return request<ContactRequestItem[]>(`/api/me/sent-contact-requests`);
+}
+
 /** PATCH /api/contact-requests/:id (auth) — compartir email o descartar. */
 export function resolveContactRequest(id: string, status: "SHARED" | "DISMISSED") {
   return request<{ id: string; status: string }>(
