@@ -224,11 +224,11 @@ export function fetchComments(slug: string, page = 1, pageSize = 20) {
   );
 }
 
-/** POST /api/products/:slug/comments (auth). */
-export function postComment(slug: string, body: string) {
+/** POST /api/products/:slug/comments (auth). Pass parentId to reply (one level deep). */
+export function postComment(slug: string, body: string, parentId?: string) {
   return request<CommentItem>(`/api/products/${encodeURIComponent(slug)}/comments`, {
     method: "POST",
-    body: JSON.stringify({ body }),
+    body: JSON.stringify(parentId ? { body, parentId } : { body }),
   });
 }
 

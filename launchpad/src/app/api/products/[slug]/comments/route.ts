@@ -14,10 +14,24 @@ const commentSelect = {
   body: true,
   createdAt: true,
   updatedAt: true,
+  parentId: true,
   user: { select: { id: true, name: true, avatarUrl: true } },
 } as const;
 
-/** GET /api/products/:idOrSlug/comments — newest first, soft-deleted hidden. */
+const replySelect = {
+  ...commentSelect,
+  replies: {
+    where: { deletedAt: null },
+    orderBy: { createdAt: "asc" as const },
+    select: commentSelect,
+  },
+};
+
+/**
+ * GET /api/products/:idOrSlug/comments — newest first, soft-deleted hidden.
+ * Pagination applies to top-level comments only; replies (one level deep)
+ * are nested under their parent and always returned in full.
+ */
 export const GET = withErrorHandling(async (req: Request, { params }: Params) => {
   const product = await findProduct(params.slug);
   const url = new URL(req.url);
@@ -26,13 +40,13 @@ export const GET = withErrorHandling(async (req: Request, { params }: Params) =>
 
   const [items, total] = await Promise.all([
     prisma.comment.findMany({
-      where: { productId: product.id, deletedAt: null },
+      where: { productId: product.id, deletedAt: null, parentId: null },
       orderBy: { createdAt: "desc" },
-      select: commentSelect,
+      select: replySelect,
       skip: (page - 1) * pageSize,
       take: pageSize,
     }),
-    prisma.comment.count({ where: { productId: product.id, deletedAt: null } }),
+    prisma.comment.count({ where: { productId: product.id, deletedAt: null, parentId: null } }),
   ]);
 
   return ok({ items, page, pageSize, total, totalPages: Math.ceil(total / pageSize) });
@@ -53,18 +67,27 @@ export const POST = withErrorHandling(async (req: Request, { params }: Params) =
 
   const input = await parseBody(req, createCommentSchema);
 
+  let parent: { id: string; userId: string; parentId: string | null } | null = null;
+  if (input.parentId) {
+    parent = await prisma.comment.findFirst({
+      where: { id: input.parentId, productId: product.id, deletedAt: null },
+      select: { id: true, userId: true, parentId: true },
+    });
+    if (!parent) throw new ApiError(404, "Parent comment not found");
+    if (parent.parentId) throw new ApiError(400, "Replies can only be one level deep");
+  }
+
   const comment = await prisma.comment.create({
-    data: { userId: user.id, productId: product.id, body: input.body },
+    data: { userId: user.id, productId: product.id, body: input.body, parentId: parent?.id ?? null },
     select: commentSelect,
   });
 
-  await notify({
-    userId: product.makerId,
-    actorId: user.id,
-    type: "COMMENT",
-    productId: product.id,
-    commentId: comment.id,
-  });
+  const recipients = new Set([product.makerId, ...(parent ? [parent.userId] : [])]);
+  await Promise.all(
+    [...recipients].map((userId) =>
+      notify({ userId, actorId: user.id, type: "COMMENT", productId: product.id, commentId: comment.id })
+    )
+  );
 
   return created(comment);
 });

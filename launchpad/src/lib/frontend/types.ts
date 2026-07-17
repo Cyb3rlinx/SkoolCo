@@ -153,7 +153,9 @@ export interface CommentItem {
   body: string;
   createdAt: string;
   updatedAt: string;
+  parentId: string | null;
   user: UserRef;
+  replies?: CommentItem[];
 }
 
 /** POST/DELETE /api/products/:slug/upvote */
