@@ -156,6 +156,13 @@ export interface CommentItem {
   user: UserRef;
 }
 
+/** GET/POST /api/products/:slug/updates — bitácora de progreso del maker. */
+export interface ProductUpdateItem {
+  id: string;
+  body: string;
+  createdAt: string;
+}
+
 /** POST/DELETE /api/products/:slug/upvote */
 export interface UpvoteResult {
   upvoted: boolean;

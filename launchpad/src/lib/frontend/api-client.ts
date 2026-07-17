@@ -24,6 +24,7 @@ import type {
   Paginated,
   ProductDetail,
   ProductListItem,
+  ProductUpdateItem,
   PublicUser,
   ProductListQuery,
   ReportStatus,
@@ -232,6 +233,23 @@ export function fetchComments(slug: string, page = 1, pageSize = 20) {
 /** POST /api/products/:slug/comments (auth). */
 export function postComment(slug: string, body: string) {
   return request<CommentItem>(`/api/products/${encodeURIComponent(slug)}/comments`, {
+    method: "POST",
+    body: JSON.stringify({ body }),
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Bitácora de progreso del maker
+// ---------------------------------------------------------------------------
+
+/** GET /api/products/:slug/updates — pública. */
+export function fetchProductUpdates(slug: string) {
+  return request<ProductUpdateItem[]>(`/api/products/${encodeURIComponent(slug)}/updates`);
+}
+
+/** POST /api/products/:slug/updates (auth) — solo el maker dueño o staff. */
+export function postProductUpdate(slug: string, body: string) {
+  return request<ProductUpdateItem>(`/api/products/${encodeURIComponent(slug)}/updates`, {
     method: "POST",
     body: JSON.stringify({ body }),
   });

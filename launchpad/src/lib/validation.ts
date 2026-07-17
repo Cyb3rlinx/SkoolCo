@@ -77,6 +77,11 @@ export const createCommentSchema = z.object({
   body: z.string().trim().min(1).max(2000),
 });
 
+/** POST /api/products/:slug/updates — bitácora de progreso del maker. */
+export const createProductUpdateSchema = z.object({
+  body: z.string().trim().min(5).max(1000),
+});
+
 export const createReportSchema = z
   .object({
     productId: z.string().optional(),

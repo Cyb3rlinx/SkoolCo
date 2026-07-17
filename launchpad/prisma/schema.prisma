@@ -119,11 +119,26 @@ model Product {
   notifications Notification[]
   images        ProductImage[]
   contactRequests ContactRequest[]
+  updates         ProductUpdate[]
 
   @@index([status, launchDate])
   @@index([makerId])
   @@index([categoryId])
   @@map("products")
+}
+
+/// Bitácora de progreso: updates cortos que el maker publica en su propio
+/// producto (avances, novedades). Público, solo lectura para todos.
+model ProductUpdate {
+  id        String   @id @default(cuid())
+  productId String   @map("product_id")
+  body      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId, createdAt])
+  @@map("product_updates")
 }
 
 /// Product gallery screenshots (URLs — typically /api/uploads/:id).

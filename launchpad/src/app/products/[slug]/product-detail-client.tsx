@@ -15,6 +15,7 @@ import { ProductLogo } from "@/components/product/product-logo";
 import { UpvoteButton } from "@/components/product/upvote-button";
 import { ProductGallery } from "@/components/product/product-gallery";
 import { CommentSection } from "@/components/product/comment-section";
+import { ProductUpdatesSection } from "@/components/product/product-updates-section";
 import { MakerCard } from "@/components/product/maker-card";
 import { OfferCard } from "@/components/product/offer-card";
 import { OfferSettings } from "@/components/product/offer-settings";
@@ -161,6 +162,8 @@ export function ProductDetailClient({ slug }: { slug: string }) {
               {product.description}
             </p>
           </section>
+
+          <ProductUpdatesSection slug={product.slug} makerId={product.maker.id} />
 
           <CommentSection slug={product.slug} live={product.status === "LIVE"} />
         </div>
