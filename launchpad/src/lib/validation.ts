@@ -78,11 +78,14 @@ export const createCommentSchema = z.object({
   parentId: z.string().min(1).optional(),
 });
 
+export const REPORT_CATEGORIES = ["SPAM", "SCAM", "INAPPROPRIATE", "OTHER"] as const;
+
 export const createReportSchema = z
   .object({
     productId: z.string().optional(),
     commentId: z.string().optional(),
     reason: z.string().trim().min(5).max(1000),
+    category: z.enum(REPORT_CATEGORIES).optional(),
   })
   .refine((v) => Boolean(v.productId) !== Boolean(v.commentId), {
     message: "Provide exactly one of productId or commentId",

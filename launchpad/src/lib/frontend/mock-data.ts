@@ -391,6 +391,7 @@ export const mockReports: ModerationReportItem[] = [
   {
     id: "mock_r_1",
     reason: "Example report for testing the moderation queue.",
+    category: "OTHER",
     status: "OPEN",
     createdAt: daysAgo(1),
     resolvedAt: null,

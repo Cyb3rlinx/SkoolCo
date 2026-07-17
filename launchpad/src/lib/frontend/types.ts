@@ -216,11 +216,13 @@ export interface NotificationsPage extends Paginated<NotificationItem> {
 // ---------------------------------------------------------------------------
 
 export type ReportStatus = "OPEN" | "REVIEWING" | "RESOLVED" | "DISMISSED";
+export type ReportCategory = "SPAM" | "SCAM" | "INAPPROPRIATE" | "OTHER";
 
 /** Item shape of GET /api/reports (moderator/admin only). */
 export interface ModerationReportItem {
   id: string;
   reason: string;
+  category: ReportCategory;
   status: ReportStatus;
   createdAt: string;
   resolvedAt: string | null;

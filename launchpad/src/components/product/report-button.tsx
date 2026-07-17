@@ -6,10 +6,20 @@ import { useSession } from "next-auth/react";
 import { Flag } from "lucide-react";
 import { createReport } from "@/lib/frontend/api-client";
 import { useMutation } from "@/lib/frontend/hooks";
+import type { ReportCategory } from "@/lib/frontend/types";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
+import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert } from "@/components/ui/alert";
+import { Label } from "@/components/ui/label";
+
+const CATEGORY_LABEL: Record<ReportCategory, string> = {
+  SPAM: "Spam",
+  SCAM: "Estafa o fraude",
+  INAPPROPRIATE: "Contenido inapropiado",
+  OTHER: "Otro",
+};
 
 /**
  * Report-a-product flow → POST /api/reports. Reports land in the moderation
@@ -21,6 +31,7 @@ export function ReportButton({ productId }: { productId: string }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState("");
+  const [category, setCategory] = useState<ReportCategory>("OTHER");
   const [done, setDone] = useState(false);
   const { mutate, submitting, error } = useMutation(createReport);
 
@@ -31,12 +42,13 @@ export function ReportButton({ productId }: { productId: string }) {
     }
     setDone(false);
     setReason("");
+    setCategory("OTHER");
     setOpen(true);
   }
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    const result = await mutate({ productId, reason: reason.trim() });
+    const result = await mutate({ productId, reason: reason.trim(), category });
     if (result) setDone(true);
   }
 
@@ -70,6 +82,20 @@ export function ReportButton({ productId }: { productId: string }) {
           </div>
         ) : (
           <form onSubmit={onSubmit} className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="report-category">Categoría</Label>
+              <Select
+                id="report-category"
+                value={category}
+                onChange={(e) => setCategory(e.target.value as ReportCategory)}
+              >
+                {Object.entries(CATEGORY_LABEL).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </Select>
+            </div>
             <Textarea
               value={reason}
               onChange={(e) => setReason(e.target.value)}

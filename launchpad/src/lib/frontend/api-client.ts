@@ -26,6 +26,7 @@ import type {
   ProductListItem,
   PublicUser,
   ProductListQuery,
+  ReportCategory,
   ReportStatus,
   SaveResult,
   UpvoteResult,
@@ -360,11 +361,16 @@ export function resolveReport(id: string, status: Exclude<ReportStatus, "OPEN">)
 }
 
 /** POST /api/reports (auth) — report a product or a comment. */
-export function createReport(input: { productId?: string; commentId?: string; reason: string }) {
-  return request<{ id: string; status: ReportStatus; createdAt: string }>(`/api/reports`, {
-    method: "POST",
-    body: JSON.stringify(input),
-  });
+export function createReport(input: {
+  productId?: string;
+  commentId?: string;
+  reason: string;
+  category?: ReportCategory;
+}) {
+  return request<{ id: string; status: ReportStatus; category: ReportCategory; createdAt: string }>(
+    `/api/reports`,
+    { method: "POST", body: JSON.stringify(input) }
+  );
 }
 
 // ---------------------------------------------------------------------------
