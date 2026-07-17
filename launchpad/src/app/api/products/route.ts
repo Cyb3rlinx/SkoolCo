@@ -49,6 +49,10 @@ export const GET = withErrorHandling(async (req: Request) => {
     where.category = { slug: query.category };
   }
 
+  if (query.openToOffers !== undefined) {
+    where.openToOffers = query.openToOffers;
+  }
+
   if (query.q) {
     // MVP search: case-insensitive substring match. Move to Postgres
     // full-text (tsvector) only if catalog size ever makes this slow.

@@ -7,7 +7,20 @@ import {
   createProductSchema,
   createContactRequestSchema,
   adminUpdateUserSchema,
+  listProductsQuerySchema,
 } from "@/lib/validation";
+
+describe("listProductsQuerySchema", () => {
+  it("openToOffers es opcional", () => {
+    const result = listProductsQuerySchema.safeParse({});
+    expect(result.success && result.data.openToOffers).toBeUndefined();
+  });
+
+  it("coacciona ?openToOffers=true a booleano", () => {
+    const result = listProductsQuerySchema.safeParse({ openToOffers: "true" });
+    expect(result.success && result.data.openToOffers).toBe(true);
+  });
+});
 
 describe("password schemas", () => {
   it("forgot requires a valid email", () => {

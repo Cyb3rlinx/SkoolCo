@@ -85,6 +85,8 @@ function product(p: MockProductInput): ProductDetail {
     maker: p.maker,
     _count: { upvotes: p.upvotes, comments: p.comments },
     upvotedByMe: false,
+    openToOffers: false,
+    soldAt: null,
   };
 }
 
