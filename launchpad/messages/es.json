@@ -264,7 +264,8 @@
     "emptyOtherTitle": "No hay lanzamientos en este periodo",
     "emptyDescription": "Los grandes días empiezan vacíos. Mira lanzamientos anteriores o publica el tuyo.",
     "viewAllLaunches": "Ver todos los lanzamientos",
-    "publishMyProduct": "Publicar mi producto"
+    "publishMyProduct": "Publicar mi producto",
+    "openToOffersOnly": "Solo abiertos a ofertas"
   },
   "productFeed": {
     "loading": "Cargando lanzamientos",
