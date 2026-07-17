@@ -27,6 +27,7 @@ import type {
   PublicUser,
   ProductListQuery,
   ReportStatus,
+  SaveResult,
   UpvoteResult,
 } from "./types";
 
@@ -211,6 +212,25 @@ export function removeUpvote(slug: string) {
   return request<UpvoteResult>(`/api/products/${encodeURIComponent(slug)}/upvote`, {
     method: "DELETE",
   });
+}
+
+/** POST /api/products/:slug/save (auth, idempotent). */
+export function saveProduct(slug: string) {
+  return request<SaveResult>(`/api/products/${encodeURIComponent(slug)}/save`, {
+    method: "POST",
+  });
+}
+
+/** DELETE /api/products/:slug/save (auth, idempotent). */
+export function unsaveProduct(slug: string) {
+  return request<SaveResult>(`/api/products/${encodeURIComponent(slug)}/save`, {
+    method: "DELETE",
+  });
+}
+
+/** GET /api/me/saved (auth) */
+export function fetchSavedProducts() {
+  return request<ProductListItem[]>(`/api/me/saved`);
 }
 
 // ---------------------------------------------------------------------------

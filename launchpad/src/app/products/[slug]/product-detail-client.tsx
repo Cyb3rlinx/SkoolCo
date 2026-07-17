@@ -13,6 +13,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { DemoBanner, EmptyState, ErrorState } from "@/components/ui/states";
 import { ProductLogo } from "@/components/product/product-logo";
 import { UpvoteButton } from "@/components/product/upvote-button";
+import { SaveButton } from "@/components/product/save-button";
 import { ProductGallery } from "@/components/product/product-gallery";
 import { CommentSection } from "@/components/product/comment-section";
 import { MakerCard } from "@/components/product/maker-card";
@@ -130,13 +131,14 @@ export function ProductDetailClient({ slug }: { slug: string }) {
             )}
           </div>
         </div>
-        <div className="shrink-0 self-start sm:self-center">
+        <div className="flex shrink-0 items-start gap-2 self-start sm:items-center sm:self-center">
           <UpvoteButton
             slug={product.slug}
             count={product._count.upvotes}
             upvoted={product.upvotedByMe}
             variant="large"
           />
+          <SaveButton slug={product.slug} saved={product.savedByMe} />
         </div>
       </div>
 

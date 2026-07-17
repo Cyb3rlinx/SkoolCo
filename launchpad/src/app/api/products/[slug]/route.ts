@@ -48,6 +48,15 @@ export const GET = withErrorHandling(async (_req: Request, { params }: Params) =
       )
     : false;
 
+  const savedByMe = user
+    ? Boolean(
+        await prisma.savedProduct.findUnique({
+          where: { userId_productId: { userId: user.id, productId: base.id } },
+          select: { id: true },
+        })
+      )
+    : false;
+
   // Señal del puente: una vista de la oferta por cada carga de un no-maker.
   // Efecto secundario: si falla, no tumba la respuesta.
   if (product.openToOffers && user?.id !== base.makerId) {
@@ -61,7 +70,7 @@ export const GET = withErrorHandling(async (_req: Request, { params }: Params) =
     }
   }
 
-  return ok({ ...product, upvotedByMe });
+  return ok({ ...product, upvotedByMe, savedByMe });
 });
 
 /** PATCH /api/products/:slug — update (maker or staff only). */

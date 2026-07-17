@@ -104,6 +104,7 @@ export interface ProductDetail extends ProductListItem {
   description: string;
   updatedAt: string;
   upvotedByMe: boolean;
+  savedByMe?: boolean;
   /** Gallery screenshots (empty for older mocks). */
   images?: ProductImage[];
   /** Puente de compraventa — declarado por el maker, NO verificado. */
@@ -168,6 +169,11 @@ export interface CommentItem {
 export interface UpvoteResult {
   upvoted: boolean;
   upvoteCount: number;
+}
+
+/** POST/DELETE /api/products/:slug/save */
+export interface SaveResult {
+  saved: boolean;
 }
 
 // ---------------------------------------------------------------------------
