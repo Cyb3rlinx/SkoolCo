@@ -2,7 +2,8 @@ export const dynamic = "force-dynamic";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { requireModerator, requireUser, ApiError } from "@/lib/auth";
-import { withErrorHandling, parseBody, ok, noContent } from "@/lib/api";
+import { withErrorHandling, parseBody, ok, noContent, errorResponse } from "@/lib/api";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 type Params = { params: { id: string } };
 
@@ -36,6 +37,10 @@ export const PATCH = withErrorHandling(async (req: Request, { params }: Params) 
 /** DELETE /api/community-links/:id — submitter can remove their own link. */
 export const DELETE = withErrorHandling(async (_req: Request, { params }: Params) => {
   const user = await requireUser();
+
+  if (!(await checkRateLimit(`community-link-delete:${user.id}`, RATE_LIMITS.selfAction))) {
+    return errorResponse(429, "Estás borrando demasiado rápido. Intenta de nuevo en un minuto.");
+  }
 
   const link = await prisma.communityLink.findUnique({
     where: { id: params.id },

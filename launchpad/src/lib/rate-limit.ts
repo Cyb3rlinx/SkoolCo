@@ -41,6 +41,9 @@ export const RATE_LIMITS = {
   contactForm: { limit: 3, windowMs: 60 * 60_000 }, // 3 mensajes de contacto / hora / IP
   login: { limit: 5, windowMs: 15 * 60_000 }, // 5 login attempts / 15 min (per email and per IP)
   resendVerification: { limit: 3, windowMs: 15 * 60_000 }, // 3 resends / 15 min / IP
+  productEdit: { limit: 20, windowMs: 60 * 60_000 }, // 20 ediciones de producto / hora / usuario
+  selfAction: { limit: 30, windowMs: 60_000 }, // 30 acciones propias (perfil, seguir, notificaciones...) / minuto / usuario
+  authToken: { limit: 10, windowMs: 15 * 60_000 }, // 10 intentos de token de auth (reset/verify) / 15 min / IP
 } satisfies Record<string, RateLimitRule>;
 
 function checkRateLimitMemory(key: string, rule: RateLimitRule): boolean {

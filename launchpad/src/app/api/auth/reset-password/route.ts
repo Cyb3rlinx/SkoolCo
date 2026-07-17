@@ -4,9 +4,15 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
 import { resetPasswordSchema } from "@/lib/validation";
 import { isPasswordPwned } from "@/lib/password";
-import { ok, parseBody, withErrorHandling, errorResponse } from "@/lib/api";
+import { ok, parseBody, withErrorHandling, errorResponse, clientIp } from "@/lib/api";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 export const POST = withErrorHandling(async (req: Request) => {
+  const ip = clientIp(req);
+  if (!(await checkRateLimit(`reset-password:${ip}`, RATE_LIMITS.authToken))) {
+    return errorResponse(429, "Demasiados intentos. Intenta de nuevo más tarde.");
+  }
+
   const { token, password } = await parseBody(req, resetPasswordSchema);
   const tokenHash = createHash("sha256").update(token).digest("hex");
 

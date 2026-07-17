@@ -2,7 +2,8 @@ export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { markNotificationsReadSchema } from "@/lib/validation";
-import { withErrorHandling, parseBody, ok } from "@/lib/api";
+import { withErrorHandling, parseBody, ok, errorResponse } from "@/lib/api";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 /**
  * PATCH /api/notifications/read — mark notifications as read.
@@ -11,6 +12,11 @@ import { withErrorHandling, parseBody, ok } from "@/lib/api";
  */
 export const PATCH = withErrorHandling(async (req: Request) => {
   const user = await requireUser();
+
+  if (!(await checkRateLimit(`notif-read:${user.id}`, RATE_LIMITS.selfAction))) {
+    return errorResponse(429, "Demasiadas solicitudes. Intenta de nuevo en un minuto.");
+  }
+
   const { ids } = await parseBody(req, markNotificationsReadSchema);
 
   const result = await prisma.notification.updateMany({
