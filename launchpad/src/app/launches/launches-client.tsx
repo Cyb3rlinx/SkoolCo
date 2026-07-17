@@ -31,7 +31,7 @@ export function LaunchesClient() {
 
   const q = searchParams.get("q") ?? "";
   const category = searchParams.get("category") ?? "";
-  const sort = (searchParams.get("sort") as "newest" | "top" | null) ?? "newest";
+  const sort = (searchParams.get("sort") as "newest" | "top" | "trending" | null) ?? "newest";
   const windowParam = (searchParams.get("window") as Window | null) ?? "today";
 
   /** Update one query param while keeping the rest (shareable URLs). */
@@ -119,6 +119,7 @@ export function LaunchesClient() {
             <Select id="filter-sort" value={sort} onChange={(e) => setParam("sort", e.target.value === "newest" ? "" : e.target.value)}>
               <option value="newest">Más recientes</option>
               <option value="top">Más votados</option>
+              <option value="trending">🔥 Tendencia (últimas 24h)</option>
             </Select>
           </div>
         </div>
@@ -128,7 +129,7 @@ export function LaunchesClient() {
       <ProductFeed
         query={query}
         dateWindow={windowParam}
-        ranked={windowParam !== "all" || sort === "top"}
+        ranked={windowParam !== "all" || sort === "top" || sort === "trending"}
         emptyTitle={
           windowParam === "today"
             ? "Hoy todavía no hay lanzamientos"

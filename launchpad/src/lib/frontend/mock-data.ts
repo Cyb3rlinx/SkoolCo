@@ -211,7 +211,7 @@ export function paginate<T>(items: T[], page = 1, pageSize = 20): Paginated<T> {
 export function filterMockProducts(query: {
   q?: string;
   category?: string;
-  sort?: "newest" | "top" | "launching";
+  sort?: "newest" | "top" | "launching" | "trending";
   page?: number;
   pageSize?: number;
 } = {}): Paginated<ProductListItem> {
@@ -228,8 +228,11 @@ export function filterMockProducts(query: {
     );
   }
 
+  // Los mocks no tienen timestamps por voto individual, así que "trending"
+  // (votos recientes) se aproxima con "top" en modo demo — mejor esfuerzo
+  // razonable sin datos reales, no una simulación falsa de tendencia.
   const sorted = [...details].sort((a, b) =>
-    query.sort === "top"
+    query.sort === "top" || query.sort === "trending"
       ? b._count.upvotes - a._count.upvotes
       : new Date(b.launchDate).getTime() - new Date(a.launchDate).getTime()
   );

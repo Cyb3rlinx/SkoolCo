@@ -64,7 +64,7 @@ export const listProductsQuerySchema = z.object({
   category: z.string().optional(), // category slug
   q: z.string().trim().min(1).max(100).optional(), // free-text search
   maker: z.string().trim().min(1).max(40).optional(), // "me" or a user id
-  sort: z.enum(["newest", "top", "launching"]).default("newest"),
+  sort: z.enum(["newest", "top", "launching", "trending"]).default("newest"),
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(50).default(20),
 });

@@ -113,7 +113,7 @@ export interface ProductListQuery {
   category?: string; // category slug
   q?: string;
   maker?: string; // "me" or a user id
-  sort?: "newest" | "top" | "launching";
+  sort?: "newest" | "top" | "launching" | "trending";
   page?: number;
   pageSize?: number;
 }
