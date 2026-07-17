@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
 import { Handshake } from "lucide-react";
 import { ApiClientError, markProductSold, updateProduct } from "@/lib/frontend/api-client";
@@ -32,6 +33,8 @@ export function OfferSettings({
   soldAt?: string | null;
   onUpdated: () => void;
 }) {
+  const t = useTranslations("product.offerSettings");
+  const tOfferCard = useTranslations("product.offerCard");
   const { data: session } = useSession();
   const [editing, setEditing] = useState(false);
   const [open, setOpen] = useState(Boolean(openToOffers));
@@ -44,13 +47,13 @@ export function OfferSettings({
   if (session?.user?.id !== makerId) return null;
 
   async function onMarkSold() {
-    if (!window.confirm("¿Confirmas que vendiste este producto? Esto apaga \"Abierto a ofertas\" y no se puede deshacer desde acá.")) return;
+    if (!window.confirm(t("confirmSold"))) return;
     setMarking(true);
     try {
       await markProductSold(slug);
       onUpdated();
     } catch (err) {
-      setError(err instanceof ApiClientError ? err.message : "No se pudo marcar como vendido.");
+      setError(err instanceof ApiClientError ? err.message : t("errorMarkSold"));
     } finally {
       setMarking(false);
     }
@@ -62,11 +65,9 @@ export function OfferSettings({
         <CardContent className="space-y-1 p-5">
           <p className="flex items-center gap-2 text-sm font-bold">
             <Handshake className="h-4 w-4 text-primary" aria-hidden />
-            Vendido ✅
+            {t("soldTitle")}
           </p>
-          <p className="text-xs text-muted-foreground">
-            Marcaste este producto como vendido. Ya no aparece como abierto a ofertas.
-          </p>
+          <p className="text-xs text-muted-foreground">{t("soldDescription")}</p>
         </CardContent>
       </Card>
     );
@@ -77,7 +78,7 @@ export function OfferSettings({
     setError(null);
     const mrrValue = mrr.trim() === "" ? null : Number(mrr);
     if (mrrValue !== null && (!Number.isInteger(mrrValue) || mrrValue < 0)) {
-      setError("El MRR debe ser un número entero positivo (USD/mes).");
+      setError(t("errorMrrInvalid"));
       return;
     }
     setBusy(true);
@@ -90,7 +91,7 @@ export function OfferSettings({
       setEditing(false);
       onUpdated();
     } catch (err) {
-      setError(err instanceof ApiClientError ? err.message : "No se pudo guardar.");
+      setError(err instanceof ApiClientError ? err.message : t("errorSaveGeneric"));
     } finally {
       setBusy(false);
     }
@@ -101,37 +102,37 @@ export function OfferSettings({
       <CardContent className="space-y-3 p-5">
         <p className="flex items-center gap-2 text-sm font-bold">
           <Handshake className="h-4 w-4 text-primary" aria-hidden />
-          Ofertas (solo tú ves esto)
+          {t("panelTitle")}
         </p>
 
         {!editing ? (
           <>
             <p className="text-xs text-muted-foreground">
               {openToOffers
-                ? `Tu producto está abierto a ofertas${
+                ? `${t("statusOpenBase")}${
                     declaredMrrUsd != null
-                      ? ` · MRR declarado $${declaredMrrUsd.toLocaleString("en-US")}/mes`
+                      ? t("statusOpenMrrSuffix", { amount: declaredMrrUsd.toLocaleString("en-US") })
                       : ""
                   }.`
-                : "Activa esto si te interesa recibir solicitudes de compra por tu producto."}
+                : t("statusClosed")}
             </p>
             {openToOffers && (
               <p className="text-xs text-muted-foreground">
                 {(offerViewCount ?? 0) > 0
-                  ? `👀 ${(offerViewCount ?? 0).toLocaleString("en-US")} ${
-                      offerViewCount === 1 ? "vista" : "vistas"
-                    } en tu oferta`
-                  : "Todavía nadie vio tu oferta."}
+                  ? t(offerViewCount === 1 ? "viewsCountOne" : "viewsCountOther", {
+                      count: (offerViewCount ?? 0).toLocaleString("en-US"),
+                    })
+                  : t("viewsCountZero")}
               </p>
             )}
             {error && <Alert variant="destructive">{error}</Alert>}
             <div className="flex flex-wrap gap-2">
               <Button variant="outline" size="sm" onClick={() => setEditing(true)}>
-                Configurar
+                {t("configure")}
               </Button>
               {openToOffers && (
                 <Button variant="ghost" size="sm" disabled={marking} onClick={onMarkSold}>
-                  {marking ? "Marcando…" : "Marcar como vendido"}
+                  {marking ? t("marking") : t("markSold")}
                 </Button>
               )}
             </div>
@@ -145,11 +146,11 @@ export function OfferSettings({
                 onChange={(e) => setOpen(e.target.checked)}
                 className="h-4 w-4 accent-[hsl(var(--primary))]"
               />
-              Abierto a ofertas
+              {tOfferCard("openToOffers")}
             </label>
             <div className="space-y-1">
               <label htmlFor="offer-mrr" className="text-xs font-semibold">
-                MRR declarado (USD/mes, opcional)
+                {t("mrrLabel")}
               </label>
               <Input
                 id="offer-mrr"
@@ -161,26 +162,24 @@ export function OfferSettings({
             </div>
             <div className="space-y-1">
               <label htmlFor="offer-note" className="text-xs font-semibold">
-                Cómo monetiza (opcional)
+                {t("noteLabel")}
               </label>
               <Input
                 id="offer-note"
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 maxLength={200}
-                placeholder="Suscripciones, ads, one-time…"
+                placeholder={t("notePlaceholder")}
               />
             </div>
-            <p className="text-[11px] text-muted-foreground">
-              Las métricas son declaradas bajo tu responsabilidad; Denveler no las verifica.
-            </p>
+            <p className="text-[11px] text-muted-foreground">{t("disclaimer")}</p>
             {error && <Alert variant="destructive">{error}</Alert>}
             <div className="flex gap-2">
               <Button type="submit" size="sm" disabled={busy}>
-                {busy ? "Guardando…" : "Guardar"}
+                {busy ? t("saving") : t("save")}
               </Button>
               <Button variant="ghost" size="sm" onClick={() => setEditing(false)}>
-                Cancelar
+                {tOfferCard("cancel")}
               </Button>
             </div>
           </form>

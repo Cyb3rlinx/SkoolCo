@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations, useLocale } from "next-intl";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import {
@@ -21,23 +22,35 @@ import { Alert } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState, ErrorState } from "@/components/ui/states";
 
-const STATUS_META: Record<ProductStatus, { label: string; variant: "success" | "warning" | "secondary" | "outline" }> = {
-  LIVE: { label: "Publicado", variant: "success" },
-  SCHEDULED: { label: "Programado", variant: "warning" },
-  DRAFT: { label: "Borrador", variant: "secondary" },
-  ARCHIVED: { label: "Archivado", variant: "outline" },
+const STATUS_VARIANT: Record<ProductStatus, "success" | "warning" | "secondary" | "outline"> = {
+  LIVE: "success",
+  SCHEDULED: "warning",
+  DRAFT: "secondary",
+  ARCHIVED: "outline",
 };
 
-const FILTERS: { value: string; label: string }[] = [
-  { value: "", label: "Todos" },
-  { value: "LIVE", label: "Publicados" },
-  { value: "SCHEDULED", label: "Programados" },
-  { value: "DRAFT", label: "Borradores" },
-  { value: "ARCHIVED", label: "Archivados" },
-];
+const STATUS_KEY: Record<ProductStatus, "published" | "scheduled" | "draft" | "archived"> = {
+  LIVE: "published",
+  SCHEDULED: "scheduled",
+  DRAFT: "draft",
+  ARCHIVED: "archived",
+};
 
 /** Pestaña Productos — lista completa + archivar (solo ADMIN). */
 export function ProductsSection() {
+  const t = useTranslations("admin.products");
+  const tc = useTranslations("admin.common");
+  const tStatus = useTranslations("product.status");
+  const locale = useLocale();
+
+  const FILTERS: { value: string; label: string }[] = [
+    { value: "", label: t("filterAll") },
+    { value: "LIVE", label: t("filterLive") },
+    { value: "SCHEDULED", label: t("filterScheduled") },
+    { value: "DRAFT", label: t("filterDraft") },
+    { value: "ARCHIVED", label: t("filterArchived") },
+  ];
+
   const [q, setQ] = useState("");
   const [status, setStatus] = useState("");
   const [page, setPage] = useState(1);
@@ -50,14 +63,14 @@ export function ProductsSection() {
   );
 
   async function onArchive(slug: string, name: string, id: string) {
-    if (!window.confirm(`¿Archivar "${name}"? Dejará de ser visible al público.`)) return;
+    if (!window.confirm(t("confirmArchive", { name }))) return;
     setActionError(null);
     setBusyId(id);
     try {
       await archiveProduct(slug);
       refetch();
     } catch (err) {
-      setActionError(err instanceof ApiClientError ? err.message : "No se pudo archivar.");
+      setActionError(err instanceof ApiClientError ? err.message : t("errorArchive"));
     } finally {
       setBusyId(null);
     }
@@ -70,7 +83,7 @@ export function ProductsSection() {
       await toggleMrrVerified(id);
       refetch();
     } catch (err) {
-      setActionError(err instanceof ApiClientError ? err.message : "No se pudo actualizar.");
+      setActionError(err instanceof ApiClientError ? err.message : t("errorUpdate"));
     } finally {
       setBusyId(null);
     }
@@ -85,8 +98,8 @@ export function ProductsSection() {
             setQ(e.target.value);
             setPage(1);
           }}
-          placeholder="Buscar por nombre, slug o tagline…"
-          aria-label="Buscar productos"
+          placeholder={t("searchPlaceholder")}
+          aria-label={t("searchLabel")}
           className="max-w-sm"
         />
         <div className="flex flex-wrap gap-1.5">
@@ -120,14 +133,13 @@ export function ProductsSection() {
       )}
       {!loading && error && <ErrorState message={error} onRetry={refetch} />}
       {!loading && !error && data && data.items.length === 0 && (
-        <EmptyState title="Sin resultados" description="Ningún producto coincide con el filtro." />
+        <EmptyState title={tc("noResultsTitle")} description={t("noResultsProducts")} />
       )}
 
       {!loading && !error && data && data.items.length > 0 && (
         <>
           <div className="space-y-2">
             {data.items.map((p) => {
-              const meta = STATUS_META[p.status];
               const busy = busyId === p.id;
               return (
                 <Card key={p.id}>
@@ -139,14 +151,17 @@ export function ProductsSection() {
                         {p.maker.name} · {p.maker.email}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        Lanzamiento: {formatDate(p.launchDate)} · {p._count.upvotes} votos ·{" "}
-                        {p._count.comments} comentarios
+                        {t("launchInfo", {
+                          date: formatDate(p.launchDate, locale),
+                          votes: p._count.upvotes,
+                          comments: p._count.comments,
+                        })}
                       </p>
                     </div>
-                    <Badge variant={meta.variant}>{meta.label}</Badge>
+                    <Badge variant={STATUS_VARIANT[p.status]}>{tStatus(STATUS_KEY[p.status])}</Badge>
                     {p.declaredMrrUsd !== null && (
                       <Badge variant={p.mrrVerifiedAt ? "success" : "outline"}>
-                        {p.mrrVerifiedAt ? "MRR verificado ✓" : "MRR sin verificar"}
+                        {p.mrrVerifiedAt ? t("mrrVerified") : t("mrrUnverified")}
                       </Badge>
                     )}
                     <div className="flex items-center gap-2">
@@ -154,7 +169,7 @@ export function ProductsSection() {
                         href={`/products/${p.slug}`}
                         className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
                       >
-                        Ver <ExternalLink className="h-3.5 w-3.5" aria-hidden />
+                        {t("view")} <ExternalLink className="h-3.5 w-3.5" aria-hidden />
                       </Link>
                       {p.declaredMrrUsd !== null && (
                         <Button
@@ -163,7 +178,7 @@ export function ProductsSection() {
                           disabled={busy}
                           onClick={() => onToggleMrr(p.id)}
                         >
-                          {p.mrrVerifiedAt ? "Quitar verificación" : "Verificar MRR"}
+                          {p.mrrVerifiedAt ? t("removeMrrVerification") : t("verifyMrr")}
                         </Button>
                       )}
                       {p.status !== "ARCHIVED" && (
@@ -173,7 +188,7 @@ export function ProductsSection() {
                           disabled={busy}
                           onClick={() => onArchive(p.slug, p.name, p.id)}
                         >
-                          Archivar
+                          {t("archive")}
                         </Button>
                       )}
                     </div>
@@ -186,10 +201,10 @@ export function ProductsSection() {
           {data.totalPages > 1 && (
             <div className="flex items-center justify-center gap-3">
               <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(page - 1)}>
-                Anterior
+                {tc("prev")}
               </Button>
               <span className="text-sm text-muted-foreground">
-                Página {data.page} de {data.totalPages}
+                {tc("pageOf", { page: data.page, totalPages: data.totalPages })}
               </span>
               <Button
                 variant="outline"
@@ -197,7 +212,7 @@ export function ProductsSection() {
                 disabled={page >= data.totalPages}
                 onClick={() => setPage(page + 1)}
               >
-                Siguiente
+                {tc("next")}
               </Button>
             </div>
           )}

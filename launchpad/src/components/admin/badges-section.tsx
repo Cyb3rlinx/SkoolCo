@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   ApiClientError,
   fetchAdminUsers,
@@ -18,16 +19,18 @@ import { Alert } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState, ErrorState } from "@/components/ui/states";
 
-/** Catálogo fijo — sin UI de administración de catálogo en esta iteración. */
-const BADGE_CATALOG: BadgeInfo[] = [
-  { slug: "fundador", name: "Fundador", description: "Uno de los primeros 10 makers en lanzar en Denveler", icon: "🏛️" },
-  { slug: "primer-lanzamiento", name: "Primer lanzamiento", description: "Publicó su primer producto en Denveler", icon: "🚀" },
-  { slug: "top-10-mes", name: "Top 10 del mes", description: "Producto entre los 10 más votados del mes", icon: "🏆" },
-  { slug: "vendido", name: "Vendido", description: "Concretó la venta de su producto a través de Denveler", icon: "🤝" },
-];
-
 /** Pestaña Insignias — buscar usuario, otorgar/revocar insignias del catálogo (solo ADMIN). */
 export function BadgesSection() {
+  const t = useTranslations("admin.badges");
+  const tc = useTranslations("admin.common");
+
+  const BADGE_CATALOG: BadgeInfo[] = [
+    { slug: "fundador", name: t("catalogFundadorName"), description: t("catalogFundadorDescription"), icon: "🏛️" },
+    { slug: "primer-lanzamiento", name: t("catalogFirstLaunchName"), description: t("catalogFirstLaunchDescription"), icon: "🚀" },
+    { slug: "top-10-mes", name: t("catalogTopMonthName"), description: t("catalogTopMonthDescription"), icon: "🏆" },
+    { slug: "vendido", name: t("catalogSoldName"), description: t("catalogSoldDescription"), icon: "🤝" },
+  ];
+
   const [q, setQ] = useState("");
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [selectedUserName, setSelectedUserName] = useState<string>("");
@@ -56,7 +59,7 @@ export function BadgesSection() {
       await fn();
       refetchBadges();
     } catch (err) {
-      setActionError(err instanceof ApiClientError ? err.message : "No se pudo completar la acción.");
+      setActionError(err instanceof ApiClientError ? err.message : tc("errorGenericAction"));
     } finally {
       setBusySlug(null);
     }
@@ -72,15 +75,15 @@ export function BadgesSection() {
           setQ(e.target.value);
           setSelectedUserId(null);
         }}
-        placeholder="Buscar usuario por nombre o email…"
-        aria-label="Buscar usuario"
+        placeholder={t("searchPlaceholder")}
+        aria-label={t("searchLabel")}
       />
 
       {q.trim().length > 0 && !selectedUserId && (
         <div className="space-y-2">
           {searchLoading && <Skeleton className="h-12 rounded-xl" />}
           {!searchLoading && searchResults && searchResults.items.length === 0 && (
-            <EmptyState title="Sin resultados" description="Ningún usuario coincide con la búsqueda." />
+            <EmptyState title={tc("noResultsTitle")} description={tc("noResultsUsers")} />
           )}
           {!searchLoading &&
             searchResults?.items.map((u) => (
@@ -104,9 +107,9 @@ export function BadgesSection() {
         <Card>
           <CardContent className="space-y-4 p-4">
             <div className="flex items-center justify-between">
-              <p className="font-semibold">Insignias de {selectedUserName}</p>
+              <p className="font-semibold">{t("badgesOf", { name: selectedUserName })}</p>
               <Button variant="outline" size="sm" onClick={() => setSelectedUserId(null)}>
-                Cambiar usuario
+                {t("changeUser")}
               </Button>
             </div>
 
@@ -132,7 +135,7 @@ export function BadgesSection() {
                           <p className="truncate text-sm font-semibold">{b.name}</p>
                           <p className="truncate text-xs text-muted-foreground">{b.description}</p>
                         </div>
-                        {held && <Badge variant="secondary">Otorgada</Badge>}
+                        {held && <Badge variant="secondary">{t("granted")}</Badge>}
                       </div>
                       <Button
                         variant={held ? "destructive" : "outline"}
@@ -146,7 +149,7 @@ export function BadgesSection() {
                           )
                         }
                       >
-                        {held ? "Revocar" : "Otorgar"}
+                        {held ? t("revoke") : t("grant")}
                       </Button>
                     </div>
                   );

@@ -22,6 +22,7 @@ interface ProductCardProps {
  */
 export function ProductCard({ product, rank, className }: ProductCardProps) {
   const t = useTranslations("common");
+  const tOfferCard = useTranslations("product.offerCard");
   return (
     <article
       className={cn(
@@ -69,11 +70,11 @@ export function ProductCard({ product, rank, className }: ProductCardProps) {
             {product._count.comments}
           </span>
           {product.soldAt ? (
-            <span className="rounded-full bg-muted px-2 py-0.5 font-semibold">Vendido</span>
+            <span className="rounded-full bg-muted px-2 py-0.5 font-semibold">{t("sold")}</span>
           ) : (
             product.openToOffers && (
               <span className="rounded-full bg-primary/10 px-2 py-0.5 font-semibold text-primary">
-                Abierto a ofertas
+                {tOfferCard("openToOffers")}
               </span>
             )
           )}

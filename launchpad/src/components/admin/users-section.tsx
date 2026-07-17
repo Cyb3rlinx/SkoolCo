@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations, useLocale } from "next-intl";
 import { useSession } from "next-auth/react";
 import {
   ApiClientError,
@@ -27,6 +28,9 @@ const ROLE_VARIANT: Record<AdminUserItem["role"], "outline" | "secondary" | "gra
 
 /** Pestaña Usuarios — lista + rol / suspensión / borrado (solo ADMIN). */
 export function UsersSection() {
+  const t = useTranslations("admin.users");
+  const tc = useTranslations("admin.common");
+  const locale = useLocale();
   const { data: session } = useSession();
   const [q, setQ] = useState("");
   const [page, setPage] = useState(1);
@@ -45,17 +49,14 @@ export function UsersSection() {
       await fn();
       refetch();
     } catch (err) {
-      setActionError(err instanceof ApiClientError ? err.message : "No se pudo completar la acción.");
+      setActionError(err instanceof ApiClientError ? err.message : tc("errorGenericAction"));
     } finally {
       setBusyId(null);
     }
   }
 
   function onDelete(user: AdminUserItem) {
-    const typed = window.prompt(
-      `Esto borra la cuenta y TODO su contenido (productos, votos, comentarios). ` +
-        `Escribe el nombre exacto del usuario para confirmar: ${user.name}`
-    );
+    const typed = window.prompt(t("deleteConfirmPrompt", { name: user.name }));
     if (typed !== user.name) return;
     act(user.id, () => deleteAdminUser(user.id));
   }
@@ -68,8 +69,8 @@ export function UsersSection() {
           setQ(e.target.value);
           setPage(1);
         }}
-        placeholder="Buscar por nombre o email…"
-        aria-label="Buscar usuarios"
+        placeholder={t("searchPlaceholder")}
+        aria-label={t("searchLabel")}
       />
       {actionError && <Alert variant="destructive">{actionError}</Alert>}
 
@@ -82,7 +83,7 @@ export function UsersSection() {
       )}
       {!loading && error && <ErrorState message={error} onRetry={refetch} />}
       {!loading && !error && data && data.items.length === 0 && (
-        <EmptyState title="Sin resultados" description="Ningún usuario coincide con la búsqueda." />
+        <EmptyState title={tc("noResultsTitle")} description={tc("noResultsUsers")} />
       )}
 
       {!loading && !error && data && data.items.length > 0 && (
@@ -97,16 +98,16 @@ export function UsersSection() {
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-semibold">
                         {u.name}{" "}
-                        {isSelf && <span className="text-xs text-muted-foreground">(tú)</span>}
+                        {isSelf && <span className="text-xs text-muted-foreground">{t("you")}</span>}
                       </p>
                       <p className="truncate text-sm text-muted-foreground">{u.email}</p>
                       <p className="text-xs text-muted-foreground">
-                        Registro: {formatDate(u.createdAt)} · {u._count?.products ?? 0} productos
+                        {t("registered", { date: formatDate(u.createdAt, locale), count: u._count?.products ?? 0 })}
                       </p>
                     </div>
                     <Badge variant={ROLE_VARIANT[u.role]}>{u.role}</Badge>
-                    {u.suspendedAt && <Badge variant="destructive">Suspendido</Badge>}
-                    {u.verifiedAt && <Badge variant="secondary">Verificado</Badge>}
+                    {u.suspendedAt && <Badge variant="destructive">{t("suspended")}</Badge>}
+                    {u.verifiedAt && <Badge variant="secondary">{t("verified")}</Badge>}
                     {!isSelf && (
                       <div className="flex flex-wrap items-center gap-2">
                         <Button
@@ -117,13 +118,13 @@ export function UsersSection() {
                             act(u.id, () => updateAdminUser(u.id, { verified: !u.verifiedAt }))
                           }
                         >
-                          {u.verifiedAt ? "Quitar verificación" : "Verificar"}
+                          {u.verifiedAt ? t("removeVerification") : t("verify")}
                         </Button>
                         <select
                           className="h-9 rounded-lg border bg-background px-2 text-sm"
                           value={u.role}
                           disabled={busy}
-                          aria-label={`Rol de ${u.name}`}
+                          aria-label={t("roleLabel", { name: u.name })}
                           onChange={(e) =>
                             act(u.id, () =>
                               updateAdminUser(u.id, {
@@ -146,7 +147,7 @@ export function UsersSection() {
                             )
                           }
                         >
-                          {u.suspendedAt ? "Reactivar" : "Suspender"}
+                          {u.suspendedAt ? t("reactivate") : t("suspend")}
                         </Button>
                         <Button
                           variant="destructive"
@@ -154,7 +155,7 @@ export function UsersSection() {
                           disabled={busy}
                           onClick={() => onDelete(u)}
                         >
-                          Borrar
+                          {t("delete")}
                         </Button>
                       </div>
                     )}
@@ -167,10 +168,10 @@ export function UsersSection() {
           {data.totalPages > 1 && (
             <div className="flex items-center justify-center gap-3">
               <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(page - 1)}>
-                Anterior
+                {tc("prev")}
               </Button>
               <span className="text-sm text-muted-foreground">
-                Página {data.page} de {data.totalPages}
+                {tc("pageOf", { page: data.page, totalPages: data.totalPages })}
               </span>
               <Button
                 variant="outline"
@@ -178,7 +179,7 @@ export function UsersSection() {
                 disabled={page >= data.totalPages}
                 onClick={() => setPage(page + 1)}
               >
-                Siguiente
+                {tc("next")}
               </Button>
             </div>
           )}

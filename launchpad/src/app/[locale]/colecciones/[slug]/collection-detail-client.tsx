@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { ArrowLeft } from "lucide-react";
 import { fetchCollection } from "@/lib/frontend/api-client";
@@ -10,6 +11,7 @@ import { EmptyState, ErrorState } from "@/components/ui/states";
 import { ProductCard, ProductCardSkeleton } from "@/components/product/product-card";
 
 export function CollectionDetailClient({ slug }: { slug: string }) {
+  const t = useTranslations("collections");
   const { data, loading, error, errorStatus, refetch } = useApi(() => fetchCollection(slug), {
     deps: [slug],
   });
@@ -35,12 +37,12 @@ export function CollectionDetailClient({ slug }: { slug: string }) {
         <div className="container-page py-16">
           <EmptyState
             icon="search"
-            title="Colección no encontrada"
-            description="Puede que el enlace esté roto o que ya no exista."
+            title={t("notFoundTitle")}
+            description={t("notFoundDescription")}
             action={
               <Link href="/colecciones" className={buttonVariants({ variant: "outline" })}>
                 <ArrowLeft className="h-4 w-4" aria-hidden />
-                Volver a colecciones
+                {t("backToCollections")}
               </Link>
             }
           />
@@ -49,7 +51,7 @@ export function CollectionDetailClient({ slug }: { slug: string }) {
     }
     return (
       <div className="container-page py-16">
-        <ErrorState message={error ?? "No pudimos cargar la colección."} onRetry={refetch} />
+        <ErrorState message={error ?? t("loadError")} onRetry={refetch} />
       </div>
     );
   }
@@ -61,7 +63,7 @@ export function CollectionDetailClient({ slug }: { slug: string }) {
         className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4" aria-hidden />
-        Colecciones
+        {t("metaTitle")}
       </Link>
 
       <div className="space-y-2">
@@ -70,7 +72,7 @@ export function CollectionDetailClient({ slug }: { slug: string }) {
       </div>
 
       {data.products.length === 0 ? (
-        <EmptyState title="Sin productos todavía" description="Esta colección está vacía por ahora." />
+        <EmptyState title={t("emptyTitle")} description={t("emptyDescription")} />
       ) : (
         <div className="space-y-3">
           {data.products.map((p) => (

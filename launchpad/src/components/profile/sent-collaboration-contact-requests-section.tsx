@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Send } from "lucide-react";
 import { fetchSentCollaborationContactRequests } from "@/lib/frontend/api-client";
 import { useApi } from "@/lib/frontend/hooks";
@@ -14,6 +14,8 @@ import { Link } from "@/i18n/navigation";
 /** Solicitudes de contacto que YO envié sobre colaboraciones ajenas. */
 export function SentCollaborationContactRequestsSection() {
   const t = useTranslations("collaborations");
+  const tContact = useTranslations("contactRequests");
+  const locale = useLocale();
   const requests = useApi(fetchSentCollaborationContactRequests, {});
 
   const STATUS_CHIP = {
@@ -43,7 +45,7 @@ export function SentCollaborationContactRequestsSection() {
             <Card key={r.id}>
               <CardContent className="space-y-2 p-5">
                 <div className="flex flex-wrap items-center gap-2 text-sm">
-                  <span className="text-muted-foreground">Solicitud a</span>
+                  <span className="text-muted-foreground">{tContact("requestTo")}</span>
                   <Link
                     href={`/colaboraciones/${r.collaboration.id}`}
                     className="font-bold text-primary hover:underline"
@@ -51,7 +53,7 @@ export function SentCollaborationContactRequestsSection() {
                     {r.collaboration.title}
                   </Link>
                   <Badge variant={chip.variant}>{chip.text}</Badge>
-                  <span className="ml-auto text-xs text-muted-foreground">{formatDate(r.createdAt)}</span>
+                  <span className="ml-auto text-xs text-muted-foreground">{formatDate(r.createdAt, locale)}</span>
                 </div>
                 <p className="rounded-xl bg-muted p-3 text-sm">{r.message}</p>
               </CardContent>
