@@ -267,6 +267,18 @@ export interface AdminUserItem {
   _count?: { products: number };
 }
 
+export interface BadgeInfo {
+  slug: string;
+  name: string;
+  description: string;
+  icon: string;
+}
+
+export interface UserBadgeItem extends BadgeInfo {
+  grantedByAdmin: boolean;
+  createdAt: string;
+}
+
 export interface AdminProductItem {
   id: string;
   name: string;

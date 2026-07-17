@@ -191,6 +191,11 @@ export const adminUpdateUserSchema = z
     message: "Debes enviar al menos un cambio (role o suspended).",
   });
 
+/** POST /api/admin/users/:id/badges — otorga una insignia del catálogo. */
+export const grantBadgeSchema = z.object({
+  badgeSlug: z.string().min(1).max(60),
+});
+
 /** POST /api/contact — formulario público de contacto. */
 export const contactMessageSchema = z.object({
   name: z.string().trim().min(2).max(80),
