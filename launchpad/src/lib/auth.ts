@@ -71,12 +71,20 @@ export const authOptions: NextAuthOptions = {
       // Refresca el rol desde la base en cada verificación de sesión: así una
       // promoción a ADMIN/MODERATOR (o una degradación) aplica a las sesiones
       // vivas sin necesidad de cerrar sesión y volver a entrar.
+      // Si la consulta falla (p. ej. pool de conexiones saturado en un pico),
+      // NO invalidamos la sesión: un token firmado y vigente sigue valiendo
+      // con su rol anterior. Sin este catch, next-auth trata cualquier error
+      // del callback como "sin sesión" y toda la página se llena de 401.
       if (token.id) {
-        const dbUser = await prisma.user.findUnique({
-          where: { id: token.id as string },
-          select: { role: true },
-        });
-        if (dbUser) token.role = dbUser.role;
+        try {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: token.id as string },
+            select: { role: true },
+          });
+          if (dbUser) token.role = dbUser.role;
+        } catch (err) {
+          console.error("[auth] no se pudo refrescar el rol, uso el del token:", err);
+        }
       }
       return token;
     },
