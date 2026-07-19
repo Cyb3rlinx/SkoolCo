@@ -1,4 +1,5 @@
 {
+  "regions": ["sin1"],
   "crons": [
     { "path": "/api/cron/offer-nudge", "schedule": "0 14 * * *" },
     { "path": "/api/cron/top-month-badges", "schedule": "0 6 1 * *" },
